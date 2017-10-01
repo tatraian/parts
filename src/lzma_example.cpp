@@ -14,7 +14,7 @@ int main(){
     char obuffer[1 * 1024 * 1024];
 
     lzma_stream lzma_context = LZMA_STREAM_INIT;
-    lzma_ret ret = lzma_easy_encoder(&lzma_context, 6, LZMA_CHECK_CRC64);
+    lzma_ret ret = lzma_easy_encoder(&lzma_context, 9, LZMA_CHECK_CRC64);
     if (ret != LZMA_OK)
     {
         std::cerr << "no way to continue...\n";
@@ -49,6 +49,7 @@ int main(){
             size_t bytes_to_write = 1024*1024 - lzma_context.avail_out;
             std::cerr << "writing to file: " << bytes_to_write << std::endl;
             output_file.write(obuffer, bytes_to_write);
+            lzma_context.next_out = reinterpret_cast<uint8_t*>(obuffer);
             lzma_context.avail_out = 1024*1024;
         }
 
