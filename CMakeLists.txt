@@ -12,18 +12,20 @@ option(BUILD_TESTS "Build tests too" ON)
 
 project(Parts)
 
-if (BUILD_TESTS)
-    hunter_add_package(Boost COMPONENTS system filesystem test)
-    find_package(Boost CONFIG REQUIRED system filesystem test_exec_monitor)
-    hunter_add_package(FakeIt)
-    find_package(FakeIt)
-else()
-    hunter_add_package(Boost COMPONENTS system filesystem)
-    find_package(Boost CONFIG REQUIRED system filesystem)
-endif()
-
+hunter_add_package(Boost COMPONENTS system filesystem)
+find_package(Boost CONFIG REQUIRED system filesystem)
 hunter_add_package(lzma)
 find_package(lzma)
 
+if (BUILD_TESTS)
+    hunter_add_package(Boost COMPONENTS test)
+    find_package(Boost CONFIG REQUIRED test_exec_monitor)
+    hunter_add_package(FakeIt)
+    find_package(FakeIt)
+endif()
+
+
 
 add_subdirectory(lib)
+add_subdirectory(src)
+
