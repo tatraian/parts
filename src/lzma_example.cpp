@@ -5,10 +5,24 @@
 
 using namespace std;
 
-int main(){
+int main(int argc, char** argv){
     int main_return = 0;
-    ifstream input_file("/usr/lib/libkhtml.so.5.14.30", ios::in | ios::binary);
-    ofstream output_file("/tmp/output.xz", ios::out | ios::binary);
+    if (argc < 3) {
+        std::cerr << "Usage: lzma_example input_file output_file\n";
+        return 3;
+    }
+    ifstream input_file(argv[1], ios::in | ios::binary);
+    ofstream output_file(argv[2], ios::out | ios::binary);
+
+    if (!input_file) {
+        std::cerr << "Cannot open file: " << argv[1] << std::endl;
+        return 3;
+    }
+
+    if (!output_file) {
+        std::cerr << "Cannot open file: " << argv[2] << std::endl;
+        return 3;
+    }
 
     char ibuffer[1 * 1024 * 1024];
     char obuffer[1 * 1024 * 1024];
