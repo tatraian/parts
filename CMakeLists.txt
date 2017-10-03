@@ -26,6 +26,7 @@ endif()
 
 
 
+add_subdirectory(thirdparty)
 add_subdirectory(lib)
 add_subdirectory(src)
 
