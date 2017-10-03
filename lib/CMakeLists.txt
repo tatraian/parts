@@ -1,4 +1,4 @@
-set(parts_SRCS partscreator.cpp parts.cpp filewritebackend.cpp contentwritebackend.h hash.h hash.cpp)
+set(parts_SRCS partscreator.cpp parts.cpp filewritebackend.cpp contentwritebackend.h hash.h hash.cpp compressor.h)
 
 add_library(parts ${parts_SRCS})
 target_link_libraries(parts Boost::system Boost::filesystem PicoSHA256)
