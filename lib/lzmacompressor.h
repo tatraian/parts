@@ -17,7 +17,7 @@ class LzmaCompressor : public Compressor
 {
 public:
     LzmaCompressor(const LzmaCompressorParameters& parameters);
-    ~LzmaCompressorParameters() override;
+    ~LzmaCompressor() override;
 
     size_t compressFile(const boost::filesystem::path& path, ContentWriteBackend& backend) override;
 
