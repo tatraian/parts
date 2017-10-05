@@ -1,0 +1,6 @@
+#ifndef INTERNAL_DEFINITIONS_H
+#define INTERNAL_DEFINITIONS_H
+
+const size_t MB = 1024*1024;
+
+#endif // INTERNAL_DEFINITIONS_H

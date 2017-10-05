@@ -5,6 +5,8 @@ set(parts_SRCS
     contentwritebackend.h
     hash.cpp
     compressor.h
+    plaincompressor.cpp
+    lzmacompressor.cpp
     tableofcontents.cpp)
 
 add_library(parts ${parts_SRCS})
