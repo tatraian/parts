@@ -3,14 +3,24 @@
 
 #include "compressor.h"
 
+#include "lzma.h"
+
 namespace parts
 {
 
 struct LzmaCompressorParameters
 {
-    size_t m_threads;
+    LzmaCompressorParameters(uint32_t compression_level = LZMA_PRESET_DEFAULT,
+                             bool x86Filter = true,
+                             uint32_t threads = 1) :
+        m_compressionLevel(compression_level),
+        m_x86FilterActive(x86Filter),
+        m_threads(threads)
+    {}
+
+    uint32_t m_compressionLevel;
     bool m_x86FilterActive;
-    size_t m_compressionLevel;
+    uint32_t m_threads;
 };
 
 class LzmaCompressor : public Compressor
@@ -22,6 +32,9 @@ public:
     size_t compressFile(const boost::filesystem::path& path, ContentWriteBackend& backend) override;
 
     size_t compressBuffer(const std::vector<uint8_t>& buffer, ContentWriteBackend& backend) override;
+
+protected:
+    void setupXZLib(lzma_stream& context);
 
 protected:
     LzmaCompressorParameters m_parameters;
