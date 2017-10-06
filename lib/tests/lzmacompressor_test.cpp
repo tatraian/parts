@@ -13,6 +13,7 @@ using namespace fakeit;
 namespace
 {
 
+//==========================================================================================================================================
 void check_data(const std::vector<uint8_t>& input,
                 const std::vector<uint8_t>& compressed)
 {
