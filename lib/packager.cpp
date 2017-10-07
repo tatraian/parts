@@ -42,7 +42,7 @@ void Packager::append(std::vector<uint8_t>& output, uint64_t value)
 }
 
 //==========================================================================================================================================
-void Packager::append(std::vector<uint8_t>& output, boost::filesystem::path& value)
+void Packager::append(std::vector<uint8_t>& output, const boost::filesystem::path& value)
 {
     append<uint16_t>(output, value.string());
 }

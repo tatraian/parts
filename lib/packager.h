@@ -18,7 +18,7 @@ public:
     static void append(std::vector<uint8_t>& output, uint16_t value);
     static void append(std::vector<uint8_t>& output, uint32_t value);
     static void append(std::vector<uint8_t>& output, uint64_t value);
-    static void append(std::vector<uint8_t>& output, boost::filesystem::path& value);
+    static void append(std::vector<uint8_t>& output, const boost::filesystem::path& value);
     template<class SizeType>
     static void append(std::vector<uint8_t>& output, const std::string& value){
         SizeType size = static_cast<SizeType>(value.size());

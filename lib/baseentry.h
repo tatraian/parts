@@ -1,6 +1,9 @@
 #ifndef BASEENTRY_H
 #define BASEENTRY_H
 
+#include "compressor.h"
+#include "contentwritebackend.h"
+
 #include <string>
 
 #include <boost/filesystem/path.hpp>
@@ -26,6 +29,10 @@ public:
     {}
 
     virtual ~BaseEntry() {}
+
+    virtual std::vector<uint8_t> getRaw() const;
+
+    virtual void compressEntry(Compressor& compressor, ContentWriteBackend& backend) = 0;
 
     const boost::filesystem::path& file() const
     { return m_file; }
