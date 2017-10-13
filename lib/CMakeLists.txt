@@ -22,7 +22,8 @@ if(BUILD_TESTS)
         tests/plaincompressor_test.cpp
         tests/lzmacompressor_test.cpp
         tests/baseentry_test.cpp
-        tests/packager_test.cpp)
+        tests/packager_test.cpp
+        tests/stackvector_test.cpp)
     target_link_libraries(parts_lib_tests parts FakeIt::FakeIt Boost::test_exec_monitor c++)
     add_test(parts_lib_tester parts_lib_tests)
 endif()
