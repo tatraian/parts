@@ -3,6 +3,7 @@
 
 #include "compressor.h"
 #include "contentwritebackend.h"
+#include "stackvector.h"
 
 #include <string>
 
@@ -30,7 +31,7 @@ public:
 
     virtual ~BaseEntry() {}
 
-    virtual std::vector<uint8_t> getRaw() const;
+    virtual void append(StackVector<uint8_t>& buffer) const;
 
     virtual void compressEntry(Compressor& compressor, ContentWriteBackend& backend) = 0;
 

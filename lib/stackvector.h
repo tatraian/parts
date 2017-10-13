@@ -147,7 +147,7 @@ public:
 protected:
     void checkEnd(size_t size)
     {
-        if (m_endOffset + size >= m_capacity)
+        if (m_endOffset + size > m_capacity)
             throw std::runtime_error("Inserted element is too large (at end)");
     }
 

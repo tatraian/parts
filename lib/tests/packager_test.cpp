@@ -8,7 +8,8 @@ using namespace parts;
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_pack_byte) {
-    std::vector<uint8_t> result;
+    uint8_t buffer[] = {0};
+    StackVector<uint8_t> result(buffer, 1, 0, 0);
     uint8_t byte = 4;
 
     Packager::append(result, byte);
@@ -20,7 +21,8 @@ BOOST_AUTO_TEST_CASE(can_pack_byte) {
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_pack_short) {
-    std::vector<uint8_t> result;
+    uint8_t buffer[] = {0,0};
+    StackVector<uint8_t> result(buffer, 2, 0, 0);
     uint16_t data = 0x0201;
 
     Packager::append(result, data);
@@ -30,9 +32,11 @@ BOOST_AUTO_TEST_CASE(can_pack_short) {
     BOOST_REQUIRE_EQUAL(result[1], 0x01);
 }
 
+
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_pack_int) {
-    std::vector<uint8_t> result;
+    uint8_t buffer[4];
+    StackVector<uint8_t> result(buffer, 4, 0, 0);
     uint32_t data = 0x04030201;
 
     Packager::append(result, data);
@@ -45,6 +49,7 @@ BOOST_AUTO_TEST_CASE(can_pack_int) {
     BOOST_REQUIRE_EQUAL(result[3], 0x01);
 }
 
+/*
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_pack_long) {
     std::vector<uint8_t> result;
@@ -136,4 +141,4 @@ BOOST_AUTO_TEST_CASE(can_pack_path_with_two_length_names) {
     BOOST_REQUIRE_EQUAL(result[7], 's');
     BOOST_REQUIRE_EQUAL(result[15], 'b');
 }
-
+*/
