@@ -3,9 +3,9 @@
 
 #include "compressor.h"
 #include "contentwritebackend.h"
-#include "stackvector.h"
 
 #include <string>
+#include <deque>
 
 #include <boost/filesystem/path.hpp>
 
@@ -31,7 +31,7 @@ public:
 
     virtual ~BaseEntry() {}
 
-    virtual void append(StackVector<uint8_t>& buffer) const;
+    virtual void append(std::deque<uint8_t>& buffer) const;
 
     virtual void compressEntry(Compressor& compressor, ContentWriteBackend& backend) = 0;
 

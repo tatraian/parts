@@ -6,19 +6,10 @@ using namespace parts;
 
 
 //==========================================================================================================================================
-void BaseEntry::append(StackVector<uint8_t>& buffer) const
+void BaseEntry::append(std::deque<uint8_t>& buffer) const
 {
-    // Entry Name: 32 bytes, + size 2 bytes + owner 1 byte + group 1 byte + permissios 2 bytes
-    const size_t DEFAULT_SIZE = 38;
-    std::vector<uint8_t> result;
-    result.reserve(DEFAULT_SIZE);
-/*
-    Packager::append(result, m_file);
-    Packager::append(result, m_permissions);
-    Packager::append(result, m_ownerId);
-    Packager::append(result, m_groupId);
-
-    return result;
-    */
+    Packager::append(buffer, m_file);
+    Packager::append(buffer, m_permissions);
+    Packager::append(buffer, m_ownerId);
+    Packager::append(buffer, m_groupId);
 }
-

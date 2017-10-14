@@ -21,12 +21,14 @@ public:
 };
 }
 
-/*
+
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_pack_base_data) {
     TestBaseEntry entry("file1", 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1);
 
-    std::vector<uint8_t> result = entry.getRaw();
+    std::deque<uint8_t> result(100);
+    result.clear();
+    entry.append(result);
 
     BOOST_REQUIRE_EQUAL(result.size(), 13u);
     BOOST_REQUIRE_EQUAL(result[0], 0u);
@@ -44,4 +46,3 @@ BOOST_AUTO_TEST_CASE(can_pack_base_data) {
     BOOST_REQUIRE_EQUAL(result[11], 0u);
     BOOST_REQUIRE_EQUAL(result[12], 1u);
 }
-*/
