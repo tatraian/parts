@@ -9,6 +9,7 @@ set(parts_SRCS
     lzmacompressor.cpp
     tableofcontents.cpp
     baseentry.cpp
+    directoryentry.cpp
     linkentry.cpp
     packager.cpp)
 
@@ -23,6 +24,7 @@ if(BUILD_TESTS)
         tests/plaincompressor_test.cpp
         tests/lzmacompressor_test.cpp
         tests/baseentry_test.cpp
+        tests/directoryentry_test.cpp
         tests/linkentry_test.cpp
         tests/packager_test.cpp
         tests/stackvector_test.cpp)
