@@ -19,7 +19,7 @@ public:
     HashType type() const
     { return m_type; }
 
-    const std::vector<uint8_t> hash() const
+    const std::vector<uint8_t>& hash() const
     { return m_hash; }
 
     std::string hashString() const;
