@@ -68,6 +68,21 @@ BOOST_AUTO_TEST_CASE(can_pack_long) {
     BOOST_REQUIRE_EQUAL(result[7], 0x01);
 }
 
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(can_pack_vector) {
+    std::deque<uint8_t> result;
+    std::vector<uint8_t> data = {0, 1, 2, 3, 4};
+
+    Packager::append(result, data);
+
+    BOOST_REQUIRE_EQUAL(result.size(), 5);
+    BOOST_REQUIRE_EQUAL(result[0], 0);
+    BOOST_REQUIRE_EQUAL(result[1], 1);
+    BOOST_REQUIRE_EQUAL(result[2], 2);
+    BOOST_REQUIRE_EQUAL(result[3], 3);
+    BOOST_REQUIRE_EQUAL(result[4], 4);
+}
+
 namespace
 {
 void check_text(const std::deque<uint8_t>& result, size_t offset) {

@@ -42,6 +42,12 @@ void Packager::append(std::deque<uint8_t> &output, uint64_t value)
 }
 
 //==========================================================================================================================================
+void Packager::append(std::deque<uint8_t>& output, const std::vector<uint8_t>& value)
+{
+    output.insert(output.end(), value.begin(), value.end());
+}
+
+//==========================================================================================================================================
 void Packager::append(std::deque<uint8_t> &output, const boost::filesystem::path& value)
 {
     append<uint16_t>(output, value.string());

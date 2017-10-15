@@ -18,6 +18,7 @@ public:
     static void append(std::deque<uint8_t>& output, uint16_t value);
     static void append(std::deque<uint8_t>& output, uint32_t value);
     static void append(std::deque<uint8_t>& output, uint64_t value);
+    static void append(std::deque<uint8_t>& output, const std::vector<uint8_t>& value);
     static void append(std::deque<uint8_t>& output, const boost::filesystem::path& value);
     template<class SizeType>
     static void append(std::deque<uint8_t>& output, const std::string& value){
