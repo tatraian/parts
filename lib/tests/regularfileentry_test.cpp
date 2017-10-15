@@ -86,5 +86,3 @@ BOOST_AUTO_TEST_CASE(compress_fills_missing_entries_and_after_it_is_packed_corre
     BOOST_REQUIRE_EQUAL(result[68], 0);
     BOOST_REQUIRE_EQUAL(result[69], 100);
 }
-
-
