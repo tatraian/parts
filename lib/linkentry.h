@@ -32,6 +32,7 @@ public:
 
 protected:
     boost::filesystem::path m_destination;
+    /// TODO: should remove this...
     bool m_absolute;
 };
 

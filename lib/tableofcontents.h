@@ -24,9 +24,12 @@ public:
     std::vector<uint8_t> getRaw() const;
 
 protected:
-    uint16_t getOwnerId(const stat* file_stat);
-    uint16_t getGroupId(const stat* file_stat);
-    uint16_t getPermissions(const stat* file_stat);
+    void add(const boost::filesystem::path& root, const boost::filesystem::path& file);
+    uint16_t getOwnerId(const struct stat* file_stat);
+    uint16_t getGroupId(const struct stat* file_stat);
+    uint16_t getPermissions(const struct stat* file_stat);
+
+    uint16_t findOrInsert(const std::string& name, std::vector<std::string>& table);
 
 protected:
     std::map<boost::filesystem::path, std::shared_ptr<BaseEntry> > m_files;
