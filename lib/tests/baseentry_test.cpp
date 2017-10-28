@@ -17,7 +17,7 @@ public:
                   uint16_t group_id) :
         BaseEntry(file, permissions, owner, owner_id, group, group_id) {}
 
-    void compressEntry(Compressor& compressor, ContentWriteBackend& backend) override {};
+    void compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend) override {};
 };
 }
 

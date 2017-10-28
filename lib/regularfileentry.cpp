@@ -35,8 +35,8 @@ void RegularFileEntry::append(std::deque<uint8_t>& buffer) const
 }
 
 //==========================================================================================================================================
-void RegularFileEntry::compressEntry(Compressor& compressor, ContentWriteBackend& backend)
+void RegularFileEntry::compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend)
 {
     m_offset = backend.getPosition();
-    m_compressedSize = compressor.compressFile(m_file, backend);
+    m_compressedSize = compressor.compressFile(root / m_file, backend);
 }

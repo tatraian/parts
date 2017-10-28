@@ -44,5 +44,5 @@ BOOST_AUTO_TEST_CASE(directory_compress_doesn_t_modify_the_output) {
     // Since mock are not initialized a calling of its function will produce error
     DirectoryEntry entry("file1", 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1);
 
-    entry.compressEntry(compressor_mock.get(), writer_mock.get());
+    entry.compressEntry(boost::filesystem::path("nowhere"), compressor_mock.get(), writer_mock.get());
 }

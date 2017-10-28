@@ -23,7 +23,7 @@ void DirectoryEntry::append(std::deque<uint8_t>& buffer) const
 }
 
 //==========================================================================================================================================
-void DirectoryEntry::compressEntry(Compressor& compressor, ContentWriteBackend& backend)
+void DirectoryEntry::compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend)
 {
     // Do nothing
 }

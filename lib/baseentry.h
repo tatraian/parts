@@ -33,7 +33,7 @@ public:
 
     virtual void append(std::deque<uint8_t>& buffer) const;
 
-    virtual void compressEntry(Compressor& compressor, ContentWriteBackend& backend) = 0;
+    virtual void compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend) = 0;
 
     const boost::filesystem::path& file() const
     { return m_file; }

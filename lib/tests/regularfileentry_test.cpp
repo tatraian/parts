@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(compress_fills_missing_entries_and_after_it_is_packed_corre
 
     When(Method(backend_mock, getPosition)).Return(100);
 
-    entry.compressEntry(compressor_mock.get(), backend_mock.get());
+    entry.compressEntry(boost::filesystem::path("nowhere"), compressor_mock.get(), backend_mock.get());
 
     Verify(Method(compressor_mock, compressFile)).Once();
     Verify(Method(backend_mock, getPosition)).Once();

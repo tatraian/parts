@@ -23,7 +23,7 @@ public:
 
     void append(std::deque<uint8_t>& buffer) const override;
 
-    void compressEntry(Compressor& compressor, ContentWriteBackend& backend) override;
+    void compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend) override;
 
     const Hash& uncompressedHash() const
     { return m_uncompressedHash; }
