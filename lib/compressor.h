@@ -3,6 +3,7 @@
 
 #include "contentwritebackend.h"
 
+#include <deque>
 #include <boost/filesystem/path.hpp>
 
 
@@ -23,7 +24,7 @@ public:
                                 ContentWriteBackend& backend) = 0;
 
     virtual size_t compressBuffer(const std::vector<uint8_t>& buffer,
-                                  ContentWriteBackend& backend) = 0;
+                                  std::vector<uint8_t>& backend) = 0;
 };
 
 }

@@ -39,19 +39,16 @@ void check_data(const std::vector<uint8_t>& input,
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(lzma_can_compress_buffer) {
-    std::vector<uint8_t> input(MB, 0);
-    for(size_t tmp = 0; tmp != input.size(); ++tmp)
-        input[tmp] = tmp;
+    std::vector<uint8_t> input;
+    for(size_t tmp = 0; tmp != MB; ++tmp)
+        input.push_back(tmp);
 
     LzmaCompressorParameters parameters;
     LzmaCompressor compressor(parameters);
 
     std::vector<uint8_t> compressed;
 
-    Mock<ContentWriteBackend> mock;
-    When(OverloadedMethod(mock, append, void(const std::vector<uint8_t>&))).AlwaysDo([&](const std::vector<uint8_t>& a){compressed = a;});
-
-    compressor.compressBuffer(input, mock.get());
+    compressor.compressBuffer(input, compressed);
 
     check_data(input, compressed);
 }
@@ -79,5 +76,9 @@ BOOST_AUTO_TEST_CASE(lzma_can_compress_file) {
 
     compressor.compressFile(path, mock.get());
 
-    check_data(input, compressed);
+    std::vector<uint8_t> converted_input(MB);
+    converted_input.clear();
+    converted_input.insert(converted_input.end(), input.begin(), input.end());
+
+    check_data(converted_input, compressed);
 }

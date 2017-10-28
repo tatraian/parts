@@ -2,6 +2,7 @@
 #include "directoryentry.h"
 #include "regularfileentry.h"
 #include "linkentry.h"
+#include "packager.h"
 
 #include <boost/filesystem.hpp>
 
@@ -38,6 +39,22 @@ TableOfContents::TableOfContents(const boost::filesystem::path& root, const Part
         if (boost::filesystem::is_symlink(dir->path()))
             dir.no_push();
     }
+}
+
+//==========================================================================================================================================
+std::vector<uint8_t> TableOfContents::getRaw() const
+{
+    std::vector<uint8_t> result;
+    result.reserve(1024*1024);
+
+    packNames(result, m_owners);
+    packNames(result, m_groups);
+
+    for(const auto& entry : m_files){
+        entry.second->append(result);
+    }
+
+    return result;
 }
 
 //==========================================================================================================================================
@@ -152,6 +169,15 @@ bool TableOfContents::fileInsideRoot(const boost::filesystem::path& root, const 
     auto real_file = boost::filesystem::canonical(file);
 
     return real_file.string().find(real_root.string()) == 0;
+}
+
+//==========================================================================================================================================
+void TableOfContents::packNames(std::vector<uint8_t>& buffer, const std::vector<std::string>& names) const
+{
+    Packager::append(buffer, static_cast<uint16_t>(names.size()));
+    for(const std::string& name : names) {
+        Packager::append<uint16_t>(buffer, name);
+    }
 }
 
 //==========================================================================================================================================

@@ -12,14 +12,12 @@ BOOST_AUTO_TEST_CASE(can_compress_buffer) {
     PlainCompressor compressor;
     std::vector<uint8_t> data = {1,2,3,4};
 
-    Mock<ContentWriteBackend> mock;
-    When(OverloadedMethod(mock, append, void(const std::vector<uint8_t>&))).AlwaysReturn();
+    std::vector<uint8_t> result;
 
-    ContentWriteBackend& backend = mock.get();
+    compressor.compressBuffer(data, result);
 
-    compressor.compressBuffer(data, backend);
-
-    Verify(OverloadedMethod(mock, append, void(const std::vector<uint8_t>&)).Using(data)).Once();
+    BOOST_REQUIRE_EQUAL(data.size(), result.size());
+    BOOST_CHECK_EQUAL_COLLECTIONS(data.begin(), data.end(), result.begin(), result.end());
 }
 
 //==========================================================================================================================================

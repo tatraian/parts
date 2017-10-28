@@ -55,6 +55,8 @@ protected:
 
     static bool fileInsideRoot(const boost::filesystem::path& root, const boost::filesystem::path& file);
 
+    void packNames(std::vector<uint8_t>& buffer, const std::vector<std::string>& names) const;
+
     // This constructor is just for unit testing...
     TableOfContents(const PartsCompressionParameters& params);
 

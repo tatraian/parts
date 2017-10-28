@@ -30,9 +30,9 @@ size_t PlainCompressor::compressFile(const boost::filesystem::path& path, Conten
 }
 
 //==========================================================================================================================================
-size_t PlainCompressor::compressBuffer(const std::vector<uint8_t>& buffer, ContentWriteBackend& backend)
+size_t PlainCompressor::compressBuffer(const std::vector<uint8_t>& buffer, std::vector<uint8_t>& backend)
 {
-    backend.append(buffer);
+    backend.insert(backend.end(), buffer.begin(), buffer.end());
 
     return buffer.size();
 }

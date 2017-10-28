@@ -8,8 +8,7 @@ using namespace parts;
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_pack_byte) {
-    std::deque<uint8_t> result(1);
-    result.clear();
+    std::vector<uint8_t> result;
     uint8_t byte = 4;
 
     Packager::append(result, byte);
@@ -21,8 +20,7 @@ BOOST_AUTO_TEST_CASE(can_pack_byte) {
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_pack_short) {
-    std::deque<uint8_t> result(2);
-    result.clear();
+    std::vector<uint8_t> result;
     uint16_t data = 0x0201;
 
     Packager::append(result, data);
@@ -35,8 +33,7 @@ BOOST_AUTO_TEST_CASE(can_pack_short) {
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_pack_int) {
-    std::deque<uint8_t> result(4);
-    result.clear();
+    std::vector<uint8_t> result;
     uint32_t data = 0x04030201;
 
     Packager::append(result, data);
@@ -51,7 +48,7 @@ BOOST_AUTO_TEST_CASE(can_pack_int) {
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_pack_long) {
-    std::deque<uint8_t> result;
+    std::vector<uint8_t> result;
     uint64_t data = 0x0807060504030201;
 
     Packager::append(result, data);
@@ -70,7 +67,7 @@ BOOST_AUTO_TEST_CASE(can_pack_long) {
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_pack_vector) {
-    std::deque<uint8_t> result;
+    std::vector<uint8_t> result;
     std::vector<uint8_t> data = {0, 1, 2, 3, 4};
 
     Packager::append(result, data);
@@ -85,7 +82,7 @@ BOOST_AUTO_TEST_CASE(can_pack_vector) {
 
 namespace
 {
-void check_text(const std::deque<uint8_t>& result, size_t offset) {
+void check_text(const std::vector<uint8_t>& result, size_t offset) {
     BOOST_REQUIRE_EQUAL(result[0 + offset], 't');
     BOOST_REQUIRE_EQUAL(result[1 + offset], 'e');
     BOOST_REQUIRE_EQUAL(result[2 + offset], 'x');
@@ -95,7 +92,7 @@ void check_text(const std::deque<uint8_t>& result, size_t offset) {
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_pack_string_length_1) {
-    std::deque<uint8_t> result;
+    std::vector<uint8_t> result;
     std::string txt("text");
 
     Packager::append<uint8_t>(result, txt);
@@ -107,7 +104,7 @@ BOOST_AUTO_TEST_CASE(can_pack_string_length_1) {
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_pack_string_length_2) {
-    std::deque<uint8_t> result;
+    std::vector<uint8_t> result;
     std::string txt("text");
 
     Packager::append<uint16_t>(result, txt);
@@ -120,7 +117,7 @@ BOOST_AUTO_TEST_CASE(can_pack_string_length_2) {
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_pack_string_length_4) {
-    std::deque<uint8_t> result;
+    std::vector<uint8_t> result;
     std::string txt("text");
 
     Packager::append<uint32_t>(result, txt);
@@ -136,7 +133,7 @@ BOOST_AUTO_TEST_CASE(can_pack_string_length_4) {
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(string_pack_throw_exception_if_length_is_too_short) {
-    std::deque<uint8_t> result;
+    std::vector<uint8_t> result;
     std::string txt(300,'a');
 
     BOOST_REQUIRE_THROW(Packager::append<uint8_t>(result, txt), PartsException);
@@ -144,7 +141,7 @@ BOOST_AUTO_TEST_CASE(string_pack_throw_exception_if_length_is_too_short) {
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_pack_path_with_two_length_names) {
-    std::deque<uint8_t> result;
+    std::vector<uint8_t> result;
     boost::filesystem::path path("/usr/share/lib");
 
     Packager::append(result, path);

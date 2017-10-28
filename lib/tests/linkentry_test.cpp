@@ -12,7 +12,7 @@ using namespace fakeit;
 BOOST_AUTO_TEST_CASE(can_pack_link_data) {
     LinkEntry entry("file1", 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1, "../file2", true);
 
-    std::deque<uint8_t> result(100);
+    std::vector<uint8_t> result(100);
     result.clear();
     entry.append(result);
 

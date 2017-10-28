@@ -87,7 +87,7 @@ size_t LzmaCompressor::compressFile(const boost::filesystem::path& path, Content
 }
 
 //==========================================================================================================================================
-size_t LzmaCompressor::compressBuffer(const std::vector<uint8_t>& buffer, ContentWriteBackend& backend)
+size_t LzmaCompressor::compressBuffer(const std::vector<uint8_t>& buffer, std::vector<uint8_t>& backend)
 {
     lzma_stream context;
     setupXZLib(context);
@@ -107,7 +107,7 @@ size_t LzmaCompressor::compressBuffer(const std::vector<uint8_t>& buffer, Conten
             size_t real_size = MB - context.avail_out;
             output.resize(real_size);
             compressed_size += real_size;
-            backend.append(output);
+            backend.insert(backend.end(), output.begin(), output.end());
             output.resize(MB);
             context.next_out = &output[0];
             context.avail_out = MB;

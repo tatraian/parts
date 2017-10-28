@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(compress_fills_missing_entries_and_after_it_is_packed_corre
     BOOST_REQUIRE_EQUAL(entry.compressedSize(), 2);
     BOOST_REQUIRE_EQUAL(entry.offset(), 100);
 
-    std::deque<uint8_t> result;
+    std::vector<uint8_t> result;
 
     entry.append(result);
 

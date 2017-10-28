@@ -6,7 +6,7 @@ using namespace parts;
 
 
 //==========================================================================================================================================
-void BaseEntry::append(std::deque<uint8_t>& buffer) const
+void BaseEntry::append(std::vector<uint8_t>& buffer) const
 {
     Packager::append(buffer, m_file);
     Packager::append(buffer, m_permissions);

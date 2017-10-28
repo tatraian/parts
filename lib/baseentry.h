@@ -5,7 +5,6 @@
 #include "contentwritebackend.h"
 
 #include <string>
-#include <deque>
 
 #include <boost/filesystem/path.hpp>
 
@@ -31,7 +30,7 @@ public:
 
     virtual ~BaseEntry() {}
 
-    virtual void append(std::deque<uint8_t>& buffer) const;
+    virtual void append(std::vector<uint8_t>& buffer) const;
 
     virtual void compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend) = 0;
 

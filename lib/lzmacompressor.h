@@ -17,7 +17,7 @@ public:
 
     size_t compressFile(const boost::filesystem::path& path, ContentWriteBackend& backend) override;
 
-    size_t compressBuffer(const std::vector<uint8_t>& buffer, ContentWriteBackend& backend) override;
+    size_t compressBuffer(const std::vector<uint8_t>& buffer, std::vector<uint8_t>& backend) override;
 
 protected:
     void setupXZLib(lzma_stream& context);

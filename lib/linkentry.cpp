@@ -27,7 +27,7 @@ LinkEntry::LinkEntry(const boost::filesystem::path& file,
 }
 
 //==========================================================================================================================================
-void LinkEntry::append(std::deque<uint8_t>& buffer) const
+void LinkEntry::append(std::vector<uint8_t>& buffer) const
 {
     buffer.push_back(static_cast<uint8_t>(EntryTypes::Link));
     BaseEntry::append(buffer);
@@ -36,7 +36,7 @@ void LinkEntry::append(std::deque<uint8_t>& buffer) const
 }
 
 //==========================================================================================================================================
-void LinkEntry::compressEntry(Compressor& compressor, ContentWriteBackend& backend)
+void LinkEntry::compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend)
 {
     // This function is empty, since there is no file to be compressed
 }

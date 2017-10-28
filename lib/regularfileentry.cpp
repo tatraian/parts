@@ -24,7 +24,7 @@ RegularFileEntry::RegularFileEntry(const boost::filesystem::path& file,
 }
 
 //==========================================================================================================================================
-void RegularFileEntry::append(std::deque<uint8_t>& buffer) const
+void RegularFileEntry::append(std::vector<uint8_t>& buffer) const
 {
     buffer.push_back(static_cast<uint8_t>(EntryTypes::RegularFile));
     BaseEntry::append(buffer);

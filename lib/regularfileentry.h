@@ -21,7 +21,7 @@ public:
 
     ~RegularFileEntry() override = default;
 
-    void append(std::deque<uint8_t>& buffer) const override;
+    void append(std::vector<uint8_t>& buffer) const override;
 
     void compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend) override;
 

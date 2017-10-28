@@ -15,7 +15,7 @@ DirectoryEntry::DirectoryEntry(const boost::filesystem::path& file,
 }
 
 //==========================================================================================================================================
-void DirectoryEntry::append(std::deque<uint8_t>& buffer) const
+void DirectoryEntry::append(std::vector<uint8_t>& buffer) const
 {
     buffer.push_back(static_cast<uint8_t>(EntryTypes::Directory));
     BaseEntry::append(buffer);
