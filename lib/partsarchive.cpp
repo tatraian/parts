@@ -4,8 +4,6 @@
 
 #include <boost/filesystem.hpp>
 
-#include <iostream>
-
 using namespace parts;
 
 
