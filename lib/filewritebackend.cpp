@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include <boost/endian/conversion.hpp>
+#include <boost/filesystem.hpp>
 
 using namespace parts;
 
@@ -103,6 +104,7 @@ void FileWriteBackend::concatenate(ContentWriteBackend&& tail)
 
     // This will drop this object in invalid state
     file_tail.m_file.close();
+    boost::filesystem::remove(file_tail.m_filename);
 }
 
 //==========================================================================================================================================
