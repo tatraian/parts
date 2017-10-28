@@ -12,10 +12,13 @@ set(parts_SRCS
     regularfileentry.cpp
     directoryentry.cpp
     linkentry.cpp
-    packager.cpp)
+    packager.cpp
+    partsarchive.cpp
+    header.cpp)
 
 add_library(parts ${parts_SRCS})
 target_link_libraries(parts Boost::system Boost::filesystem PicoSHA256 lzma::lzma)
+target_include_directories(parts INTERFACE .)
 
 if(BUILD_TESTS)
     add_executable(parts_lib_tests
