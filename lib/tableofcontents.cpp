@@ -12,9 +12,8 @@
 
 using namespace parts;
 
-const std::string DEFAULT_OWNER = "__PARTS_DEFAULT_OWNER__";
-const std::string DEFAULT_GROUP = "__PARTS_DEFAULT_GROUP__";
-
+const std::string TableOfContents::DEFAULT_OWNER = "__PARTS_DEFAULT_OWNER__";
+const std::string TableOfContents::DEFAULT_GROUP = "__PARTS_DEFAULT_GROUP__";
 
 //==========================================================================================================================================
 TableOfContents::TableOfContents(const boost::filesystem::path& root, const PartsCompressionParameters& parameters) :
@@ -42,9 +41,19 @@ TableOfContents::TableOfContents(const boost::filesystem::path& root, const Part
 }
 
 //==========================================================================================================================================
+std::shared_ptr<BaseEntry> TableOfContents::find(const boost::filesystem::path& file)
+{
+    auto it = m_files.find(file);
+    if (it == m_files.end())
+        return std::shared_ptr<BaseEntry>();
+
+    return it->second;
+}
+
+//==========================================================================================================================================
 void TableOfContents::add(const boost::filesystem::path& root, const boost::filesystem::path& file)
 {
-    boost::filesystem::path filename = boost::filesystem::relative(file, root);
+    boost::filesystem::path filename = file.lexically_relative(root);
 
     // getting stat
     struct stat file_stat;
@@ -55,8 +64,27 @@ void TableOfContents::add(const boost::filesystem::path& root, const boost::file
     uint16_t group_id    = getGroupId(&file_stat);
 
     std::shared_ptr<BaseEntry> entry;
-    if (boost::filesystem::is_regular_file(file))
-    {
+    // must check this first, because depending of the target of the link is_regular_file and is_directory are also true...
+    if (boost::filesystem::is_symlink(file)) {
+            boost::filesystem::path target = boost::filesystem::read_symlink(file);
+
+            entry.reset(new LinkEntry(filename,
+                                      permissions,
+                                      m_owners[owner_id],
+                                      owner_id,
+                                      m_groups[group_id],
+                                      group_id,
+                                      // order is important otherwise fileInsideRoot will die with relative paths
+                                      target.is_absolute() && fileInsideRoot(root, target) ? target.lexically_relative(root) : target,
+                                      target.is_absolute()));
+    } else if (boost::filesystem::is_directory(file)) {
+        entry.reset(new DirectoryEntry(filename,
+                                       permissions,
+                                       m_owners[owner_id],
+                                       owner_id,
+                                       m_groups[group_id],
+                                       group_id));
+    } else if (boost::filesystem::is_regular_file(file)) {
         Hash hash(m_parameters.m_hashType, file);
         entry.reset(new RegularFileEntry(filename,
                                          permissions,
@@ -66,25 +94,9 @@ void TableOfContents::add(const boost::filesystem::path& root, const boost::file
                                          group_id,
                                          hash,
                                          boost::filesystem::file_size(file)));
-    } else if (boost::filesystem::is_directory(file))
-    {
-        entry.reset(new DirectoryEntry(filename,
-                                       permissions,
-                                       m_owners[owner_id],
-                                       owner_id,
-                                       m_groups[group_id],
-                                       group_id));
-    } else if (boost::filesystem::is_symlink(file))
-    {
-        boost::filesystem::path target = boost::filesystem::read_symlink(file);
-        entry.reset(new LinkEntry(filename,
-                                  permissions,
-                                  m_owners[owner_id],
-                                  owner_id,
-                                  m_groups[group_id],
-                                  group_id,
-                                  target,
-                                  false));
+    } else {
+        // TODO log here!
+        return;
     }
 
     m_files[entry->file()] = entry;
@@ -117,7 +129,7 @@ uint16_t TableOfContents::getGroupId(const struct stat *file_stat)
 //==========================================================================================================================================
 uint16_t TableOfContents::getPermissions(const struct stat *file_stat)
 {
-    return static_cast<uint16_t>(file_stat->st_mode & (S_IRWXU|S_IRWXO|S_IRWXG));
+    return static_cast<uint16_t>(file_stat->st_mode & (S_IRWXU|S_IRWXO|S_IRWXG|S_ISUID|S_ISGID));
 }
 
 //==========================================================================================================================================
@@ -131,4 +143,19 @@ uint16_t TableOfContents::findOrInsert(const std::string& name, std::vector<std:
     }
 
     return it - table.begin();
+}
+
+//==========================================================================================================================================
+bool TableOfContents::fileInsideRoot(const boost::filesystem::path& root, const boost::filesystem::path& file)
+{
+    auto real_root = boost::filesystem::canonical(root);
+    auto real_file = boost::filesystem::canonical(file);
+
+    return real_file.string().find(real_root.string()) == 0;
+}
+
+//==========================================================================================================================================
+TableOfContents::TableOfContents(const PartsCompressionParameters& params) : m_parameters(params)
+{
+    // Unit test only constructor, It does nothing
 }

@@ -29,7 +29,8 @@ if(BUILD_TESTS)
         tests/directoryentry_test.cpp
         tests/linkentry_test.cpp
         tests/packager_test.cpp
-        tests/stackvector_test.cpp)
+        tests/stackvector_test.cpp
+        tests/tableofcontents_test.cpp)
     target_link_libraries(parts_lib_tests parts FakeIt::FakeIt Boost::test_exec_monitor c++)
     add_test(parts_lib_tester parts_lib_tests)
 endif()

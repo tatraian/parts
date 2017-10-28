@@ -19,9 +19,31 @@ namespace parts
 class TableOfContents
 {
 public:
+    typedef std::map<boost::filesystem::path, std::shared_ptr<BaseEntry>>::iterator iterator;
+    typedef std::map<boost::filesystem::path, std::shared_ptr<BaseEntry>>::const_iterator const_iterator;
+
     TableOfContents(const boost::filesystem::path& root, const PartsCompressionParameters& parameters);
 
     std::vector<uint8_t> getRaw() const;
+
+    iterator begin()
+    { return m_files.begin(); }
+    const_iterator begin() const
+    { return m_files.begin(); }
+
+    iterator end()
+    { return m_files.end(); }
+    const_iterator end() const
+    { return m_files.end(); }
+
+    size_t size() const
+    { return m_files.size(); }
+
+    std::shared_ptr<BaseEntry> find(const boost::filesystem::path& file);
+
+    static const std::string DEFAULT_OWNER;
+    static const std::string DEFAULT_GROUP;
+
 
 protected:
     void add(const boost::filesystem::path& root, const boost::filesystem::path& file);
@@ -30,6 +52,11 @@ protected:
     uint16_t getPermissions(const struct stat* file_stat);
 
     uint16_t findOrInsert(const std::string& name, std::vector<std::string>& table);
+
+    static bool fileInsideRoot(const boost::filesystem::path& root, const boost::filesystem::path& file);
+
+    // This constructor is just for unit testing...
+    TableOfContents(const PartsCompressionParameters& params);
 
 protected:
     std::map<boost::filesystem::path, std::shared_ptr<BaseEntry> > m_files;
