@@ -14,7 +14,11 @@ set(parts_SRCS
     linkentry.cpp
     packager.cpp
     partsarchive.cpp
-    header.cpp)
+    header.cpp
+    contentreadbackend.h
+    decompressor.h
+    decompressorfactory.cpp
+    )
 
 add_library(parts ${parts_SRCS})
 target_link_libraries(parts Boost::system Boost::filesystem PicoSHA256 lzma::lzma)
@@ -33,7 +37,8 @@ if(BUILD_TESTS)
         tests/linkentry_test.cpp
         tests/packager_test.cpp
         tests/stackvector_test.cpp
-        tests/tableofcontents_test.cpp)
+        tests/tableofcontents_test.cpp
+        tests/header_test.cpp)
     target_link_libraries(parts_lib_tests parts FakeIt::FakeIt Boost::test_exec_monitor c++)
     add_test(parts_lib_tester parts_lib_tests)
 endif()

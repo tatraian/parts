@@ -3,6 +3,7 @@
 
 #include "baseentry.h"
 #include "parts_definitions.h"
+#include "contentreadbackend.h"
 
 #include <map>
 #include <memory>
@@ -23,6 +24,7 @@ public:
     typedef std::map<boost::filesystem::path, std::shared_ptr<BaseEntry>>::const_iterator const_iterator;
 
     TableOfContents(const boost::filesystem::path& root, const PartsCompressionParameters& parameters);
+    TableOfContents(ContentReadBackend& backend, size_t toc_size, const PartsCompressionParameters& parameters);
 
     std::vector<uint8_t> getRaw() const;
 
@@ -65,7 +67,7 @@ protected:
     std::vector<std::string> m_owners;
     std::vector<std::string> m_groups;
 
-    const PartsCompressionParameters& m_parameters;
+    PartsCompressionParameters m_parameters;
 };
 
 }

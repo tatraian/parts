@@ -5,6 +5,7 @@
 #include "parts_definitions.h"
 #include "header.h"
 #include "tableofcontents.h"
+#include "contentreadbackend.h"
 
 namespace parts
 {
@@ -21,25 +22,28 @@ public:
 
     /**
      * @brief PartsArchive constructor for extracting archive
-     * @param archive
+     * @param backend Backend should now the destination
      */
-    //PartsArchive(const boost::filesystem::path& archive);
+    PartsArchive(std::unique_ptr<ContentReadBackend>&& backend);
 
 
     const TableOfContents& toc() const
     {return m_toc; }
 
     void createArchive(const boost::filesystem::path& archive);
-/* This is not final, because they should be get the "Reader interface too"
-    void extractArchive(const boost::filesystem::path& dest, const boost::filesystem::path& archive) const;
+
+    void extractArchive(const boost::filesystem::path& dest) const;
     void updateArchive(const boost::filesystem::path& original_root,
-                       const boost::filesystem::path& dest,
-                       const boost::filesystem::path& archive);
-*/
+                       const boost::filesystem::path& dest);
+
 protected:
-    const boost::filesystem::path& m_root;
-    TableOfContents m_toc;
+    // destination for write mode
+    boost::filesystem::path m_root;
+    // reader interface for extract/update mode
+    std::unique_ptr<ContentReadBackend> m_contentReader;
+
     Header m_header;
+    TableOfContents m_toc;
 };
 
 }

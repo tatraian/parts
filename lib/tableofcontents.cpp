@@ -3,6 +3,7 @@
 #include "regularfileentry.h"
 #include "linkentry.h"
 #include "packager.h"
+#include "decompressorfactory.h"
 
 #include <boost/filesystem.hpp>
 
@@ -39,6 +40,17 @@ TableOfContents::TableOfContents(const boost::filesystem::path& root, const Part
         if (boost::filesystem::is_symlink(dir->path()))
             dir.no_push();
     }
+}
+
+//==========================================================================================================================================
+TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, const PartsCompressionParameters& parameters) :
+    m_parameters(parameters)
+{
+    std::vector<uint8_t> compressed_toc(toc_size, 0);
+    backend.read(compressed_toc);
+
+    auto decompressor = DecompressorFactory::createDecompressor(m_parameters.m_tocCompression);
+    std::deque<uint8_t> uncompressed_toc = decompressor->uncompressBuffer(compressed_toc);
 }
 
 //==========================================================================================================================================
