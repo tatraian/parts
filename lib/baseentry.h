@@ -3,8 +3,11 @@
 
 #include "compressor.h"
 #include "contentwritebackend.h"
+#include "contentreadbackend.h"
 
 #include <string>
+#include <vector>
+#include <deque>
 
 #include <boost/filesystem/path.hpp>
 
@@ -27,6 +30,10 @@ public:
         m_group(group),
         m_groupId(group_id)
     {}
+
+    BaseEntry(std::deque<uint8_t>& buffer,
+              const std::vector<std::string>& owners,
+              const std::vector<std::string>& groups);
 
     virtual ~BaseEntry() {}
 
