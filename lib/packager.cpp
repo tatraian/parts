@@ -15,6 +15,62 @@ void append_internal(std::vector<uint8_t>& output, Value value)
     output.insert(output.end(), reinterpret_cast<uint8_t*>(&value), reinterpret_cast<uint8_t*>(&value) + sizeof(value));
 }
 
+//==========================================================================================================================================
+template<class Value>
+void pop_front_internal(std::deque<uint8_t>& input, Value& value)
+{
+    if (input.size() < sizeof(value))
+        throw PartsException("No enough data to read value");
+    value = reinterpret_cast<Value&>(input.front());
+    boost::endian::big_to_native_inplace(value);
+    input.erase(input.begin(), input.begin() + sizeof(Value));
+}
+
+}
+
+//==========================================================================================================================================
+void Packager::pop_front(std::deque<uint8_t>& input, uint8_t& value)
+{
+    pop_front_internal(input, value);
+}
+
+//==========================================================================================================================================
+void Packager::pop_front(std::deque<uint8_t>& input, uint16_t& value)
+{
+    pop_front_internal(input, value);
+}
+
+//==========================================================================================================================================
+void Packager::pop_front(std::deque<uint8_t>& input, uint32_t& value)
+{
+    pop_front_internal(input, value);
+}
+
+//==========================================================================================================================================
+void Packager::pop_front(std::deque<uint8_t>& input, uint64_t& value)
+{
+    pop_front_internal(input, value);
+}
+
+//==========================================================================================================================================
+void Packager::pop_front(std::deque<uint8_t>& input, std::vector<uint8_t>& value)
+{
+    size_t size = value.size();
+    value.clear();
+
+    if (input.size() < size)
+        throw PartsException("No enough data to read value");
+
+    value.insert(value.end(), input.begin(), input.begin() + size);
+    input.erase(input.begin(), input.begin() + size);
+}
+
+//==========================================================================================================================================
+void Packager::pop_front(std::deque<uint8_t>& input, boost::filesystem::path& value)
+{
+    std::string tmp;
+    pop_front<uint16_t>(input, tmp);
+    value = tmp;
 }
 
 //==========================================================================================================================================

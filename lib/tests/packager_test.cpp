@@ -6,6 +6,145 @@
 
 using namespace parts;
 
+
+
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(can_unpack_byte) {
+    std::deque<uint8_t> input = {1, 2, 3};
+    uint8_t result = 0;
+
+    Packager::pop_front(input, result);
+
+    BOOST_REQUIRE_EQUAL(input.size(), 2);
+    BOOST_REQUIRE_EQUAL(result, 1);
+}
+
+
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(can_unpack_short) {
+    std::deque<uint8_t> input = {0x02, 0x01};
+    uint16_t result = 0;
+
+    Packager::pop_front(input, result);
+
+    BOOST_REQUIRE_EQUAL(input.size(), 0u);
+    BOOST_REQUIRE_EQUAL(result, 0x0201);
+}
+
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(can_unpack_int) {
+    std::deque<uint8_t> input = {0x04, 0x03, 0x02, 0x01};
+    uint32_t result = 0;
+
+    Packager::pop_front(input, result);
+
+    BOOST_REQUIRE_EQUAL(input.size(), 0u);
+    BOOST_REQUIRE_EQUAL(result, 0x04030201);
+}
+
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(can_unpack_long) {
+    std::deque<uint8_t> input = { 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01 };
+    uint64_t result = 0;
+
+    Packager::pop_front(input, result);
+
+    BOOST_REQUIRE_EQUAL(input.size(), 0u);
+    BOOST_REQUIRE_EQUAL(result, 0x0807060504030201);
+}
+
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(can_unpack_vector) {
+    std::deque<uint8_t> input = {0, 1, 2, 3, 4};
+    std::vector<uint8_t> result(5, 0);
+
+    Packager::pop_front(input, result);
+
+    BOOST_REQUIRE_EQUAL(input.size(), 0);
+    BOOST_REQUIRE_EQUAL(result[0], 0);
+    BOOST_REQUIRE_EQUAL(result[1], 1);
+    BOOST_REQUIRE_EQUAL(result[2], 2);
+    BOOST_REQUIRE_EQUAL(result[3], 3);
+    BOOST_REQUIRE_EQUAL(result[4], 4);
+}
+
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(can_unpack_string_length_1) {
+    std::deque<uint8_t> input = {4, 't', 'e', 'x', 't'};
+    std::string txt;
+
+    Packager::pop_front<uint8_t>(input, txt);
+
+    BOOST_REQUIRE_EQUAL(input.size(), 0u);
+    BOOST_REQUIRE_EQUAL(txt, "text");
+}
+
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(can_unpack_string_length_2) {
+    std::deque<uint8_t> input = {0, 4, 't', 'e', 'x', 't'};
+    std::string txt;
+
+    Packager::pop_front<uint16_t>(input, txt);
+
+    BOOST_REQUIRE_EQUAL(input.size(), 0u);
+    BOOST_REQUIRE_EQUAL(txt, "text");
+}
+
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(can_unpack_string_length_4) {
+    std::deque<uint8_t> input = {0, 0, 0, 4, 't', 'e', 'x', 't'};
+    std::string txt;
+
+    Packager::pop_front<uint32_t>(input, txt);
+
+    BOOST_REQUIRE_EQUAL(input.size(), 0u);
+    BOOST_REQUIRE_EQUAL(txt, "text");
+}
+
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(can_unpack_path_with_two_length_names) {
+    std::deque<uint8_t> input = {0, 14, '/', 'u', 's', 'r', '/', 's', 'h', 'a', 'r', 'e', '/', 'l', 'i', 'b'};
+    boost::filesystem::path path;
+
+    Packager::pop_front(input, path);
+
+    BOOST_REQUIRE_EQUAL(input.size(), 0u);
+    BOOST_REQUIRE_EQUAL(path, "/usr/share/lib");
+}
+
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(throw_exception_if_no_enough_data_for_scalars) {
+    std::deque<uint8_t> input = {0};
+    uint16_t result;
+
+    BOOST_REQUIRE_THROW(Packager::pop_front(input, result), PartsException);
+}
+
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(throw_exception_if_no_enough_data_for_vector) {
+    std::deque<uint8_t> input = {0};
+    std::vector<uint8_t> result(2,0);
+
+    BOOST_REQUIRE_THROW(Packager::pop_front(input, result), PartsException);
+}
+
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(throw_exception_if_no_enough_data_for_string_size) {
+    std::deque<uint8_t> input = {0};
+    std::string result;
+
+    BOOST_REQUIRE_THROW(Packager::pop_front<uint16_t>(input, result), PartsException);
+}
+
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(throw_exception_if_no_enough_data_for_string_data) {
+    std::deque<uint8_t> input = {0, 4, 't'};
+    std::string result;
+
+    BOOST_REQUIRE_THROW(Packager::pop_front<uint16_t>(input, result), PartsException);
+}
+
+
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_pack_byte) {
     std::vector<uint8_t> result;

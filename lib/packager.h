@@ -14,6 +14,23 @@ namespace parts
 class Packager
 {
 public:
+    static void pop_front(std::deque<uint8_t>& input, uint8_t& value);
+    static void pop_front(std::deque<uint8_t>& input, uint16_t& value);
+    static void pop_front(std::deque<uint8_t>& input, uint32_t& value);
+    static void pop_front(std::deque<uint8_t>& input, uint64_t& value);
+    static void pop_front(std::deque<uint8_t>& input, std::vector<uint8_t>& value);
+    static void pop_front(std::deque<uint8_t>& input, boost::filesystem::path& value);
+    template<class SizeType>
+    static void pop_front(std::deque<uint8_t>& input, std::string& value){
+        SizeType size;
+        pop_front(input, size);
+        if (input.size() < size)
+            throw PartsException("No enough data to read value");
+        value.clear();
+        value.insert(0, reinterpret_cast<const char*>(&input.front()), size);
+        input.erase(input.begin(), input.begin() + size);
+    }
+
     static void append(std::vector<uint8_t>& output, uint8_t value);
     static void append(std::vector<uint8_t>& output, uint16_t value);
     static void append(std::vector<uint8_t>& output, uint32_t value);
