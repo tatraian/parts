@@ -24,7 +24,7 @@ if (BUILD_TESTS)
     find_package(FakeIt)
 endif()
 
-
+add_definitions(-Wall)
 
 add_subdirectory(thirdparty)
 add_subdirectory(lib)
