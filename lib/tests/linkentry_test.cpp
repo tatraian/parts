@@ -58,3 +58,25 @@ BOOST_AUTO_TEST_CASE(compress_doesn_t_modify_the_output) {
 
     entry.compressEntry(boost::filesystem::path("nowhere"),  compressor_mock.get(), writer_mock.get());
 }
+
+
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(can_unpack_link_data) {
+    std::deque<uint8_t> input = {0, 5, 'f', 'i', 'l', 'e', '1', 1, 0244, 0, 0, 0, 0, 1, 0, 8, '.', '.', '/', 'f', 'i', 'l', 'e', '2'};
+
+    std::vector<std::string> owners = {"DEFAULT_OWNER"};
+    std::vector<std::string> groups = {"DEFAULT_GROUP"};
+
+    LinkEntry entry(input, owners, groups);
+
+    BOOST_REQUIRE_EQUAL(input.size(), 0);
+    BOOST_CHECK_EQUAL(entry.file(), "file1");
+    BOOST_CHECK_EQUAL(entry.permissions(), 0644);
+    BOOST_CHECK_EQUAL(entry.owner(), "DEFAULT_OWNER");
+    BOOST_CHECK_EQUAL(entry.group(), "DEFAULT_GROUP");
+    BOOST_CHECK_EQUAL(entry.ownerId(), 0);
+    BOOST_CHECK_EQUAL(entry.groupId(), 0);
+    BOOST_CHECK_EQUAL(entry.destination(), "../file2");
+    BOOST_CHECK_EQUAL(entry.absolute(), true);
+
+}

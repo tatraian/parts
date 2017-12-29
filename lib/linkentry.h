@@ -18,6 +18,10 @@ public:
               const boost::filesystem::path& destination,
               bool absolute = false);
 
+    LinkEntry(std::deque<uint8_t>& buffer,
+              const std::vector<std::string>& owners,
+              const std::vector<std::string>& groups);
+
     ~LinkEntry() override = default;
 
     void append(std::vector<uint8_t> &buffer) const override;

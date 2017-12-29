@@ -24,6 +24,19 @@ RegularFileEntry::RegularFileEntry(const boost::filesystem::path& file,
 }
 
 //==========================================================================================================================================
+RegularFileEntry::RegularFileEntry(std::deque<uint8_t>& buffer,
+                                   const std::vector<std::string>& owners,
+                                   const std::vector<std::string>& groups,
+                                   HashType hash_type) :
+    BaseEntry(buffer, owners, groups),
+    m_uncompressedHash(hash_type, buffer)
+{
+    Packager::pop_front(buffer, m_uncompressedSize);
+    Packager::pop_front(buffer, m_compressedSize);
+    Packager::pop_front(buffer, m_offset);
+}
+
+//==========================================================================================================================================
 void RegularFileEntry::append(std::vector<uint8_t>& buffer) const
 {
     buffer.push_back(static_cast<uint8_t>(EntryTypes::RegularFile));

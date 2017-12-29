@@ -13,7 +13,11 @@ BaseEntry::BaseEntry(std::deque<uint8_t>& buffer, const std::vector<std::string>
     Packager::pop_front(buffer, m_ownerId);
     Packager::pop_front(buffer, m_groupId);
 
+    if (owners.size() <= m_ownerId)
+        throw PartsException("Unknown owner id, during processing file: " + m_file.string());
     m_owner = owners[m_ownerId];
+    if (groups.size() <= m_groupId)
+        throw PartsException("Unknown group id, during processing file: " + m_file.string());
     m_group = groups[m_groupId];
 }
 

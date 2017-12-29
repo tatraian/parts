@@ -1,6 +1,7 @@
 #include <boost/test/auto_unit_test.hpp>
 
 #include "../baseentry.h"
+#include "../parts_definitions.h"
 
 using namespace parts;
 
@@ -65,6 +66,23 @@ BOOST_AUTO_TEST_CASE(can_unpack_base_data) {
     BOOST_CHECK_EQUAL(entry.group(), "DEFAULT_GROUP");
     BOOST_CHECK_EQUAL(entry.ownerId(), 0);
     BOOST_CHECK_EQUAL(entry.groupId(), 1);
+}
 
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(throws_if_there_is_no_entry_for_owner) {
+    std::deque<uint8_t> input = {0, 5, 'f', 'i', 'l', 'e', '1', 1, 0244, 0, 3, 0, 1};
+
+    std::vector<std::string> names = {"DEFAULT_OWNER", "DEFAULT_GROUP"};
+
+    BOOST_REQUIRE_THROW(TestBaseEntry entry(input, names, names), PartsException);
+}
+
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(throws_if_there_is_no_entry_for_group) {
+    std::deque<uint8_t> input = {0, 5, 'f', 'i', 'l', 'e', '1', 1, 0244, 0, 0, 0, 3};
+
+    std::vector<std::string> names = {"DEFAULT_OWNER", "DEFAULT_GROUP"};
+
+    BOOST_REQUIRE_THROW(TestBaseEntry entry(input, names, names), PartsException);
 }
 

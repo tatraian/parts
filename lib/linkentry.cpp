@@ -27,6 +27,17 @@ LinkEntry::LinkEntry(const boost::filesystem::path& file,
 }
 
 //==========================================================================================================================================
+LinkEntry::LinkEntry(std::deque<uint8_t>& buffer, const std::vector<std::string>& owners, const std::vector<std::string>& groups) :
+    BaseEntry(buffer, owners, groups)
+{
+    uint8_t tmp = 0;
+    Packager::pop_front(buffer, tmp);
+    m_absolute = tmp;
+
+    Packager::pop_front(buffer, m_destination);
+}
+
+//==========================================================================================================================================
 void LinkEntry::append(std::vector<uint8_t>& buffer) const
 {
     buffer.push_back(static_cast<uint8_t>(EntryTypes::Link));

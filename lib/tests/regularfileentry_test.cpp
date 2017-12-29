@@ -86,3 +86,39 @@ BOOST_AUTO_TEST_CASE(compress_fills_missing_entries_and_after_it_is_packed_corre
     BOOST_REQUIRE_EQUAL(result[68], 0);
     BOOST_REQUIRE_EQUAL(result[69], 100);
 }
+
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(regular_file_entry_can_be_created_from_input_stream) {
+    std::deque<uint8_t> input = {0, 5, 'f', 'i', 'l', 'e', '1', 1, 0244, 0, 0, 0, 0,
+                                 // hash
+                                 0x88, 0xd4, 0x26, 0x6f, 0xd4, 0xe6, 0x33, 0x8d,
+                                 0x13, 0xb8, 0x45, 0xfc, 0xf2, 0x89, 0x57, 0x9d,
+                                 0x20, 0x9c, 0x89, 0x78, 0x23, 0xb9, 0x21, 0x7d,
+                                 0xa3, 0xe1, 0x61, 0x93, 0x6f, 0x03, 0x15, 0x89,
+                                 // uncompressed size
+                                 0, 0, 0, 0, 0, 0, 0, 100,
+                                 // compressed size
+                                 0, 0, 0, 0, 0, 0, 0, 42,
+                                 // offset
+                                 0, 0, 0, 0, 0, 0, 1, 0
+                                 };
+
+    std::vector<std::string> owners = {"DEFAULT_OWNER"};
+    std::vector<std::string> groups = {"DEFAULT_GROUP"};
+
+    RegularFileEntry entry(input, owners, groups, HashType::SHA256);
+
+    BOOST_REQUIRE_EQUAL(input.size(), 0);
+    //base entries
+    BOOST_CHECK_EQUAL(entry.file(), "file1");
+    BOOST_CHECK_EQUAL(entry.permissions(), 0644);
+    BOOST_CHECK_EQUAL(entry.owner(), "DEFAULT_OWNER");
+    BOOST_CHECK_EQUAL(entry.group(), "DEFAULT_GROUP");
+    BOOST_CHECK_EQUAL(entry.ownerId(), 0);
+    BOOST_CHECK_EQUAL(entry.groupId(), 0);
+
+    BOOST_CHECK_EQUAL(entry.uncompressedHash().hashString(), "88d4266fd4e6338d13b845fcf289579d209c897823b9217da3e161936f031589");
+    BOOST_CHECK_EQUAL(entry.uncompressedSize(), 100u);
+    BOOST_CHECK_EQUAL(entry.compressedSize(), 42u);
+    BOOST_CHECK_EQUAL(entry.offset(), 256u);
+}

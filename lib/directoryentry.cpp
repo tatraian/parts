@@ -10,7 +10,16 @@ DirectoryEntry::DirectoryEntry(const boost::filesystem::path& file,
                                const std::string& owner,
                                uint16_t owner_id,
                                const std::string& group,
-                               uint16_t group_id) : BaseEntry(file, permissions, owner, owner_id, group, group_id)
+                               uint16_t group_id) :
+    BaseEntry(file, permissions, owner, owner_id, group, group_id)
+{
+}
+
+//==========================================================================================================================================
+DirectoryEntry::DirectoryEntry(std::deque<uint8_t>& buffer,
+                               const std::vector<std::string>& owners,
+                               const std::vector<std::string>& groups) :
+    BaseEntry(buffer, owners, groups)
 {
 }
 

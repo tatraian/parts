@@ -32,12 +32,26 @@ Hash::Hash(HashType type, const boost::filesystem::path& path) :
 //==========================================================================================================================================
 Hash::Hash(HashType type, const std::vector<uint8_t>& data) :
     m_type(type),
-    m_hash(32)
+    m_hash(hash_size(m_type), 0)
 {
     if (type != HashType::SHA256)
         throw PartsException("Only SHA 256 hash is supported currently");
 
     picosha2::hash256(data.begin(), data.end(), m_hash.begin(), m_hash.end());
+}
+
+//==========================================================================================================================================
+Hash::Hash(HashType type, std::deque<uint8_t>& data) :
+    m_type(type),
+    m_hash(hash_size(m_type), 0)
+{
+
+    m_hash.clear();
+
+    if (data.size() < m_hash.size())
+        throw PartsException("No enough data to read hash");
+    m_hash.insert(m_hash.end(), data.begin(), data.begin() + hash_size(type));
+    data.erase(data.begin(), data.begin() + hash_size(type));
 }
 
 //==========================================================================================================================================

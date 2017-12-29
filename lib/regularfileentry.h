@@ -19,6 +19,11 @@ public:
                      Hash uncompressed_hash,
                      uint64_t uncompressed_size);
 
+    RegularFileEntry(std::deque<uint8_t>& buffer,
+                     const std::vector<std::string>& owners,
+                     const std::vector<std::string>& groups,
+                     HashType hash_type);
+
     ~RegularFileEntry() override = default;
 
     void append(std::vector<uint8_t>& buffer) const override;
