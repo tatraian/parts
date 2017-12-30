@@ -4,17 +4,9 @@
 
 #include "parts_definitions.h"
 #include "internal_definitions.h"
+#include "simpleguard.h"
 
 using namespace parts;
-
-template<class Functor>
-struct SimpleGuard {
-public:
-    SimpleGuard(Functor fn) : m_destructor(fn) {}
-    ~SimpleGuard() { m_destructor(); }
-
-    Functor m_destructor;
-};
 
 //==========================================================================================================================================
 LzmaCompressor::LzmaCompressor(const LzmaCompressorParameters& parameters) : m_parameters(parameters)

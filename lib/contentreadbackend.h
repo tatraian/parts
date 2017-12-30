@@ -19,6 +19,8 @@ public:
     // will read data.size() bytes
     virtual void read(std::vector<uint8_t>& data) = 0;
 
+    virtual void read(uint8_t* data, size_t size) = 0;
+
     virtual void seek(const uint64_t& position) = 0;
 };
 

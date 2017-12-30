@@ -50,7 +50,7 @@ TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, c
     backend.read(compressed_toc);
 
     auto decompressor = DecompressorFactory::createDecompressor(m_parameters.m_tocCompression);
-    std::deque<uint8_t> uncompressed_toc = decompressor->uncompressBuffer(compressed_toc);
+    std::deque<uint8_t> uncompressed_toc = decompressor->extractBuffer(compressed_toc);
 }
 
 //==========================================================================================================================================
