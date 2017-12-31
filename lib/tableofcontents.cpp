@@ -4,6 +4,7 @@
 #include "linkentry.h"
 #include "packager.h"
 #include "decompressorfactory.h"
+#include "internal_definitions.h"
 
 #include <boost/filesystem.hpp>
 
@@ -51,6 +52,32 @@ TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, c
 
     auto decompressor = DecompressorFactory::createDecompressor(m_parameters.m_tocCompression);
     std::deque<uint8_t> uncompressed_toc = decompressor->extractBuffer(compressed_toc);
+
+    unpackNames(uncompressed_toc, m_owners);
+    unpackNames(uncompressed_toc, m_groups);
+
+    while (!uncompressed_toc.empty())
+    {
+        uint8_t tmp = 0;
+        Packager::pop_front(uncompressed_toc, tmp);
+        EntryTypes type = static_cast<EntryTypes>(tmp);
+        std::shared_ptr<BaseEntry> entry;
+        switch (type) {
+        case EntryTypes::RegularFile:
+            entry.reset(new RegularFileEntry(uncompressed_toc, m_owners, m_groups, m_parameters.m_hashType));
+            break;
+        case EntryTypes::Directory:
+            entry.reset(new DirectoryEntry(uncompressed_toc, m_owners, m_groups));
+            break;
+        case EntryTypes::Link:
+            entry.reset(new LinkEntry(uncompressed_toc, m_owners, m_groups));
+            break;
+        default:
+            throw PartsException("Unknown node type: " + std::to_string(tmp));
+        }
+
+        m_files[entry->file()] = entry;
+    }
 }
 
 //==========================================================================================================================================
@@ -189,6 +216,17 @@ void TableOfContents::packNames(std::vector<uint8_t>& buffer, const std::vector<
     Packager::append(buffer, static_cast<uint16_t>(names.size()));
     for(const std::string& name : names) {
         Packager::append<uint16_t>(buffer, name);
+    }
+}
+
+//==========================================================================================================================================
+void TableOfContents::unpackNames(std::deque<uint8_t>& buffer, std::vector<std::string>& names)
+{
+    uint16_t size = 0;
+    Packager::pop_front(buffer, size);
+    names.resize(size);
+    for (size_t tmp = 0; tmp != size; ++tmp) {
+        Packager::pop_front<uint16_t>(buffer, names[tmp]);
     }
 }
 

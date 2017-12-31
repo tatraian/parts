@@ -254,3 +254,21 @@ BOOST_FIXTURE_TEST_CASE(detects_files_correctly, FakeTableOfContents) {
     BOOST_CHECK(link->absolute());
 }
 
+//==========================================================================================================================================
+BOOST_FIXTURE_TEST_CASE(can_unpack_names, FakeTableOfContents) {
+    std::deque<uint8_t> buffer = {0, 3,
+                                  0, 3, 'X', 'X', 'X',
+                                  0, 2, 'Y', 'Y',
+                                  0, 4, 'Z', 'Z', 'z', 'z'};
+
+    std::vector<std::string> names;
+
+    unpackNames(buffer, names);
+
+    BOOST_REQUIRE_EQUAL(names.size(), 3);
+    BOOST_CHECK_EQUAL(buffer.size(), 0);
+
+    BOOST_CHECK_EQUAL(names[0], "XXX");
+    BOOST_CHECK_EQUAL(names[1], "YY");
+    BOOST_CHECK_EQUAL(names[2], "ZZzz");
+}
