@@ -20,6 +20,7 @@ set(parts_SRCS
     decompressorfactory.cpp
     lzmadecompressor.cpp
     simpleguard.h
+    filereadbackend.cpp
     )
 
 add_library(parts ${parts_SRCS})
@@ -41,7 +42,8 @@ if(BUILD_TESTS)
         tests/stackvector_test.cpp
         tests/tableofcontents_test.cpp
         tests/header_test.cpp
-        tests/lzmadecompressor_test.cpp)
+        tests/lzmadecompressor_test.cpp
+        tests/filereadbackend_test.cpp)
     target_link_libraries(parts_lib_tests parts FakeIt::FakeIt Boost::test_exec_monitor c++)
     add_test(parts_lib_tester parts_lib_tests)
 endif()
