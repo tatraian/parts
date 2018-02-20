@@ -1,6 +1,7 @@
 #include "partsarchive.h"
 #include "filewritebackend.h"
 #include "lzmacompressor.h"
+#include "lzmadecompressor.h"
 
 #include <boost/filesystem.hpp>
 
@@ -18,10 +19,10 @@ PartsArchive::PartsArchive(const boost::filesystem::path& root, const PartsCompr
 //==========================================================================================================================================
 PartsArchive::PartsArchive(std::unique_ptr<ContentReadBackend>&& backend) :
     m_contentReader(std::move(backend)),
-    m_header(*backend.get()),
-    m_toc(*backend.get(), m_header.getTocSize(), PartsCompressionParameters(m_header.getHashType(),
-                                                                            m_header.getTocCompressionType(),
-                                                                            m_header.getFileCompressionType()))
+    m_header(*m_contentReader.get()),
+    m_toc(*m_contentReader.get(), m_header.getTocSize(), PartsCompressionParameters(m_header.getHashType(),
+                                                                                    m_header.getTocCompressionType(),
+                                                                                    m_header.getFileCompressionType()))
 {
 }
 
@@ -49,4 +50,13 @@ void PartsArchive::createArchive(const boost::filesystem::path& archive)
     file.append(m_header.getRaw());
     file.append(compressed_toc);
     file.concatenate(std::move(temp));
+}
+
+//==========================================================================================================================================
+void PartsArchive::extractArchive(const boost::filesystem::path& dest) const
+{
+    for (auto& entry : m_toc) {
+        LzmaDecompressor decompressor;
+        entry.second->extractEntry(dest, decompressor, *m_contentReader.get());
+    }
 }

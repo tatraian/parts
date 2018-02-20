@@ -2,6 +2,10 @@
 
 #include "packager.h"
 
+#include <sys/stat.h>
+#include <pwd.h>
+#include <grp.h>
+
 using namespace parts;
 
 
@@ -28,4 +32,21 @@ void BaseEntry::append(std::vector<uint8_t>& buffer) const
     Packager::append(buffer, m_permissions);
     Packager::append(buffer, m_ownerId);
     Packager::append(buffer, m_groupId);
+}
+
+//==========================================================================================================================================
+void BaseEntry::setMetadata(const boost::filesystem::path& dest_root)
+{
+    if (m_ownerId != 0) {
+        struct passwd* pw = getpwname(m_owner.c_str());
+        struct ::group* gr = getgrnam(m_group.c_str());
+
+        int result = chown((dest_root / m_file).c_str(), pw->pw_uid, gr->gr_gid);
+        if (result != 0)
+            throw PartsException("Cannot change owner/group of file: " + (dest_root / m_file).string());
+    }
+
+    int result = chmod((dest_root / m_file).c_str(), m_permissions);
+    if (result != 0)
+        throw PartsException("Cannot change permissions of file: " + (dest_root / m_file).string());
 }

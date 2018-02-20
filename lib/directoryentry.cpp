@@ -1,6 +1,9 @@
 #include "directoryentry.h"
 
+#include "parts_definitions.h"
 #include "internal_definitions.h"
+
+#include <boost/filesystem.hpp>
 
 using namespace parts;
 
@@ -35,4 +38,14 @@ void DirectoryEntry::append(std::vector<uint8_t>& buffer) const
 void DirectoryEntry::compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend)
 {
     // Do nothing
+}
+
+//==========================================================================================================================================
+void DirectoryEntry::extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend)
+{
+    // Do not decompression, but creates the directory with the correct rights
+    if (!boost::filesystem::create_directory(dest_root / m_file))
+        throw PartsException("Cannot create directory: " + (dest_root / m_file).string());
+
+    setMetadata(dest_root);
 }

@@ -2,6 +2,7 @@
 #define BASEENTRY_H
 
 #include "compressor.h"
+#include "decompressor.h"
 #include "contentwritebackend.h"
 #include "contentreadbackend.h"
 
@@ -41,6 +42,8 @@ public:
 
     virtual void compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend) = 0;
 
+    virtual void extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend) = 0;
+
     const boost::filesystem::path& file() const
     { return m_file; }
 
@@ -58,6 +61,9 @@ public:
 
     uint16_t groupId() const
     { return m_groupId; }
+
+protected:
+    void setMetadata(const boost::filesystem::path& dest_root);
 
 protected:
     boost::filesystem::path m_file;

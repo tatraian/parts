@@ -15,9 +15,6 @@
 
 using namespace parts;
 
-const std::string TableOfContents::DEFAULT_OWNER = "__PARTS_DEFAULT_OWNER__";
-const std::string TableOfContents::DEFAULT_GROUP = "__PARTS_DEFAULT_GROUP__";
-
 //==========================================================================================================================================
 TableOfContents::TableOfContents(const boost::filesystem::path& root, const PartsCompressionParameters& parameters) :
     m_parameters(parameters)

@@ -3,6 +3,8 @@
 #include "packager.h"
 #include "internal_definitions.h"
 
+#include <boost/filesystem.hpp>
+
 using namespace parts;
 
 
@@ -50,5 +52,11 @@ void LinkEntry::append(std::vector<uint8_t>& buffer) const
 void LinkEntry::compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend)
 {
     // This function is empty, since there is no file to be compressed
+}
+
+//==========================================================================================================================================
+void LinkEntry::extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend)
+{
+    boost::filesystem::create_symlink(m_destination)
 }
 
