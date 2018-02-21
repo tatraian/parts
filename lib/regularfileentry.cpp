@@ -57,5 +57,7 @@ void RegularFileEntry::compressEntry(const boost::filesystem::path& root, Compre
 //==========================================================================================================================================
 void RegularFileEntry::extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend)
 {
+    decompressor.extractFile(dest_root / m_file, backend, m_offset, m_compressedSize);
 
+    setMetadata(dest_root);
 }

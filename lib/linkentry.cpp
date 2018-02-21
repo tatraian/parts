@@ -57,6 +57,8 @@ void LinkEntry::compressEntry(const boost::filesystem::path& root, Compressor& c
 //==========================================================================================================================================
 void LinkEntry::extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend)
 {
-    //boost::filesystem::create_symlink(m_destination)
+    boost::system::error_code ec;
+    boost::filesystem::create_symlink(m_destination, dest_root / m_file, ec);
+    if (ec)
+        throw PartsException("Cannot create symbolic link: '" + (dest_root / m_file).string() + "' to '" + m_destination.string() +"'");
 }
-
