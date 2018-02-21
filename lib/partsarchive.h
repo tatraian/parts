@@ -28,7 +28,7 @@ public:
 
 
     const TableOfContents& toc() const
-    {return m_toc; }
+    { return m_toc; }
 
     void createArchive(const boost::filesystem::path& archive);
 
