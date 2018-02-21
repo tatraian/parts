@@ -109,7 +109,7 @@ std::shared_ptr<BaseEntry> TableOfContents::find(const boost::filesystem::path& 
 //==========================================================================================================================================
 void TableOfContents::add(const boost::filesystem::path& root, const boost::filesystem::path& file)
 {
-    boost::filesystem::path filename = file.lexically_relative(root);
+    boost::filesystem::path filename = file.lexically_relative(root.parent_path());
 
     // getting stat
     struct stat file_stat;
