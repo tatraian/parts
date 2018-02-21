@@ -38,7 +38,7 @@ void BaseEntry::append(std::vector<uint8_t>& buffer) const
 void BaseEntry::setMetadata(const boost::filesystem::path& dest_root)
 {
     if (m_ownerId != 0) {
-        struct passwd* pw = getpwname(m_owner.c_str());
+        struct passwd* pw = getpwnam(m_owner.c_str());
         struct ::group* gr = getgrnam(m_group.c_str());
 
         int result = chown((dest_root / m_file).c_str(), pw->pw_uid, gr->gr_gid);

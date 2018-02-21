@@ -11,7 +11,4 @@ enum class EntryTypes : uint8_t {
     Link = 3
 };
 
-const std::string TableOfContents::DEFAULT_OWNER = "__PARTS_DEFAULT_OWNER__";
-const std::string TableOfContents::DEFAULT_GROUP = "__PARTS_DEFAULT_GROUP__";
-
 #endif // INTERNAL_DEFINITIONS_H

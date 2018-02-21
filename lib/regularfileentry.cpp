@@ -53,3 +53,9 @@ void RegularFileEntry::compressEntry(const boost::filesystem::path& root, Compre
     m_offset = backend.getPosition();
     m_compressedSize = compressor.compressFile(root / m_file, backend);
 }
+
+//==========================================================================================================================================
+void RegularFileEntry::extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend)
+{
+
+}

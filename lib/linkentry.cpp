@@ -57,6 +57,6 @@ void LinkEntry::compressEntry(const boost::filesystem::path& root, Compressor& c
 //==========================================================================================================================================
 void LinkEntry::extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend)
 {
-    boost::filesystem::create_symlink(m_destination)
+    //boost::filesystem::create_symlink(m_destination)
 }
 
