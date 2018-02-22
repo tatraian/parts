@@ -1,4 +1,6 @@
 set(parts_SRCS
+    logger.h
+    logger.cpp
     partscreator.cpp
     parts.cpp
     filewritebackend.cpp
@@ -24,7 +26,7 @@ set(parts_SRCS
     )
 
 add_library(parts ${parts_SRCS})
-target_link_libraries(parts Boost::system Boost::filesystem PicoSHA256 lzma::lzma)
+target_link_libraries(parts Boost::system Boost::filesystem PicoSHA256 lzma::lzma fmt::fmt)
 target_include_directories(parts INTERFACE .)
 
 if(BUILD_TESTS)

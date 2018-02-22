@@ -16,6 +16,8 @@ hunter_add_package(Boost COMPONENTS system filesystem)
 find_package(Boost CONFIG REQUIRED system filesystem)
 hunter_add_package(lzma)
 find_package(lzma)
+hunter_add_package(fmt)
+find_package(fmt CONFIG REQUIRED)
 
 if (BUILD_TESTS)
     hunter_add_package(Boost COMPONENTS test)
