@@ -7,11 +7,11 @@
 namespace parts {
 
 enum class LOG_LEVELS{
-    DEBUG,
-    TRACE,
-    INFO,
-    WARNING,
-    ERROR
+    DEBUG = 0,
+    TRACE = 1,
+    INFO = 2,
+    WARNING = 3,
+    ERROR = 4
 };
 
 constexpr const char* to_string(LOG_LEVELS level) {

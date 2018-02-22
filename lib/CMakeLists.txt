@@ -23,6 +23,8 @@ set(parts_SRCS
     lzmadecompressor.cpp
     simpleguard.h
     filereadbackend.cpp
+    consolelogger.h
+    consolelogger.cpp
     )
 
 add_library(parts ${parts_SRCS})
