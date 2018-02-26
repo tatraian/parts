@@ -2,6 +2,7 @@
 #include "filewritebackend.h"
 #include "lzmacompressor.h"
 #include "lzmadecompressor.h"
+#include "logger.h"
 
 #include <boost/filesystem.hpp>
 
@@ -32,11 +33,12 @@ void PartsArchive::createArchive(const boost::filesystem::path& archive)
     auto p = boost::filesystem::unique_path();
     p = "/tmp" / p;
 
+    LOG_DEBUG("Uniq temprary file: {}", p.string());
     FileWriteBackend temp(p);
-    // TODO: log for temp path
+
     LzmaCompressorParameters lzma_pars;
     for(auto& entry : m_toc) {
-        // TODO log about processing file
+        LOG_TRACE("Compressing entry: {}", entry.first.string());
         LzmaCompressor compressior(lzma_pars);
         entry.second->compressEntry(m_root, compressior, temp);
     }
@@ -46,9 +48,11 @@ void PartsArchive::createArchive(const boost::filesystem::path& archive)
 
     LzmaCompressor toc_compressior(lzma_pars);
     std::vector<uint8_t> compressed_toc;
+    LOG_DEBUG("Compressing TOC");
     toc_compressior.compressBuffer(uncompressed_toc, compressed_toc);
     m_header.setTocSize(compressed_toc.size());
 
+    LOG_DEBUG("Concatenating files");
     file.append(m_header.getRaw());
     file.append(compressed_toc);
     file.concatenate(std::move(temp));

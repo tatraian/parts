@@ -5,6 +5,7 @@
 #include "packager.h"
 #include "decompressorfactory.h"
 #include "internal_definitions.h"
+#include "logger.h"
 
 #include <boost/filesystem.hpp>
 
@@ -22,6 +23,7 @@ const std::string TableOfContents::DEFAULT_GROUP = "__PARTS_DEFAULT_GROUP__";
 TableOfContents::TableOfContents(const boost::filesystem::path& source, const PartsCompressionParameters& parameters) :
     m_parameters(parameters)
 {
+    LOG_DEBUG("Source: {}", source.string());
     m_owners.push_back(DEFAULT_OWNER);
     m_groups.push_back(DEFAULT_GROUP);
 
@@ -122,17 +124,17 @@ void TableOfContents::add(const boost::filesystem::path& root, const boost::file
     std::shared_ptr<BaseEntry> entry;
     // must check this first, because depending of the target of the link is_regular_file and is_directory are also true...
     if (boost::filesystem::is_symlink(file)) {
-            boost::filesystem::path target = boost::filesystem::read_symlink(file);
+        boost::filesystem::path target = boost::filesystem::read_symlink(file);
 
-            entry.reset(new LinkEntry(filename,
-                                      permissions,
-                                      m_owners[owner_id],
-                                      owner_id,
-                                      m_groups[group_id],
-                                      group_id,
-                                      // order is important otherwise fileInsideRoot will die with relative paths
-                                      target.is_absolute() && fileInsideRoot(root, target) ? target.lexically_relative(root) : target,
-                                      target.is_absolute()));
+        entry.reset(new LinkEntry(filename,
+                                  permissions,
+                                  m_owners[owner_id],
+                                  owner_id,
+                                  m_groups[group_id],
+                                  group_id,
+                                  // order is important otherwise fileInsideRoot will die with relative paths
+                                  target.is_absolute() && fileInsideRoot(root, target) ? target.lexically_relative(root) : target,
+                                  target.is_absolute()));
     } else if (boost::filesystem::is_directory(file)) {
         entry.reset(new DirectoryEntry(filename,
                                        permissions,
@@ -154,6 +156,7 @@ void TableOfContents::add(const boost::filesystem::path& root, const boost::file
         // TODO log here!
         return;
     }
+    LOG_DEBUG("Adding TOC entry: {}", entry->toString());
 
     m_files[entry->file()] = entry;
 }
