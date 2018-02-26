@@ -27,6 +27,8 @@ public:
     void compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend) override;
 
     void extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend) override;
+
+    std::string toString() const override;
 };
 
 }

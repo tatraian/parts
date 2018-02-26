@@ -62,6 +62,8 @@ public:
     uint16_t groupId() const
     { return m_groupId; }
 
+    virtual std::string toString() const;
+
 protected:
     void setMetadata(const boost::filesystem::path& dest_root);
 

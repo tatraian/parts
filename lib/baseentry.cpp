@@ -6,6 +6,8 @@
 #include <pwd.h>
 #include <grp.h>
 
+#include <fmt/format.h>
+
 using namespace parts;
 
 
@@ -32,6 +34,12 @@ void BaseEntry::append(std::vector<uint8_t>& buffer) const
     Packager::append(buffer, m_permissions);
     Packager::append(buffer, m_ownerId);
     Packager::append(buffer, m_groupId);
+}
+
+//==========================================================================================================================================
+std::string BaseEntry::toString() const
+{
+    return fmt::format("{}: ({:o}, {}:{})", m_file.string(), m_permissions, m_owner, m_group);
 }
 
 //==========================================================================================================================================

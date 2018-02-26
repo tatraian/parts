@@ -32,6 +32,8 @@ public:
 
     void extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend) override;
 
+    std::string toString() const override;
+
     const Hash& uncompressedHash() const
     { return m_uncompressedHash; }
 

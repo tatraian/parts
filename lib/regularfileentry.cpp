@@ -3,6 +3,8 @@
 #include "internal_definitions.h"
 #include "packager.h"
 
+#include <fmt/format.h>
+
 using namespace parts;
 
 
@@ -60,4 +62,15 @@ void RegularFileEntry::extractEntry(const boost::filesystem::path& dest_root, De
     decompressor.extractFile(dest_root / m_file, backend, m_offset, m_compressedSize);
 
     setMetadata(dest_root);
+}
+
+//==========================================================================================================================================
+std::string RegularFileEntry::toString() const
+{
+    return fmt::format("{} --- type: file, offset: {}, ucs: {}, uch: {}, cs: {}",
+                       BaseEntry::toString(),
+                       m_offset,
+                       m_uncompressedSize,
+                       m_uncompressedHash.hashString(),
+                       m_compressedSize);
 }

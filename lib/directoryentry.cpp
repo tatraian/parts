@@ -5,6 +5,8 @@
 
 #include <boost/filesystem.hpp>
 
+#include <fmt/format.h>
+
 using namespace parts;
 
 //==========================================================================================================================================
@@ -48,4 +50,10 @@ void DirectoryEntry::extractEntry(const boost::filesystem::path& dest_root, Deco
         throw PartsException("Cannot create directory: " + (dest_root / m_file).string());
 
     setMetadata(dest_root);
+}
+
+//==========================================================================================================================================
+std::string DirectoryEntry::toString() const
+{
+    return fmt::format("{} --- type: directory", BaseEntry::toString());
 }

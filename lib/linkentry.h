@@ -30,6 +30,8 @@ public:
 
     void extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend) override;
 
+    std::string toString() const override;
+
     const boost::filesystem::path& destination() const
     { return m_destination; }
 

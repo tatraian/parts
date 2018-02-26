@@ -5,6 +5,8 @@
 
 #include <boost/filesystem.hpp>
 
+#include <fmt/format.h>
+
 using namespace parts;
 
 
@@ -61,4 +63,10 @@ void LinkEntry::extractEntry(const boost::filesystem::path& dest_root, Decompres
     boost::filesystem::create_symlink(m_destination, dest_root / m_file, ec);
     if (ec)
         throw PartsException("Cannot create symbolic link: '" + (dest_root / m_file).string() + "' to '" + m_destination.string() +"'");
+}
+
+//==========================================================================================================================================
+std::string LinkEntry::toString() const
+{
+    return fmt::format("{} --- type: link, target: {}", BaseEntry::toString(), m_destination.string());
 }
