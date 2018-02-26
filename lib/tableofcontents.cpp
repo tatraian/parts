@@ -30,11 +30,9 @@ TableOfContents::TableOfContents(const boost::filesystem::path& source, const Pa
     if (!boost::filesystem::exists(source))
         throw PartsException("Source doesn't exist: " + source.string());
 
+    add(source.parent_path(), source);
     if (boost::filesystem::is_regular_file(source) || boost::filesystem::is_symlink(source))
-    {
-        add(source, source);
         return;
-    }
 
     boost::filesystem::recursive_directory_iterator dir(source), end;
     for (;dir != end;++dir)
