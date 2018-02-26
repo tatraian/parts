@@ -30,6 +30,8 @@ PartsArchive::PartsArchive(std::unique_ptr<ContentReadBackend>&& backend) :
 void PartsArchive::createArchive(const boost::filesystem::path& archive)
 {
     auto p = boost::filesystem::unique_path();
+    p = "/tmp" / p;
+
     FileWriteBackend temp(p);
     // TODO: log for temp path
     LzmaCompressorParameters lzma_pars;
