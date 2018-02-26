@@ -19,25 +19,25 @@ const std::string TableOfContents::DEFAULT_OWNER = "__PARTS_DEFAULT_OWNER__";
 const std::string TableOfContents::DEFAULT_GROUP = "__PARTS_DEFAULT_GROUP__";
 
 //==========================================================================================================================================
-TableOfContents::TableOfContents(const boost::filesystem::path& root, const PartsCompressionParameters& parameters) :
+TableOfContents::TableOfContents(const boost::filesystem::path& source, const PartsCompressionParameters& parameters) :
     m_parameters(parameters)
 {
     m_owners.push_back(DEFAULT_OWNER);
     m_groups.push_back(DEFAULT_GROUP);
 
-    if (!boost::filesystem::exists(root))
-        throw PartsException("Root directory doesn't exist: " + root.string());
+    if (!boost::filesystem::exists(source))
+        throw PartsException("Source doesn't exist: " + source.string());
 
-    if (boost::filesystem::is_regular_file(root) || boost::filesystem::is_symlink(root))
+    if (boost::filesystem::is_regular_file(source) || boost::filesystem::is_symlink(source))
     {
-        add(root.parent_path(), root);
+        add(source, source);
         return;
     }
 
-    boost::filesystem::recursive_directory_iterator dir(root), end;
+    boost::filesystem::recursive_directory_iterator dir(source), end;
     for (;dir != end;++dir)
     {
-        add(root, dir->path());
+        add(source.parent_path(), dir->path());
         if (boost::filesystem::is_symlink(dir->path()))
             dir.no_push();
     }
@@ -109,7 +109,7 @@ std::shared_ptr<BaseEntry> TableOfContents::find(const boost::filesystem::path& 
 //==========================================================================================================================================
 void TableOfContents::add(const boost::filesystem::path& root, const boost::filesystem::path& file)
 {
-    boost::filesystem::path filename = file.lexically_relative(root.parent_path());
+    boost::filesystem::path filename = file.lexically_relative(root);
 
     // getting stat
     struct stat file_stat;

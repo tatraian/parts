@@ -9,10 +9,10 @@ using namespace parts;
 
 
 //==========================================================================================================================================
-PartsArchive::PartsArchive(const boost::filesystem::path& root, const PartsCompressionParameters& parameters) :
-    m_root(root),
+PartsArchive::PartsArchive(const boost::filesystem::path& source, const PartsCompressionParameters& parameters) :
+    m_root(source.parent_path()),
     m_header(parameters),
-    m_toc(root, parameters)
+    m_toc(source, parameters)
 {
 }
 

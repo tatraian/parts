@@ -15,17 +15,16 @@ class PartsArchive
 public:
     /**
      * @brief PartsArchive constructor to compress content
-     * @param root The root of compression
+     * @param target The source of compression
      * @param parameters The compression parameters
      */
-    PartsArchive(const boost::filesystem::path& root, const PartsCompressionParameters& parameters);
+    PartsArchive(const boost::filesystem::path& source, const PartsCompressionParameters& parameters);
 
     /**
      * @brief PartsArchive constructor for extracting archive
      * @param backend Backend should now the destination
      */
     PartsArchive(std::unique_ptr<ContentReadBackend>&& backend);
-
 
     const TableOfContents& toc() const
     { return m_toc; }
