@@ -5,7 +5,7 @@
 #include <lzma.h>
 
 int main(int argc, char** argv) {
-    parts::ConsoleLogger logger(parts::LOG_LEVELS::TRACE);
+    parts::ConsoleLogger logger(parts::LOG_LEVELS::DEBUG);
     parts::set_logger(&logger);
     if (argc < 2) {
         std::cerr << "Please give a file!\n";
