@@ -1,8 +1,6 @@
 set(parts_SRCS
     logger.h
     logger.cpp
-    partscreator.cpp
-    parts.cpp
     filewritebackend.cpp
     contentwritebackend.h
     hash.cpp
@@ -33,7 +31,6 @@ target_include_directories(parts INTERFACE .)
 
 if(BUILD_TESTS)
     add_executable(parts_lib_tests
-        tests/partscreator_test.cpp
         tests/filewritebackend_test.cpp
         tests/hash_test.cpp
         tests/plaincompressor_test.cpp

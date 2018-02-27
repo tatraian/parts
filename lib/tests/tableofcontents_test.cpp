@@ -1,3 +1,4 @@
+#define BOOST_TEST_MODULE parts_test
 #include <boost/test/auto_unit_test.hpp>
 
 #include "../tableofcontents.h"
