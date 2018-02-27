@@ -13,7 +13,8 @@ using namespace parts;
 PartsArchive::PartsArchive(const boost::filesystem::path& source, const PartsCompressionParameters& parameters) :
     m_root(source.parent_path()),
     m_header(parameters),
-    m_toc(source, parameters)
+    m_toc(source, parameters),
+    m_compressionParameters(parameters)
 {
 }
 
@@ -39,14 +40,14 @@ void PartsArchive::createArchive(const boost::filesystem::path& archive)
     LzmaCompressorParameters lzma_pars;
     for(auto& entry : m_toc) {
         LOG_TRACE("Compressing entry: {}", entry.first.string());
-        LzmaCompressor compressior(lzma_pars);
+        LzmaCompressor compressior(m_compressionParameters.m_lzmaParameters);
         entry.second->compressEntry(m_root, compressior, temp);
     }
 
     FileWriteBackend file(archive.string());
     std::vector<uint8_t> uncompressed_toc = m_toc.getRaw();
 
-    LzmaCompressor toc_compressior(lzma_pars);
+    LzmaCompressor toc_compressior(m_compressionParameters.m_lzmaParameters);
     std::vector<uint8_t> compressed_toc;
     LOG_DEBUG("Compressing TOC");
     toc_compressior.compressBuffer(uncompressed_toc, compressed_toc);

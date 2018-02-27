@@ -43,6 +43,8 @@ protected:
 
     Header m_header;
     TableOfContents m_toc;
+    // Compression parameters (in case of compression)
+    PartsCompressionParameters m_compressionParameters;
 };
 
 }
