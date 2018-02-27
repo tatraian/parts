@@ -40,7 +40,6 @@ if(BUILD_TESTS)
         tests/directoryentry_test.cpp
         tests/linkentry_test.cpp
         tests/packager_test.cpp
-        tests/stackvector_test.cpp
         tests/tableofcontents_test.cpp
         tests/header_test.cpp
         tests/lzmadecompressor_test.cpp
