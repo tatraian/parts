@@ -1,8 +1,11 @@
 #include <partsarchive.h>
+#include <consolelogger.h>
 
 #include <iostream>
 
 int main(int argc, char** argv) {
+    parts::ConsoleLogger logger(parts::LOG_LEVELS::TRACE);
+    parts::set_logger(&logger);
     if (argc < 2) {
         std::cerr << "Please give a file!\n";
         return 1;
