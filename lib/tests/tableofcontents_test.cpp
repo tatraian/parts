@@ -183,7 +183,8 @@ BOOST_FIXTURE_TEST_CASE(permessions_are_saved_correctly, FakeTableOfContents) {
 
 //==========================================================================================================================================
 BOOST_FIXTURE_TEST_CASE(detects_files_correctly, FakeTableOfContents) {
-    boost::filesystem::path test_root("/tmp/test_path");
+    boost::filesystem::path test_root("/tmp");
+    boost::filesystem::path test_path("/tmp/test_path");
     boost::filesystem::path test_dir("/tmp/test_path/test_dir");
     boost::filesystem::path test_file("/tmp/test_path/test_dir/test_file");
     boost::filesystem::path test_absolute_link("/tmp/test_path/test_absolute_link");
@@ -191,9 +192,9 @@ BOOST_FIXTURE_TEST_CASE(detects_files_correctly, FakeTableOfContents) {
     boost::filesystem::path test_absolute_dir_link("/tmp/test_path/test_absolute_dir_link");
     boost::filesystem::path test_relative_dir_link("/tmp/test_path/test_relative_dir_link");
     boost::filesystem::path test_absolute_link_to_out("/tmp/test_path/test_absolute_out_link");
-    boost::filesystem::remove_all(test_root);
+    boost::filesystem::remove_all(test_path);
 
-    boost::filesystem::create_directory(test_root);
+    boost::filesystem::create_directory(test_path);
     boost::filesystem::create_directory(test_dir);
     std::ofstream f(test_file.c_str(), std::ios::ate);
     f << "aaa";
@@ -205,9 +206,7 @@ BOOST_FIXTURE_TEST_CASE(detects_files_correctly, FakeTableOfContents) {
     boost::filesystem::create_symlink( "/bin/bash", test_absolute_link_to_out);
 
     PartsCompressionParameters params;
-    TableOfContents toc(test_root, params);
-
-    BOOST_REQUIRE_EQUAL(toc.size(), 7);
+    TableOfContents toc(test_path, params);
 
     std::shared_ptr<BaseEntry> entry = toc.find(test_dir.lexically_relative(test_root));
     BOOST_REQUIRE(entry);
