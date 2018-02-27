@@ -2,6 +2,7 @@
 #include <consolelogger.h>
 
 #include <iostream>
+#include <lzma.h>
 
 int main(int argc, char** argv) {
     parts::ConsoleLogger logger(parts::LOG_LEVELS::TRACE);
@@ -18,6 +19,8 @@ int main(int argc, char** argv) {
     }
 
     parts::PartsCompressionParameters parameters;
+    parameters.m_lzmaParameters.m_compressionLevel = (9 | LZMA_PRESET_EXTREME);
+    parameters.m_lzmaParameters.m_x86FilterActive = true;
     parts::PartsArchive archive(root_name, parameters);
 
     archive.createArchive("/tmp/archive.parts");
