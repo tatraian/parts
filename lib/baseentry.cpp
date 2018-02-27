@@ -6,7 +6,7 @@
 #include <pwd.h>
 #include <grp.h>
 
-#include <fmt/format.h>
+#include "logger.h"
 
 using namespace parts;
 
@@ -50,11 +50,15 @@ void BaseEntry::setMetadata(const boost::filesystem::path& dest_root)
         struct ::group* gr = getgrnam(m_group.c_str());
 
         int result = chown((dest_root / m_file).c_str(), pw->pw_uid, gr->gr_gid);
-        if (result != 0)
-            throw PartsException("Cannot change owner/group of file: " + (dest_root / m_file).string());
+        if (result != 0) {
+            LOG_WARNING("Cannot change owner/group of file: {}", (dest_root / m_file).string());
+            //throw PartsException("Cannot change owner/group of file: " + (dest_root / m_file).string());
+        }
     }
 
     int result = chmod((dest_root / m_file).c_str(), m_permissions);
-    if (result != 0)
-        throw PartsException("Cannot change permissions of file: " + (dest_root / m_file).string());
+    if (result != 0) {
+        LOG_WARNING("Cannot change permissions of file: {}", (dest_root / m_file).string());
+        //throw PartsException("Cannot change permissions of file: " + (dest_root / m_file).string());
+    }
 }
