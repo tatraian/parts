@@ -14,6 +14,8 @@
 #include <pwd.h>
 #include <grp.h>
 
+#include <chrono>
+
 using namespace parts;
 
 const std::string TableOfContents::DEFAULT_OWNER = "__PARTS_DEFAULT_OWNER__";
@@ -23,7 +25,7 @@ const std::string TableOfContents::DEFAULT_GROUP = "__PARTS_DEFAULT_GROUP__";
 TableOfContents::TableOfContents(const boost::filesystem::path& source, const PartsCompressionParameters& parameters) :
     m_parameters(parameters)
 {
-    LOG_DEBUG("Source: {}", source.string());
+    LOG_TRACE("Source: {}", source.string());
     m_owners.push_back(DEFAULT_OWNER);
     m_groups.push_back(DEFAULT_GROUP);
 
@@ -34,6 +36,8 @@ TableOfContents::TableOfContents(const boost::filesystem::path& source, const Pa
     if (boost::filesystem::is_regular_file(source) || boost::filesystem::is_symlink(source))
         return;
 
+    auto start_time = std::chrono::system_clock::now();
+    LOG_TRACE("Creating TOC");
     boost::filesystem::recursive_directory_iterator dir(source), end;
     for (;dir != end;++dir)
     {
@@ -41,6 +45,9 @@ TableOfContents::TableOfContents(const boost::filesystem::path& source, const Pa
         if (boost::filesystem::is_symlink(dir->path()))
             dir.no_push();
     }
+    auto end_time = std::chrono::system_clock::now();
+    std::chrono::duration<double> diff = end_time-start_time;
+    LOG_DEBUG("TOC creation time: {} s", diff.count());
 }
 
 //==========================================================================================================================================
@@ -50,6 +57,7 @@ TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, c
     std::vector<uint8_t> compressed_toc(toc_size, 0);
     backend.read(compressed_toc);
 
+    LOG_DEBUG("Decompressing TOC");
     auto decompressor = DecompressorFactory::createDecompressor(m_parameters.m_tocCompression);
     std::deque<uint8_t> uncompressed_toc = decompressor->extractBuffer(compressed_toc);
 
@@ -76,6 +84,7 @@ TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, c
             throw PartsException("Unknown node type: " + std::to_string(tmp));
         }
 
+        LOG_DEBUG("TOC entry: {}", entry->toString());
         m_files[entry->file()] = entry;
     }
 }

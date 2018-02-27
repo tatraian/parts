@@ -37,12 +37,19 @@ void PartsArchive::createArchive(const boost::filesystem::path& archive)
     LOG_DEBUG("Uniq temprary file: {}", p.string());
     FileWriteBackend temp(p);
 
-    LzmaCompressorParameters lzma_pars;
+    auto start_time = std::chrono::system_clock::now();
     for(auto& entry : m_toc) {
+        auto entry_s = std::chrono::system_clock::now();
         LOG_TRACE("Compressing entry: {}", entry.first.string());
         LzmaCompressor compressior(m_compressionParameters.m_lzmaParameters);
         entry.second->compressEntry(m_root, compressior, temp);
+        auto entry_e = std::chrono::system_clock::now();
+        std::chrono::duration<double> diff = entry_e - entry_s;
+        LOG_DEBUG("Compressing time: {} s", diff.count());
     }
+    auto end_time = std::chrono::system_clock::now();
+    std::chrono::duration<double> diff = end_time - start_time;
+    LOG_TRACE("Compressing time: {} s", diff.count());
 
     FileWriteBackend file(archive.string());
     std::vector<uint8_t> uncompressed_toc = m_toc.getRaw();
@@ -53,7 +60,6 @@ void PartsArchive::createArchive(const boost::filesystem::path& archive)
     toc_compressior.compressBuffer(uncompressed_toc, compressed_toc);
     m_header.setTocSize(compressed_toc.size());
 
-    LOG_DEBUG("Concatenating files");
     file.append(m_header.getRaw());
     file.append(compressed_toc);
     file.concatenate(std::move(temp));
@@ -62,8 +68,13 @@ void PartsArchive::createArchive(const boost::filesystem::path& archive)
 //==========================================================================================================================================
 void PartsArchive::extractArchive(const boost::filesystem::path& dest) const
 {
+    auto start_time = std::chrono::system_clock::now();
     for (auto& entry : m_toc) {
+        LOG_TRACE("Extracting entry: {}", entry.second->toString());
         LzmaDecompressor decompressor;
         entry.second->extractEntry(dest, decompressor, *m_contentReader.get());
     }
+    auto end_time = std::chrono::system_clock::now();
+    std::chrono::duration<double> diff = end_time - start_time;
+    LOG_TRACE("Extracting time: {} s", diff.count());
 }
