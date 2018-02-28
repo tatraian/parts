@@ -2,6 +2,7 @@
 #define CONTENTWRITEBACKEND_H
 
 #include <vector>
+#include <cstdint>
 
 namespace parts
 {

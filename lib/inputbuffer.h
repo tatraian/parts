@@ -2,6 +2,7 @@
 #define INPUTBUFFER_H
 
 #include <vector>
+#include <cstdint>
 
 namespace parts {
 
@@ -52,7 +53,7 @@ public:
     const_reference back() const
     { return m_buffer.back(); }
 
-    size_t size() const {
+    std::size_t size() const {
         return m_buffer.size() - m_start;
     }
 
@@ -78,7 +79,7 @@ public:
 protected:
     std::vector<uint8_t> m_buffer;
 
-    size_t m_start;
+    std::size_t m_start;
 };
 
 }

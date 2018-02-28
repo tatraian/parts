@@ -23,7 +23,7 @@ public:
     PartsException(const std::string& msg) : std::runtime_error(msg) {}
 };
 
-inline constexpr size_t hash_size(HashType type) {
+inline size_t hash_size(HashType type) {
     switch (type) {
     case HashType::MD5:
         return 16;

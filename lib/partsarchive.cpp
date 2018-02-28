@@ -3,6 +3,7 @@
 #include "lzmacompressor.h"
 #include "lzmadecompressor.h"
 #include "logger.h"
+#include <chrono>
 
 #include <boost/filesystem.hpp>
 
