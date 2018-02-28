@@ -31,6 +31,14 @@ protected:
     std::vector<uint8_t> m_hash;
 };
 
+inline bool operator==(const Hash& ls, const Hash& rs) {
+    return ls.hash() == rs.hash();
+}
+
+inline bool operator!=(const Hash& ls, const Hash& rs) {
+    return !(ls == rs);
+}
+
 }
 
 #endif // HASH_H

@@ -66,6 +66,17 @@ void LinkEntry::extractEntry(const boost::filesystem::path& dest_root, Decompres
 }
 
 //==========================================================================================================================================
+void LinkEntry::updateEntry(const BaseEntry* old_entry,
+                            const boost::filesystem::path& old_root,
+                            const boost::filesystem::path& dest_root,
+                            Decompressor& decompressor,
+                            ContentReadBackend& backend)
+{
+    // Do the same in this case too, since there is no data extraction
+    extractEntry(dest_root, decompressor, backend);
+}
+
+//==========================================================================================================================================
 std::string LinkEntry::toString() const
 {
     return fmt::format("{} --- type: link, target: {}", BaseEntry::toString(), m_destination.string());

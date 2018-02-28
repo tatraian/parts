@@ -28,6 +28,12 @@ public:
 
     void extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend) override;
 
+    void updateEntry(const BaseEntry* old_entry,
+                     const boost::filesystem::path& old_root,
+                     const boost::filesystem::path& dest_root,
+                     Decompressor& decompressor,
+                     ContentReadBackend& backend) override;
+
     std::string toString() const override;
 };
 

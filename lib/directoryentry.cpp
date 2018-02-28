@@ -53,6 +53,17 @@ void DirectoryEntry::extractEntry(const boost::filesystem::path& dest_root, Deco
 }
 
 //==========================================================================================================================================
+void DirectoryEntry::updateEntry(const BaseEntry* old_entry,
+                                 const boost::filesystem::path& old_root,
+                                 const boost::filesystem::path& dest_root,
+                                 Decompressor& decompressor,
+                                 ContentReadBackend& backend)
+{
+    // Do the same as in case of extract, (that is good if the old entry is file or link too)
+    extractEntry(dest_root, decompressor, backend);
+}
+
+//==========================================================================================================================================
 std::string DirectoryEntry::toString() const
 {
     return fmt::format("{} --- type: directory", BaseEntry::toString());

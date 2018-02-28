@@ -44,6 +44,12 @@ public:
 
     virtual void extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend) = 0;
 
+    virtual void updateEntry(const BaseEntry* old_entry,
+                             const boost::filesystem::path& old_root,
+                             const boost::filesystem::path& dest_root,
+                             Decompressor& decompressor,
+                             ContentReadBackend& backend) = 0;
+
     const boost::filesystem::path& file() const
     { return m_file; }
 

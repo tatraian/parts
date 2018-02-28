@@ -51,14 +51,17 @@ void PartsArchive::createArchive(const boost::filesystem::path& archive)
     std::chrono::duration<double> diff = end_time - start_time;
     LOG_TRACE("Compressing time: {} s", diff.count());
 
+    LOG_DEBUG("Files compressed sum: {}", temp.getPosition());
     FileWriteBackend file(archive.string());
     std::vector<uint8_t> uncompressed_toc = m_toc.getRaw();
+    LOG_DEBUG("Uncompressed toc size: {}", uncompressed_toc.size());
 
     LzmaCompressor toc_compressior(m_compressionParameters.m_lzmaParameters);
     std::vector<uint8_t> compressed_toc;
     LOG_DEBUG("Compressing TOC");
     toc_compressior.compressBuffer(uncompressed_toc, compressed_toc);
     m_header.setTocSize(compressed_toc.size());
+    LOG_DEBUG("Compressed TOC size: {}", compressed_toc.size());
 
     file.append(m_header.getRaw());
     file.append(compressed_toc);
@@ -77,4 +80,25 @@ void PartsArchive::extractArchive(const boost::filesystem::path& dest) const
     auto end_time = std::chrono::system_clock::now();
     std::chrono::duration<double> diff = end_time - start_time;
     LOG_TRACE("Extracting time: {} s", diff.count());
+}
+
+//==========================================================================================================================================
+void PartsArchive::updateArchive(const boost::filesystem::path& original_source, const boost::filesystem::path& dest)
+{
+    PartsCompressionParameters params;
+    TableOfContents old_toc(original_source, params);
+
+    auto start_time = std::chrono::system_clock::now();
+    for (auto& entry : m_toc) {
+        auto old_entry = old_toc.find(entry.first);
+
+        LOG_TRACE("Update entry: {}", entry.second->toString());
+        LzmaDecompressor decompressor;
+        entry.second->updateEntry(old_entry.get(), original_source.parent_path(), dest, decompressor, *m_contentReader.get());
+    }
+
+    auto end_time = std::chrono::system_clock::now();
+    std::chrono::duration<double> diff = end_time - start_time;
+    LOG_TRACE("Extracting time: {} s", diff.count());
+
 }

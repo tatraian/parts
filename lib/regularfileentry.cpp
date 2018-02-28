@@ -3,6 +3,7 @@
 #include "internal_definitions.h"
 #include "packager.h"
 
+#include <boost/filesystem.hpp>
 #include <fmt/format.h>
 
 using namespace parts;
@@ -61,6 +62,23 @@ void RegularFileEntry::extractEntry(const boost::filesystem::path& dest_root, De
 {
     decompressor.extractFile(dest_root / m_file, backend, m_offset, m_compressedSize);
 
+    setMetadata(dest_root);
+}
+
+//==========================================================================================================================================
+void RegularFileEntry::updateEntry(const BaseEntry* old_entry,
+                                   const boost::filesystem::path& old_root,
+                                   const boost::filesystem::path& dest_root,
+                                   Decompressor& decompressor,
+                                   ContentReadBackend& backend)
+{
+    auto file_old_entry = dynamic_cast<const RegularFileEntry*>(old_entry);
+    if (file_old_entry == nullptr || file_old_entry->m_uncompressedHash != m_uncompressedHash) {
+        extractEntry(dest_root, decompressor, backend);
+        return;
+    }
+
+    boost::filesystem::copy_file(old_root / old_entry->file(), dest_root / m_file);
     setMetadata(dest_root);
 }
 
