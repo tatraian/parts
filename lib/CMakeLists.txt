@@ -24,6 +24,10 @@ set(parts_SRCS
     consolelogger.h
     consolelogger.cpp
     inputbuffer.h
+    plaindecompressor.h
+    plaindecompressor.cpp
+    compressorfactory.h
+    compressorfactory.cpp
     )
 
 add_library(parts ${parts_SRCS})
