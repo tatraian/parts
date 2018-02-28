@@ -3,6 +3,7 @@
 #include "parts_definitions.h"
 #include "internal_definitions.h"
 #include "simpleguard.h"
+#include "logger.h"
 
 #include <fstream>
 
@@ -43,6 +44,7 @@ void LzmaDecompressor::extractFile(const boost::filesystem::path& file,
     setupXZLib(lzma_context);
     SimpleGuard< std::function<void()> > guard([&](){lzma_end(&lzma_context);});
 
+    LOG_DEBUG("Seeking position: {}", position);
     backend.seek(position);
 
     size_t read_bytes = 0;
@@ -109,9 +111,14 @@ void LzmaDecompressor::extractInternal(lzma_stream& lzma_context,
             write(obuf, bytes_to_write);
             lzma_context.next_out = obuf;
             lzma_context.avail_out = 1024*1024;
+            if (result == LZMA_STREAM_END)
+                break;
+
+            continue;
         }
 
-        if (result != LZMA_OK)
-            break;
+        if (result != LZMA_OK) {
+            throw PartsException("Invalid lzam return code: " + std::to_string(result));
+        }
     }
 }

@@ -26,6 +26,8 @@ PartsArchive::PartsArchive(std::unique_ptr<ContentReadBackend>&& backend) :
                                                                                     m_header.getTocCompressionType(),
                                                                                     m_header.getFileCompressionType()))
 {
+    uint64_t head_and_compressed_toc_size = m_contentReader->position();
+    m_toc.shiftOffsets(head_and_compressed_toc_size);
 }
 
 //==========================================================================================================================================

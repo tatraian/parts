@@ -52,6 +52,9 @@ public:
     const uint64_t& offset() const
     { return m_offset; }
 
+    void shiftOffset(uint64_t& shift)
+    { m_offset += shift; }
+
 protected:
     Hash m_uncompressedHash;
     uint64_t m_uncompressedSize;

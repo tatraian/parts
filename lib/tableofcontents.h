@@ -28,6 +28,8 @@ public:
 
     std::vector<uint8_t> getRaw() const;
 
+    void shiftOffsets(uint64_t& data_start);
+
     iterator begin()
     { return m_files.begin(); }
     const_iterator begin() const

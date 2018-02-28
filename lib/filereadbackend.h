@@ -29,6 +29,8 @@ public:
 
      void seek(const uint64_t& position) override;
 
+     uint64_t position() override;
+
 protected:
      boost::filesystem::path m_path;
      std::ifstream m_file;

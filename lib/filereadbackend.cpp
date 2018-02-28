@@ -78,3 +78,9 @@ void FileReadBackend::seek(const uint64_t& position)
         throw PartsException("Seeking file: " + m_path.string() + " failed!");
     m_file.seekg(position);
 }
+
+//==========================================================================================================================================
+uint64_t FileReadBackend::position()
+{
+    return m_file.tellg();
+}

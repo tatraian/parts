@@ -106,6 +106,16 @@ std::vector<uint8_t> TableOfContents::getRaw() const
 }
 
 //==========================================================================================================================================
+void TableOfContents::shiftOffsets(uint64_t& data_start)
+{
+    for(auto entry : m_files) {
+        auto rf = dynamic_cast<RegularFileEntry*>(entry.second.get());
+        if (rf != nullptr)
+            rf->shiftOffset(data_start);
+    }
+}
+
+//==========================================================================================================================================
 std::shared_ptr<BaseEntry> TableOfContents::find(const boost::filesystem::path& file)
 {
     auto it = m_files.find(file);

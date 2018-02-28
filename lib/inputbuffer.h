@@ -66,10 +66,11 @@ public:
     }
 
     iterator erase(iterator first, iterator last) {
-        if (first == begin() + m_start)
+        if (first == begin()) {
             m_start += last-first;
-        else
+        } else {
             m_buffer.erase(first, last);
+        }
 
         return last;
     }
