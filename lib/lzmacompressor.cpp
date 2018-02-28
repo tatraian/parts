@@ -137,14 +137,23 @@ void LzmaCompressor::setupXZLib(lzma_stream& context)
 
     lzma_ret result = lzma_stream_encoder(&context, m_parameters.m_x86FilterActive ? filters_x86 : filters, LZMA_CHECK_CRC64);
 
-    if (result == LZMA_OK)
-        return;
-
-    switch (result) {
-    case LZMA_MEM_ERROR:
-        throw PartsException("Memory allocation error");
-    default:
-        throw PartsException("Compressior initialization error");
+    switch (result)
+    {
+        case LZMA_OK:
+            return;
+        case LZMA_MEM_ERROR:
+        case LZMA_MEMLIMIT_ERROR:
+            throw PartsException("Memory allocation error");
+        case LZMA_NO_CHECK:
+        case LZMA_UNSUPPORTED_CHECK:
+        case LZMA_GET_CHECK:
+        case LZMA_FORMAT_ERROR:
+        case LZMA_OPTIONS_ERROR:
+        case LZMA_DATA_ERROR:
+        case LZMA_BUF_ERROR:
+        case LZMA_PROG_ERROR:
+        case LZMA_STREAM_END:
+            throw PartsException("Compressior initialization error");
     }
 }
 

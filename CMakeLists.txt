@@ -26,7 +26,7 @@ if (BUILD_TESTS)
     find_package(FakeIt)
 endif()
 
-add_definitions(-Wall)
+add_definitions(-Wall -Werror=switch-enum)
 
 add_subdirectory(thirdparty)
 add_subdirectory(lib)
