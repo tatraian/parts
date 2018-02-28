@@ -256,7 +256,7 @@ BOOST_FIXTURE_TEST_CASE(detects_files_correctly, FakeTableOfContents) {
 
 //==========================================================================================================================================
 BOOST_FIXTURE_TEST_CASE(can_unpack_names, FakeTableOfContents) {
-    std::deque<uint8_t> buffer = {0, 3,
+    InputBuffer buffer = {0, 3,
                                   0, 3, 'X', 'X', 'X',
                                   0, 2, 'Y', 'Y',
                                   0, 4, 'Z', 'Z', 'z', 'z'};

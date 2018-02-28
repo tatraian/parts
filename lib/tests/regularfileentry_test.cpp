@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(compress_fills_missing_entries_and_after_it_is_packed_corre
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(regular_file_entry_can_be_created_from_input_stream) {
-    std::deque<uint8_t> input = {0, 5, 'f', 'i', 'l', 'e', '1', 1, 0244, 0, 0, 0, 0,
+    InputBuffer input = {0, 5, 'f', 'i', 'l', 'e', '1', 1, 0244, 0, 0, 0, 0,
                                  // hash
                                  0x88, 0xd4, 0x26, 0x6f, 0xd4, 0xe6, 0x33, 0x8d,
                                  0x13, 0xb8, 0x45, 0xfc, 0xf2, 0x89, 0x57, 0x9d,

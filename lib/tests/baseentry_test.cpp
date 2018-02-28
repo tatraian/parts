@@ -18,7 +18,7 @@ public:
                   uint16_t group_id) :
         BaseEntry(file, permissions, owner, owner_id, group, group_id) {}
 
-    TestBaseEntry(std::deque<uint8_t>& buffer, const std::vector<std::string>& owners, const std::vector<std::string>& groups) :
+    TestBaseEntry(InputBuffer& buffer, const std::vector<std::string>& owners, const std::vector<std::string>& groups) :
         BaseEntry(buffer, owners, groups) {}
 
     void compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend) override {};
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(can_pack_base_data) {
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_unpack_base_data) {
-    std::deque<uint8_t> input = {0, 5, 'f', 'i', 'l', 'e', '1', 1, 0244, 0, 0, 0, 1};
+    InputBuffer input = {0, 5, 'f', 'i', 'l', 'e', '1', 1, 0244, 0, 0, 0, 1};
 
     std::vector<std::string> names = {"DEFAULT_OWNER", "DEFAULT_GROUP"};
 
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(can_unpack_base_data) {
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(throws_if_there_is_no_entry_for_owner) {
-    std::deque<uint8_t> input = {0, 5, 'f', 'i', 'l', 'e', '1', 1, 0244, 0, 3, 0, 1};
+    InputBuffer input = {0, 5, 'f', 'i', 'l', 'e', '1', 1, 0244, 0, 3, 0, 1};
 
     std::vector<std::string> names = {"DEFAULT_OWNER", "DEFAULT_GROUP"};
 
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(throws_if_there_is_no_entry_for_owner) {
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(throws_if_there_is_no_entry_for_group) {
-    std::deque<uint8_t> input = {0, 5, 'f', 'i', 'l', 'e', '1', 1, 0244, 0, 0, 0, 3};
+    InputBuffer input = {0, 5, 'f', 'i', 'l', 'e', '1', 1, 0244, 0, 0, 0, 3};
 
     std::vector<std::string> names = {"DEFAULT_OWNER", "DEFAULT_GROUP"};
 

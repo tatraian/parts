@@ -1,7 +1,7 @@
 #ifndef DECOMPRESSOR_H
 #define DECOMPRESSOR_H
 
-#include <deque>
+#include "inputbuffer.h"
 #include <vector>
 
 #include "contentreadbackend.h"
@@ -22,7 +22,7 @@ public:
 
     virtual ~Decompressor() = default;
 
-    virtual std::deque<uint8_t> extractBuffer(const std::vector<uint8_t>& buffer) = 0;
+    virtual InputBuffer extractBuffer(const std::vector<uint8_t>& buffer) = 0;
 
     virtual void extractFile(const boost::filesystem::path& file,
                              ContentReadBackend& backend,

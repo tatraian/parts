@@ -13,7 +13,7 @@ public:
     LzmaDecompressor() = default;
     ~LzmaDecompressor() override = default;
 
-    std::deque<uint8_t> extractBuffer(const std::vector<uint8_t>& buffer) override;
+    InputBuffer extractBuffer(const std::vector<uint8_t>& buffer) override;
 
     void extractFile(const boost::filesystem::path& file,
                      ContentReadBackend& backend,

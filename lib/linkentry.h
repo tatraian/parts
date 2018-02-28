@@ -18,7 +18,7 @@ public:
               const boost::filesystem::path& destination,
               bool absolute = false);
 
-    LinkEntry(std::deque<uint8_t>& buffer,
+    LinkEntry(InputBuffer& buffer,
               const std::vector<std::string>& owners,
               const std::vector<std::string>& groups);
 

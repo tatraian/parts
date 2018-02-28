@@ -17,7 +17,7 @@ void append_internal(std::vector<uint8_t>& output, Value value)
 
 //==========================================================================================================================================
 template<class Value>
-void pop_front_internal(std::deque<uint8_t>& input, Value& value)
+void pop_front_internal(InputBuffer& input, Value& value)
 {
     if (input.size() < sizeof(value))
         throw PartsException("No enough data to read value");
@@ -29,31 +29,31 @@ void pop_front_internal(std::deque<uint8_t>& input, Value& value)
 }
 
 //==========================================================================================================================================
-void Packager::pop_front(std::deque<uint8_t>& input, uint8_t& value)
+void Packager::pop_front(InputBuffer& input, uint8_t& value)
 {
     pop_front_internal(input, value);
 }
 
 //==========================================================================================================================================
-void Packager::pop_front(std::deque<uint8_t>& input, uint16_t& value)
+void Packager::pop_front(InputBuffer& input, uint16_t& value)
 {
     pop_front_internal(input, value);
 }
 
 //==========================================================================================================================================
-void Packager::pop_front(std::deque<uint8_t>& input, uint32_t& value)
+void Packager::pop_front(InputBuffer& input, uint32_t& value)
 {
     pop_front_internal(input, value);
 }
 
 //==========================================================================================================================================
-void Packager::pop_front(std::deque<uint8_t>& input, uint64_t& value)
+void Packager::pop_front(InputBuffer& input, uint64_t& value)
 {
     pop_front_internal(input, value);
 }
 
 //==========================================================================================================================================
-void Packager::pop_front(std::deque<uint8_t>& input, std::vector<uint8_t>& value)
+void Packager::pop_front(InputBuffer& input, std::vector<uint8_t>& value)
 {
     size_t size = value.size();
     value.clear();
@@ -66,7 +66,7 @@ void Packager::pop_front(std::deque<uint8_t>& input, std::vector<uint8_t>& value
 }
 
 //==========================================================================================================================================
-void Packager::pop_front(std::deque<uint8_t>& input, boost::filesystem::path& value)
+void Packager::pop_front(InputBuffer& input, boost::filesystem::path& value)
 {
     std::string tmp;
     pop_front<uint16_t>(input, tmp);

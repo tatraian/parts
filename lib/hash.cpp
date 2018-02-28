@@ -41,7 +41,7 @@ Hash::Hash(HashType type, const std::vector<uint8_t>& data) :
 }
 
 //==========================================================================================================================================
-Hash::Hash(HashType type, std::deque<uint8_t>& data) :
+Hash::Hash(HashType type, InputBuffer& data) :
     m_type(type),
     m_hash(hash_size(m_type), 0)
 {

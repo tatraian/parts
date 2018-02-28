@@ -16,7 +16,7 @@ public:
                    const std::string& group,
                    uint16_t group_id);
 
-    DirectoryEntry(std::deque<uint8_t>& buffer,
+    DirectoryEntry(InputBuffer& buffer,
                    const std::vector<std::string>& owners,
                    const std::vector<std::string>& groups);
 

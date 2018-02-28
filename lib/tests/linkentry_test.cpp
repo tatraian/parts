@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(compress_doesn_t_modify_the_output) {
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_unpack_link_data) {
-    std::deque<uint8_t> input = {0, 5, 'f', 'i', 'l', 'e', '1', 1, 0244, 0, 0, 0, 0, 1, 0, 8, '.', '.', '/', 'f', 'i', 'l', 'e', '2'};
+    InputBuffer input = {0, 5, 'f', 'i', 'l', 'e', '1', 1, 0244, 0, 0, 0, 0, 1, 0, 8, '.', '.', '/', 'f', 'i', 'l', 'e', '2'};
 
     std::vector<std::string> owners = {"DEFAULT_OWNER"};
     std::vector<std::string> groups = {"DEFAULT_GROUP"};

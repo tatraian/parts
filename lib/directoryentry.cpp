@@ -21,7 +21,7 @@ DirectoryEntry::DirectoryEntry(const boost::filesystem::path& file,
 }
 
 //==========================================================================================================================================
-DirectoryEntry::DirectoryEntry(std::deque<uint8_t>& buffer,
+DirectoryEntry::DirectoryEntry(InputBuffer& buffer,
                                const std::vector<std::string>& owners,
                                const std::vector<std::string>& groups) :
     BaseEntry(buffer, owners, groups)

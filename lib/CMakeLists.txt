@@ -23,6 +23,7 @@ set(parts_SRCS
     filereadbackend.cpp
     consolelogger.h
     consolelogger.cpp
+    inputbuffer.h
     )
 
 add_library(parts ${parts_SRCS})

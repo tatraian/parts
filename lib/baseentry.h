@@ -8,7 +8,7 @@
 
 #include <string>
 #include <vector>
-#include <deque>
+#include "inputbuffer.h"
 
 #include <boost/filesystem/path.hpp>
 
@@ -32,7 +32,7 @@ public:
         m_groupId(group_id)
     {}
 
-    BaseEntry(std::deque<uint8_t>& buffer,
+    BaseEntry(InputBuffer& buffer,
               const std::vector<std::string>& owners,
               const std::vector<std::string>& groups);
 

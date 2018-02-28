@@ -27,7 +27,7 @@ RegularFileEntry::RegularFileEntry(const boost::filesystem::path& file,
 }
 
 //==========================================================================================================================================
-RegularFileEntry::RegularFileEntry(std::deque<uint8_t>& buffer,
+RegularFileEntry::RegularFileEntry(InputBuffer& buffer,
                                    const std::vector<std::string>& owners,
                                    const std::vector<std::string>& groups,
                                    HashType hash_type) :

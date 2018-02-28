@@ -3,7 +3,7 @@
 
 #include "contentwritebackend.h"
 
-#include <deque>
+#include "inputbuffer.h"
 #include <boost/filesystem/path.hpp>
 
 

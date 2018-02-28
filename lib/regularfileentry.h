@@ -19,7 +19,7 @@ public:
                      Hash uncompressed_hash,
                      uint64_t uncompressed_size);
 
-    RegularFileEntry(std::deque<uint8_t>& buffer,
+    RegularFileEntry(InputBuffer& buffer,
                      const std::vector<std::string>& owners,
                      const std::vector<std::string>& groups,
                      HashType hash_type);

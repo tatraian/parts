@@ -4,7 +4,7 @@
 #include "parts_definitions.h"
 
 #include <string>
-#include <deque>
+#include "inputbuffer.h"
 
 #include <boost/filesystem/path.hpp>
 
@@ -14,14 +14,14 @@ namespace parts
 class Packager
 {
 public:
-    static void pop_front(std::deque<uint8_t>& input, uint8_t& value);
-    static void pop_front(std::deque<uint8_t>& input, uint16_t& value);
-    static void pop_front(std::deque<uint8_t>& input, uint32_t& value);
-    static void pop_front(std::deque<uint8_t>& input, uint64_t& value);
-    static void pop_front(std::deque<uint8_t>& input, std::vector<uint8_t>& value);
-    static void pop_front(std::deque<uint8_t>& input, boost::filesystem::path& value);
+    static void pop_front(InputBuffer& input, uint8_t& value);
+    static void pop_front(InputBuffer& input, uint16_t& value);
+    static void pop_front(InputBuffer& input, uint32_t& value);
+    static void pop_front(InputBuffer& input, uint64_t& value);
+    static void pop_front(InputBuffer& input, std::vector<uint8_t>& value);
+    static void pop_front(InputBuffer& input, boost::filesystem::path& value);
     template<class SizeType>
-    static void pop_front(std::deque<uint8_t>& input, std::string& value){
+    static void pop_front(InputBuffer& input, std::string& value){
         SizeType size;
         pop_front(input, size);
         if (input.size() < size)

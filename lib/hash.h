@@ -3,7 +3,7 @@
 
 #include "parts_definitions.h"
 
-#include <deque>
+#include "inputbuffer.h"
 #include <vector>
 
 #include <boost/filesystem/path.hpp>
@@ -16,7 +16,7 @@ class Hash
 public:
     Hash(HashType type, const boost::filesystem::path& path);
     Hash(HashType type, const std::vector<uint8_t>& data);
-    Hash(HashType type, std::deque<uint8_t>& data);
+    Hash(HashType type, InputBuffer& data);
 
     HashType type() const
     { return m_type; }

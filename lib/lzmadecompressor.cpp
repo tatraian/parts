@@ -10,7 +10,7 @@ using namespace parts;
 
 
 //==========================================================================================================================================
-std::deque<uint8_t> LzmaDecompressor::extractBuffer(const std::vector<uint8_t>& buffer)
+InputBuffer LzmaDecompressor::extractBuffer(const std::vector<uint8_t>& buffer)
 {
     lzma_stream lzma_context;
     setupXZLib(lzma_context);
@@ -24,7 +24,7 @@ std::deque<uint8_t> LzmaDecompressor::extractBuffer(const std::vector<uint8_t>& 
         return bytes;
     };
 
-    std::deque<uint8_t> result;
+    InputBuffer result;
     auto writer = [&](uint8_t* src, size_t size) {
         result.insert(result.end(), src, src + size);
     };

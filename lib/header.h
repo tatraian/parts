@@ -4,7 +4,7 @@
 #include "parts_definitions.h"
 #include "contentreadbackend.h"
 
-#include <deque>
+#include "inputbuffer.h"
 
 namespace parts {
 

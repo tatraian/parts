@@ -59,7 +59,7 @@ TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, c
 
     LOG_DEBUG("Decompressing TOC");
     auto decompressor = DecompressorFactory::createDecompressor(m_parameters.m_tocCompression);
-    std::deque<uint8_t> uncompressed_toc = decompressor->extractBuffer(compressed_toc);
+    InputBuffer uncompressed_toc = decompressor->extractBuffer(compressed_toc);
 
     unpackNames(uncompressed_toc, m_owners);
     unpackNames(uncompressed_toc, m_groups);
@@ -230,7 +230,7 @@ void TableOfContents::packNames(std::vector<uint8_t>& buffer, const std::vector<
 }
 
 //==========================================================================================================================================
-void TableOfContents::unpackNames(std::deque<uint8_t>& buffer, std::vector<std::string>& names)
+void TableOfContents::unpackNames(InputBuffer& buffer, std::vector<std::string>& names)
 {
     uint16_t size = 0;
     Packager::pop_front(buffer, size);

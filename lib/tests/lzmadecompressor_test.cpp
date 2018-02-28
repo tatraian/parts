@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(can_decompress_lzma_buffer_smaller_than_mb) {
     std::vector<uint8_t> input = {1,2,3,4,5,6,7,8,9,0};
 
     LzmaDecompressor decomp;
-    std::deque<uint8_t> result = decomp.extractBuffer(create_data(input));
+    InputBuffer result = decomp.extractBuffer(create_data(input));
     BOOST_CHECK_EQUAL_COLLECTIONS(input.begin(), input.end(), result.begin(), result.end());
 }
 
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(can_decompress_lzma_buffer_greater_than_mb) {
     }
 
     LzmaDecompressor decomp;
-    std::deque<uint8_t> result = decomp.extractBuffer(create_data(input));
+    InputBuffer result = decomp.extractBuffer(create_data(input));
     BOOST_CHECK_EQUAL_COLLECTIONS(input.begin(), input.end(), result.begin(), result.end());
 }
 
