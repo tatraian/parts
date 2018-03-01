@@ -23,15 +23,13 @@ public:
     PartsException(const std::string& msg) : std::runtime_error(msg) {}
 };
 
-inline size_t hash_size(HashType type) {
+inline constexpr size_t hash_size(HashType type) {
     switch (type) {
     case HashType::MD5:
         return 16;
     case HashType::SHA256:
         return 32;
     }
-
-    throw PartsException("Unsupported type");
 }
 
 struct LzmaCompressorParameters
