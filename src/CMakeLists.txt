@@ -13,5 +13,8 @@ target_link_libraries(parts_list parts)
 add_executable(parts_extract parts_extract.cpp)
 target_link_libraries(parts_extract parts)
 
+add_executable(parts_web_extract parts_web_extract.cpp)
+target_link_libraries(parts_web_extract parts)
+
 add_executable(parts_update parts_update.cpp)
 target_link_libraries(parts_update parts)

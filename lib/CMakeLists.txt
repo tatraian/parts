@@ -24,6 +24,8 @@ set(parts_SRCS
     consolelogger.h
     consolelogger.cpp
     inputbuffer.h
+    networkfilereaderbackend.h
+    networkfilereaderbackend.cpp
     plaindecompressor.h
     plaindecompressor.cpp
     compressorfactory.h
@@ -31,7 +33,7 @@ set(parts_SRCS
     )
 
 add_library(parts ${parts_SRCS})
-target_link_libraries(parts Boost::system Boost::filesystem digestpp lzma::lzma fmt::fmt)
+target_link_libraries(parts Boost::system Boost::filesystem digestpp lzma::lzma fmt::fmt CURL::libcurl)
 target_include_directories(parts INTERFACE .)
 
 if(BUILD_TESTS)

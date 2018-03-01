@@ -18,6 +18,8 @@ hunter_add_package(lzma)
 find_package(lzma)
 hunter_add_package(fmt)
 find_package(fmt CONFIG REQUIRED)
+hunter_add_package(CURL)
+find_package(CURL CONFIG REQUIRED)
 
 if (BUILD_TESTS)
     hunter_add_package(Boost COMPONENTS test)
