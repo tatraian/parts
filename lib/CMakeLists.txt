@@ -40,8 +40,20 @@ set(parts_SRCS
     )
 
 add_library(parts ${parts_SRCS})
-target_link_libraries(parts Boost::system Boost::filesystem digestpp lzma::lzma fmt::fmt ${HTTP_LINK})
-target_include_directories(parts INTERFACE .)
+target_link_libraries(parts PUBLIC Boost::system Boost::filesystem)
+target_link_libraries(parts PRIVATE lzma::lzma fmt::fmt ${HTTP_LINK})
+
+install(TARGETS parts
+    EXPORT ${targets_export_name}
+    INCLUDES DESTINATION include
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib)
+
+install(DIRECTORY "."
+    DESTINATION "include/parts"
+    FILES_MATCHING PATTERN "*.h"
+    PATTERN "tests" EXCLUDE)
 
 if(BUILD_TESTS)
     add_executable(parts_lib_tests
