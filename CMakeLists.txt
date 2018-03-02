@@ -10,6 +10,7 @@ HunterGate(
 
 option(BUILD_TESTS "Build tests too" ON)
 option(BUILD_CMDLINE "Build command line programs too" ON)
+option(BUILD_HTTP "Build http input reader too" ON)
 
 project(Parts)
 
@@ -19,8 +20,10 @@ hunter_add_package(lzma)
 find_package(lzma)
 hunter_add_package(fmt)
 find_package(fmt CONFIG REQUIRED)
-hunter_add_package(CURL)
-find_package(CURL CONFIG REQUIRED)
+if (BUILD_HTTP)
+    hunter_add_package(CURL)
+    find_package(CURL CONFIG REQUIRED)
+endif()
 if (BUILD_CMDLINE)
     hunter_add_package(cxxopts)
     find_package(cxxopts CONFIG REQUIRED)
