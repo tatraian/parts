@@ -16,7 +16,14 @@ public:
     HttpReaderBackend(const std::string& file_url);
     ~HttpReaderBackend();
 
-
+    struct ReadStatistic
+    {
+        uint64_t* m_BytesRead = nullptr;
+        uint64_t* m_RequestsDone = nullptr;
+        void AddReadCount(uint64_t c) const { if(m_BytesRead) *m_BytesRead += c; }
+        void RequestDone() const { if(m_RequestsDone) ++*m_RequestsDone; }
+    };
+    ReadStatistic m_ReadStat;
     // ContentReadBackend interface
 public:
     std::string source() const override { return m_FileUrl; }
@@ -28,6 +35,7 @@ public:
     void read(uint8_t *data, size_t size) override;
     void seek(const uint64_t &position) override;
     uint64_t position() override { return m_CurrentPos; }
+
 };
 
 }

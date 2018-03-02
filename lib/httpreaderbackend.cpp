@@ -56,9 +56,10 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, void *data_struct
 
 }
 
-static void getFilePart(CURL *curl_handle , int start, WriteDataStruct* wds)
+static void getFilePart(CURL *curl_handle , int start, WriteDataStruct* wds, const  HttpReaderBackend::ReadStatistic& statistic)
 {
     LOG_DEBUG("Requesting part of file. Start {}, Size {}",start, wds->size);
+    auto requestedBytecount = wds->size;
     vector<uint8_t> res;
     res.clear();
     //setting requested range
@@ -88,19 +89,21 @@ static void getFilePart(CURL *curl_handle , int start, WriteDataStruct* wds)
     {
         throw PartsException("Not enought data in received http response");
     }
+    statistic.RequestDone();
+    statistic.AddReadCount(requestedBytecount);
 }
 
 void HttpReaderBackend::read(std::vector<uint8_t> &data)
 {
     WriteDataStruct wd { data.size(),&data[0]};
-    getFilePart(m_CurlHandle,m_CurrentPos, &wd);
+    getFilePart(m_CurlHandle,m_CurrentPos, &wd, m_ReadStat);
     m_CurrentPos += data.size();
 }
 
 void HttpReaderBackend::read(uint8_t &data)
 {
     WriteDataStruct wd { sizeof(data),(uint8_t*)&data};
-    getFilePart(m_CurlHandle,m_CurrentPos, &wd);
+    getFilePart(m_CurlHandle,m_CurrentPos, &wd, m_ReadStat);
     m_CurrentPos += sizeof(data);
     boost::endian::big_to_native_inplace(data);
 }
@@ -108,7 +111,7 @@ void HttpReaderBackend::read(uint8_t &data)
 void HttpReaderBackend::read(uint16_t &data)
 {
     WriteDataStruct wd { sizeof(data),(uint8_t*)&data};
-    getFilePart(m_CurlHandle,m_CurrentPos, &wd);
+    getFilePart(m_CurlHandle,m_CurrentPos, &wd, m_ReadStat);
     m_CurrentPos += sizeof(data);
     boost::endian::big_to_native_inplace(data);
 }
@@ -116,7 +119,7 @@ void HttpReaderBackend::read(uint16_t &data)
 void HttpReaderBackend::read(uint32_t &data)
 {
     WriteDataStruct wd { sizeof(data),(uint8_t*)&data};
-    getFilePart(m_CurlHandle,m_CurrentPos, &wd);
+    getFilePart(m_CurlHandle,m_CurrentPos, &wd, m_ReadStat);
     m_CurrentPos += sizeof(data);
     boost::endian::big_to_native_inplace(data);
 }
@@ -124,7 +127,7 @@ void HttpReaderBackend::read(uint32_t &data)
 void HttpReaderBackend::read(uint64_t &data)
 {
     WriteDataStruct wd { sizeof(data),(uint8_t*)&data};
-    getFilePart(m_CurlHandle,m_CurrentPos, &wd);
+    getFilePart(m_CurlHandle,m_CurrentPos, &wd, m_ReadStat);
     m_CurrentPos += sizeof(data);
     boost::endian::big_to_native_inplace(data);
 }
@@ -132,7 +135,7 @@ void HttpReaderBackend::read(uint64_t &data)
 void HttpReaderBackend::read(uint8_t *data, size_t size)
 {
     WriteDataStruct wd { size,(uint8_t*)data};
-    getFilePart(m_CurlHandle,m_CurrentPos, &wd);
+    getFilePart(m_CurlHandle,m_CurrentPos, &wd, m_ReadStat);
     m_CurrentPos += size;
 }
 
