@@ -2,6 +2,7 @@
 #include <fakeit/boost/fakeit.hpp>
 
 #include <fstream>
+#include <lzma.h>
 
 #include "../lzmadecompressor.h"
 #include "../parts_definitions.h"

@@ -1,12 +1,58 @@
 #include "lzmacompressor.h"
 
 #include <fstream>
+#include <lzma.h>
 
 #include "parts_definitions.h"
 #include "internal_definitions.h"
 #include "simpleguard.h"
 
 using namespace parts;
+
+namespace {
+
+//==========================================================================================================================================
+void setupXZLib(lzma_stream& context, LzmaCompressorParameters parameters)
+{
+    context = LZMA_STREAM_INIT;
+    lzma_options_lzma lzma_options;
+    if (lzma_lzma_preset(&lzma_options, parameters.m_compressionLevel))
+        throw PartsException("Unsupported compression level: " + std::to_string(parameters.m_compressionLevel));
+
+    lzma_filter filters_x86 [] = {
+        { .id = LZMA_FILTER_X86, .options = nullptr },
+        { .id = LZMA_FILTER_LZMA2, .options = &lzma_options},
+        { .id = LZMA_VLI_UNKNOWN, .options = nullptr }
+    };
+
+    lzma_filter filters [] = {
+        { .id = LZMA_FILTER_LZMA2, .options = &lzma_options},
+        { .id = LZMA_VLI_UNKNOWN, .options = nullptr }
+    };
+
+    lzma_ret result = lzma_stream_encoder(&context, parameters.m_x86FilterActive ? filters_x86 : filters, LZMA_CHECK_CRC64);
+
+    switch (result)
+    {
+        case LZMA_OK:
+            return;
+        case LZMA_MEM_ERROR:
+        case LZMA_MEMLIMIT_ERROR:
+            throw PartsException("Memory allocation error");
+        case LZMA_NO_CHECK:
+        case LZMA_UNSUPPORTED_CHECK:
+        case LZMA_GET_CHECK:
+        case LZMA_FORMAT_ERROR:
+        case LZMA_OPTIONS_ERROR:
+        case LZMA_DATA_ERROR:
+        case LZMA_BUF_ERROR:
+        case LZMA_PROG_ERROR:
+        case LZMA_STREAM_END:
+            throw PartsException("Compressior initialization error");
+    }
+}
+
+}
 
 //==========================================================================================================================================
 LzmaCompressor::LzmaCompressor(const LzmaCompressorParameters& parameters) : m_parameters(parameters)
@@ -22,7 +68,7 @@ LzmaCompressor::~LzmaCompressor()
 size_t LzmaCompressor::compressFile(const boost::filesystem::path& path, ContentWriteBackend& backend)
 {
     lzma_stream context;
-    setupXZLib(context);
+    setupXZLib(context, m_parameters);
     auto guard = SimpleGuard<std::function<void()>>([&](){lzma_end(&context); });
     size_t compressed_size = 0;
 
@@ -82,7 +128,7 @@ size_t LzmaCompressor::compressFile(const boost::filesystem::path& path, Content
 size_t LzmaCompressor::compressBuffer(const std::vector<uint8_t>& buffer, std::vector<uint8_t>& backend)
 {
     lzma_stream context;
-    setupXZLib(context);
+    setupXZLib(context, m_parameters);
     auto guard = SimpleGuard<std::function<void()>>([&](){lzma_end(&context); });
     size_t compressed_size = 0;
 
@@ -115,48 +161,3 @@ size_t LzmaCompressor::compressBuffer(const std::vector<uint8_t>& buffer, std::v
 
     return compressed_size;
 }
-
-//==========================================================================================================================================
-void LzmaCompressor::setupXZLib(lzma_stream& context)
-{
-    context = LZMA_STREAM_INIT;
-    lzma_options_lzma lzma_options;
-    if (lzma_lzma_preset(&lzma_options, m_parameters.m_compressionLevel))
-        throw PartsException("Unsupported compression level: " + std::to_string(m_parameters.m_compressionLevel));
-
-    lzma_filter filters_x86 [] = {
-        { .id = LZMA_FILTER_X86, .options = nullptr },
-        { .id = LZMA_FILTER_LZMA2, .options = &lzma_options},
-        { .id = LZMA_VLI_UNKNOWN, .options = nullptr }
-    };
-
-    lzma_filter filters [] = {
-        { .id = LZMA_FILTER_LZMA2, .options = &lzma_options},
-        { .id = LZMA_VLI_UNKNOWN, .options = nullptr }
-    };
-
-    lzma_ret result = lzma_stream_encoder(&context, m_parameters.m_x86FilterActive ? filters_x86 : filters, LZMA_CHECK_CRC64);
-
-    switch (result)
-    {
-        case LZMA_OK:
-            return;
-        case LZMA_MEM_ERROR:
-        case LZMA_MEMLIMIT_ERROR:
-            throw PartsException("Memory allocation error");
-        case LZMA_NO_CHECK:
-        case LZMA_UNSUPPORTED_CHECK:
-        case LZMA_GET_CHECK:
-        case LZMA_FORMAT_ERROR:
-        case LZMA_OPTIONS_ERROR:
-        case LZMA_DATA_ERROR:
-        case LZMA_BUF_ERROR:
-        case LZMA_PROG_ERROR:
-        case LZMA_STREAM_END:
-            throw PartsException("Compressior initialization error");
-    }
-}
-
-
-
-

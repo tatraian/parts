@@ -2,7 +2,6 @@
 #define LZMADECOMPRESSOR_H
 
 #include "decompressor.h"
-#include "lzma.h"
 
 namespace parts
 {
@@ -19,12 +18,6 @@ public:
                      ContentReadBackend& backend,
                      size_t position,
                      size_t compressed_size) override;
-protected:
-    void setupXZLib(lzma_stream& lzma_context);
-
-    void extractInternal(lzma_stream& lzma_context,
-                         std::function<size_t(uint8_t*, size_t)> read,
-                         std::function<void(uint8_t*, size_t)> write);
 };
 
 }

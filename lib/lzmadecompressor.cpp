@@ -6,9 +6,73 @@
 #include "logger_internal.h"
 
 #include <fstream>
+#include <lzma.h>
 
 using namespace parts;
 
+namespace {
+
+//==========================================================================================================================================
+void setupXZLib(lzma_stream& lzma_context)
+{
+    lzma_context = LZMA_STREAM_INIT;
+    lzma_ret result = lzma_stream_decoder(&lzma_context, UINT64_MAX, LZMA_CONCATENATED);
+
+    if (result == LZMA_OK)
+        return;
+
+    if (result == LZMA_MEM_ERROR)
+        throw PartsException("Cannot allocate memory of lzma decompressor");
+
+    throw PartsException("Unhandled error during lzma decompressor creation");
+}
+
+//==========================================================================================================================================
+void extractInternal(lzma_stream& lzma_context,
+                     std::function<size_t (uint8_t*, size_t)> read,
+                     std::function<void (uint8_t*, size_t)> write)
+{
+    uint8_t ibuf[MB];
+    uint8_t obuf[MB];
+
+    lzma_context.next_in = nullptr;
+    lzma_context.avail_in = 0;
+    lzma_context.next_out = obuf;
+    lzma_context.avail_out = MB;
+    lzma_action action = LZMA_RUN;
+
+    for(;;){
+        if (lzma_context.avail_in == 0) {
+            size_t read_bytes = read(ibuf, MB);
+            lzma_context.next_in = ibuf;
+            lzma_context.avail_in = read_bytes;
+
+            if (read_bytes != MB) {
+                action = LZMA_FINISH;
+            }
+        }
+
+        lzma_ret result = lzma_code(&lzma_context, action);
+
+        if (lzma_context.avail_out == 0 || result == LZMA_STREAM_END) {
+            size_t bytes_to_write = MB - lzma_context.avail_out;
+
+            write(obuf, bytes_to_write);
+            lzma_context.next_out = obuf;
+            lzma_context.avail_out = 1024*1024;
+            if (result == LZMA_STREAM_END)
+                break;
+
+            continue;
+        }
+
+        if (result != LZMA_OK) {
+            throw PartsException("Invalid lzam return code: " + std::to_string(result));
+        }
+    }
+}
+
+}
 
 //==========================================================================================================================================
 InputBuffer LzmaDecompressor::extractBuffer(const std::vector<uint8_t>& buffer)
@@ -61,64 +125,4 @@ void LzmaDecompressor::extractFile(const boost::filesystem::path& file,
     };
 
     extractInternal(lzma_context, reader, writer);
-}
-
-//==========================================================================================================================================
-void LzmaDecompressor::setupXZLib(lzma_stream& lzma_context)
-{
-    lzma_context = LZMA_STREAM_INIT;
-    lzma_ret result = lzma_stream_decoder(&lzma_context, UINT64_MAX, LZMA_CONCATENATED);
-
-    if (result == LZMA_OK)
-        return;
-
-    if (result == LZMA_MEM_ERROR)
-        throw PartsException("Cannot allocate memory of lzma decompressor");
-
-    throw PartsException("Unhandled error during lzma decompressor creation");
-}
-
-//==========================================================================================================================================
-void LzmaDecompressor::extractInternal(lzma_stream& lzma_context,
-                                       std::function<size_t (uint8_t*, size_t)> read,
-                                       std::function<void (uint8_t*, size_t)> write)
-{
-    uint8_t ibuf[MB];
-    uint8_t obuf[MB];
-
-    lzma_context.next_in = nullptr;
-    lzma_context.avail_in = 0;
-    lzma_context.next_out = obuf;
-    lzma_context.avail_out = MB;
-    lzma_action action = LZMA_RUN;
-
-    for(;;){
-        if (lzma_context.avail_in == 0) {
-            size_t read_bytes = read(ibuf, MB);
-            lzma_context.next_in = ibuf;
-            lzma_context.avail_in = read_bytes;
-
-            if (read_bytes != MB) {
-                action = LZMA_FINISH;
-            }
-        }
-
-        lzma_ret result = lzma_code(&lzma_context, action);
-
-        if (lzma_context.avail_out == 0 || result == LZMA_STREAM_END) {
-            size_t bytes_to_write = MB - lzma_context.avail_out;
-
-            write(obuf, bytes_to_write);
-            lzma_context.next_out = obuf;
-            lzma_context.avail_out = 1024*1024;
-            if (result == LZMA_STREAM_END)
-                break;
-
-            continue;
-        }
-
-        if (result != LZMA_OK) {
-            throw PartsException("Invalid lzam return code: " + std::to_string(result));
-        }
-    }
 }
