@@ -16,12 +16,11 @@ BOOST_AUTO_TEST_CASE(hash_throws_exception_in_case_of_not_existing_files) {
 }
 
 //==========================================================================================================================================
-BOOST_AUTO_TEST_CASE(only_sha256_is_supported_currently) {
-    std::vector<uint8_t> data(100);
+BOOST_AUTO_TEST_CASE(hash_works_md5) {
+    std::vector<uint8_t> data = {'a', 'b', 'c', 'd'};
+    Hash hash(HashType::MD5, data);
 
-    BOOST_REQUIRE_EXCEPTION(Hash(HashType::MD5, data),
-                            PartsException,
-                            [&](const PartsException& e){return e.what() == std::string("Only SHA 256 hash is supported currently");});
+    BOOST_REQUIRE_EQUAL(hash.hashString(), "e2fc714c4727ee9395f324cd2e7f331f");
 }
 
 
