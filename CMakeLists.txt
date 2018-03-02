@@ -9,6 +9,7 @@ HunterGate(
 )
 
 option(BUILD_TESTS "Build tests too" ON)
+option(BUILD_CMDLINE "Build command line programs too" ON)
 
 project(Parts)
 
@@ -20,6 +21,11 @@ hunter_add_package(fmt)
 find_package(fmt CONFIG REQUIRED)
 hunter_add_package(CURL)
 find_package(CURL CONFIG REQUIRED)
+if (BUILD_CMDLINE)
+    hunter_add_package(cxxopts)
+    find_package(cxxopts CONFIG REQUIRED)
+endif()
+
 
 if (BUILD_TESTS)
     hunter_add_package(Boost COMPONENTS test)
