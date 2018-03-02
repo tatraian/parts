@@ -1,7 +1,7 @@
 if (BUILD_HTTP)
     set(HTTP_SOURCES
-        networkfilereaderbackend.h
-        networkfilereaderbackend.cpp)
+        httpreaderbackend.h
+        httpreaderbackend.cpp)
     set(HTTP_LINK CURL::libcurl)
 endif()
 

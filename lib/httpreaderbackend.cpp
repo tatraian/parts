@@ -1,4 +1,4 @@
-#include "networkfilereaderbackend.h"
+#include "httpreaderbackend.h"
 #include "parts_definitions.h"
 #include <memory>
 #include <curl/curl.h>
@@ -13,7 +13,7 @@ using std::uint8_t;
 
 namespace parts {
 
-NetworkFileReaderBackend::NetworkFileReaderBackend(const string& file_url) :m_FileUrl(file_url)
+HttpReaderBackend::HttpReaderBackend(const string& file_url) :m_FileUrl(file_url)
 {
     struct CurlInit
     {
@@ -26,7 +26,7 @@ NetworkFileReaderBackend::NetworkFileReaderBackend(const string& file_url) :m_Fi
     curl_easy_setopt(m_CurlHandle, CURLOPT_HTTPHEADER, NULL);
 }
 
-NetworkFileReaderBackend::~NetworkFileReaderBackend()
+HttpReaderBackend::~HttpReaderBackend()
 {
     curl_easy_cleanup(m_CurlHandle);
 }
@@ -90,14 +90,14 @@ static void getFilePart(CURL *curl_handle , int start, WriteDataStruct* wds)
     }
 }
 
-void NetworkFileReaderBackend::read(std::vector<uint8_t> &data)
+void HttpReaderBackend::read(std::vector<uint8_t> &data)
 {
     WriteDataStruct wd { data.size(),&data[0]};
     getFilePart(m_CurlHandle,m_CurrentPos, &wd);
     m_CurrentPos += data.size();
 }
 
-void NetworkFileReaderBackend::read(uint8_t &data)
+void HttpReaderBackend::read(uint8_t &data)
 {
     WriteDataStruct wd { sizeof(data),(uint8_t*)&data};
     getFilePart(m_CurlHandle,m_CurrentPos, &wd);
@@ -105,7 +105,7 @@ void NetworkFileReaderBackend::read(uint8_t &data)
     boost::endian::big_to_native_inplace(data);
 }
 
-void NetworkFileReaderBackend::read(uint16_t &data)
+void HttpReaderBackend::read(uint16_t &data)
 {
     WriteDataStruct wd { sizeof(data),(uint8_t*)&data};
     getFilePart(m_CurlHandle,m_CurrentPos, &wd);
@@ -113,7 +113,7 @@ void NetworkFileReaderBackend::read(uint16_t &data)
     boost::endian::big_to_native_inplace(data);
 }
 
-void NetworkFileReaderBackend::read(uint32_t &data)
+void HttpReaderBackend::read(uint32_t &data)
 {
     WriteDataStruct wd { sizeof(data),(uint8_t*)&data};
     getFilePart(m_CurlHandle,m_CurrentPos, &wd);
@@ -121,7 +121,7 @@ void NetworkFileReaderBackend::read(uint32_t &data)
     boost::endian::big_to_native_inplace(data);
 }
 
-void NetworkFileReaderBackend::read(uint64_t &data)
+void HttpReaderBackend::read(uint64_t &data)
 {
     WriteDataStruct wd { sizeof(data),(uint8_t*)&data};
     getFilePart(m_CurlHandle,m_CurrentPos, &wd);
@@ -129,14 +129,14 @@ void NetworkFileReaderBackend::read(uint64_t &data)
     boost::endian::big_to_native_inplace(data);
 }
 
-void NetworkFileReaderBackend::read(uint8_t *data, size_t size)
+void HttpReaderBackend::read(uint8_t *data, size_t size)
 {
     WriteDataStruct wd { size,(uint8_t*)data};
     getFilePart(m_CurlHandle,m_CurrentPos, &wd);
     m_CurrentPos += size;
 }
 
-void NetworkFileReaderBackend::seek(const uint64_t &position)
+void HttpReaderBackend::seek(const uint64_t &position)
 {
     m_CurrentPos = position;
 }

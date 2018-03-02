@@ -6,15 +6,15 @@
 namespace parts {
 
 
-class NetworkFileReaderBackend : public ContentReadBackend
+class HttpReaderBackend : public ContentReadBackend
 {
 private:
     std::string m_FileUrl;
     void *m_CurlHandle;
     uint64_t m_CurrentPos = 0;
 public:
-    NetworkFileReaderBackend(const std::string& file_url);
-    ~NetworkFileReaderBackend();
+    HttpReaderBackend(const std::string& file_url);
+    ~HttpReaderBackend();
 
 
     // ContentReadBackend interface
