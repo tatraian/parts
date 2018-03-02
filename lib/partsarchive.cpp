@@ -90,20 +90,27 @@ void PartsArchive::extractArchive(const boost::filesystem::path& dest) const
 //==========================================================================================================================================
 void PartsArchive::updateArchive(const boost::filesystem::path& original_source, const boost::filesystem::path& dest)
 {
+    if (m_toc.size() == 0)
+        return;
+
+    std::string rootname = m_toc.begin()->first.string();
+
     PartsCompressionParameters params;
     params.m_hashType = m_header.getHashType();
     TableOfContents old_toc(original_source, params);
 
-    auto start_time = std::chrono::system_clock::now();
-    for (auto& entry : m_toc) {
-        auto old_entry = old_toc.find(entry.first);
+    std::string old_rootname;
+    if (old_toc.size() != 0)
+        old_rootname = old_toc.begin()->first.string();
 
-        LOG_TRACE("Update entry: {}", entry.second->toString());
+    for (auto& entry : m_toc) {
+        boost::filesystem::path p;
+        std::string path_string = entry.first.string();
+        p = path_string.replace(path_string.find(rootname), rootname.size(), old_rootname);
+
+        auto old_entry = old_toc.find(p);
+
         auto decompressor = DecompressorFactory::createDecompressor(m_header.getFileCompressionType());
         entry.second->updateEntry(old_entry.get(), original_source.parent_path(), dest, *decompressor, *m_contentReader.get());
     }
-
-    auto end_time = std::chrono::system_clock::now();
-    std::chrono::duration<double> diff = end_time - start_time;
-    LOG_TRACE("Extracting time: {} s", diff.count());
 }
