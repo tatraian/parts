@@ -91,6 +91,7 @@ void PartsArchive::extractArchive(const boost::filesystem::path& dest) const
 void PartsArchive::updateArchive(const boost::filesystem::path& original_source, const boost::filesystem::path& dest)
 {
     PartsCompressionParameters params;
+    params.m_hashType = m_header.getHashType();
     TableOfContents old_toc(original_source, params);
 
     auto start_time = std::chrono::system_clock::now();
