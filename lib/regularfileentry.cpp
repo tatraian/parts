@@ -2,6 +2,7 @@
 
 #include "internal_definitions.h"
 #include "packager.h"
+#include "logger_internal.h"
 
 #include <boost/filesystem.hpp>
 #include <fmt/format.h>
@@ -53,6 +54,7 @@ void RegularFileEntry::append(std::vector<uint8_t>& buffer) const
 //==========================================================================================================================================
 void RegularFileEntry::compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend)
 {
+    LOG_TRACE("Compressing file: {}", m_file.string());
     m_offset = backend.getPosition();
     m_compressedSize = compressor.compressFile(root / m_file, backend);
 }
@@ -60,6 +62,7 @@ void RegularFileEntry::compressEntry(const boost::filesystem::path& root, Compre
 //==========================================================================================================================================
 void RegularFileEntry::extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend)
 {
+    LOG_TRACE("Extract file: {}", m_file.string());
     decompressor.extractFile(dest_root / m_file, backend, m_offset, m_compressedSize);
 
     setMetadata(dest_root);
@@ -78,6 +81,7 @@ void RegularFileEntry::updateEntry(const BaseEntry* old_entry,
         return;
     }
 
+    LOG_TRACE("Copy file:    {}", m_file.string());
     boost::filesystem::copy_file(old_root / old_entry->file(), dest_root / m_file);
     setMetadata(dest_root);
 }

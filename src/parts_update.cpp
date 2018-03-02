@@ -7,7 +7,7 @@
 using namespace parts;
 
 int main(int argc, char** argv) {
-    ConsoleLogger logger(LOG_LEVELS::INFO);
+    ConsoleLogger logger(LOG_LEVELS::TRACE);
     set_logger(&logger);
 
     if (argc != 2){

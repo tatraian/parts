@@ -2,6 +2,7 @@
 
 #include "packager.h"
 #include "internal_definitions.h"
+#include "logger_internal.h"
 
 #include <boost/filesystem.hpp>
 
@@ -54,11 +55,13 @@ void LinkEntry::append(std::vector<uint8_t>& buffer) const
 void LinkEntry::compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend)
 {
     // This function is empty, since there is no file to be compressed
+    LOG_TRACE("Compressing link: {}", m_file.string());
 }
 
 //==========================================================================================================================================
 void LinkEntry::extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend)
 {
+    LOG_TRACE("Create link:  {}", m_file.string());
     boost::system::error_code ec;
     boost::filesystem::create_symlink(m_destination, dest_root / m_file, ec);
     if (ec)

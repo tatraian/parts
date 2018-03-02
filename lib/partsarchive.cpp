@@ -40,21 +40,10 @@ void PartsArchive::createArchive(const boost::filesystem::path& archive)
     LOG_DEBUG("Uniq temprary file: {}", p.string());
     FileWriteBackend temp(p);
 
-    auto start_time = std::chrono::system_clock::now();
     for(auto& entry : m_toc) {
-        auto entry_s = std::chrono::system_clock::now();
-        LOG_TRACE("Compressing entry: {}", entry.first.string());
-
         auto compressor = CompressorFactory::createCompressor(m_compressionParameters.m_fileCompression, m_compressionParameters);
         entry.second->compressEntry(m_root, *compressor, temp);
-
-        auto entry_e = std::chrono::system_clock::now();
-        std::chrono::duration<double> diff = entry_e - entry_s;
-        LOG_DEBUG("Compressing time: {} s", diff.count());
     }
-    auto end_time = std::chrono::system_clock::now();
-    std::chrono::duration<double> diff = end_time - start_time;
-    LOG_TRACE("Compressing time: {} s", diff.count());
 
     LOG_DEBUG("Files compressed sum: {}", temp.getPosition());
     FileWriteBackend file(archive.string());
@@ -76,15 +65,10 @@ void PartsArchive::createArchive(const boost::filesystem::path& archive)
 //==========================================================================================================================================
 void PartsArchive::extractArchive(const boost::filesystem::path& dest) const
 {
-    auto start_time = std::chrono::system_clock::now();
     for (auto& entry : m_toc) {
-        LOG_TRACE("Extracting entry: {}", entry.second->toString());
         auto decompressor = DecompressorFactory::createDecompressor(m_header.getFileCompressionType());
         entry.second->extractEntry(dest, *decompressor, *m_contentReader.get());
     }
-    auto end_time = std::chrono::system_clock::now();
-    std::chrono::duration<double> diff = end_time - start_time;
-    LOG_TRACE("Extracting time: {} s", diff.count());
 }
 
 //==========================================================================================================================================
