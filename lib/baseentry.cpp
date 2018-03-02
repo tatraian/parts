@@ -6,7 +6,7 @@
 #include <pwd.h>
 #include <grp.h>
 
-#include "logger.h"
+#include "logger_internal.h"
 
 using namespace parts;
 

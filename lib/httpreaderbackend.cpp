@@ -4,7 +4,7 @@
 #include <curl/curl.h>
 #include <cstring>
 #include <fmt/format.h>
-#include "logger.h"
+#include "logger_internal.h"
 #include <boost/endian/conversion.hpp>
 
 using std::string;

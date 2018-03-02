@@ -3,7 +3,7 @@
 #include "parts_definitions.h"
 #include "internal_definitions.h"
 #include "simpleguard.h"
-#include "logger.h"
+#include "logger_internal.h"
 
 #include <fstream>
 

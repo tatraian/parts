@@ -1,7 +1,7 @@
 #ifndef CONSOLELOGGER_H
 #define CONSOLELOGGER_H
 
-#include "logger.h"
+#include "logger_internal.h"
 
 namespace parts
 {

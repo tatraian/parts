@@ -5,7 +5,7 @@
 #include "packager.h"
 #include "decompressorfactory.h"
 #include "internal_definitions.h"
-#include "logger.h"
+#include "logger_internal.h"
 
 #include <boost/filesystem.hpp>
 

@@ -36,6 +36,8 @@ set(parts_SRCS
     plaindecompressor.cpp
     compressorfactory.h
     compressorfactory.cpp
+    logger_internal.h
+    internal_definitions.h
     ${HTTP_SOURCES}
     )
 
@@ -53,7 +55,10 @@ install(TARGETS parts
 install(DIRECTORY "."
     DESTINATION "include/parts"
     FILES_MATCHING PATTERN "*.h"
-    PATTERN "tests" EXCLUDE)
+    PATTERN "tests" EXCLUDE
+    PATTERN "logger_internal.h" EXCLUDE
+    PATTERN "internal_definitions.h" EXCLUDE
+    )
 
 if(BUILD_TESTS)
     add_executable(parts_lib_tests

@@ -2,7 +2,7 @@
 #include "filewritebackend.h"
 #include "compressorfactory.h"
 #include "decompressorfactory.h"
-#include "logger.h"
+#include "logger_internal.h"
 #include <chrono>
 
 #include <boost/filesystem.hpp>

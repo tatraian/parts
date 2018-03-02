@@ -1,6 +1,6 @@
 #include "plaindecompressor.h"
 #include "internal_definitions.h"
-#include "logger.h"
+#include "logger_internal.h"
 
 #include <fstream>
 
