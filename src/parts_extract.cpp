@@ -20,8 +20,15 @@ string usage()\
 #endif
 }
 
+//==========================================================================================================================================
+std::string cut_slash(std::string orig) {
+    while(!orig.empty() && orig.back() == '/')
+        orig.pop_back();
 
+    return orig;
+}
 
+//==========================================================================================================================================
 int main(int argc, char** argv)
 {
     cxxopts::Options options("MyProgram", "One line description of MyProgram");
@@ -66,13 +73,13 @@ int main(int argc, char** argv)
     }
 #endif
 
-    boost::filesystem::path target = options["t"].as<string>();
+    boost::filesystem::path target = cut_slash(options["t"].as<string>());
     if (target.empty())
     {
         std::cerr << "Please specify a target" << std::endl;
         return 1;
     }
-    boost::filesystem::path old_dir = options["o"].as<string>();
+    boost::filesystem::path old_dir = cut_slash(options["o"].as<string>());
 
 
     ConsoleLogger logger(LOG_LEVELS::INFO, true);
