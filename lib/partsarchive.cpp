@@ -3,6 +3,7 @@
 #include "compressorfactory.h"
 #include "decompressorfactory.h"
 #include "logger_internal.h"
+#include "partsupdatejob.h"
 #include <chrono>
 
 #include <boost/filesystem.hpp>
@@ -74,27 +75,21 @@ void PartsArchive::extractArchive(const boost::filesystem::path& dest) const
 //==========================================================================================================================================
 void PartsArchive::updateArchive(const boost::filesystem::path& original_source, const boost::filesystem::path& dest)
 {
-    if (m_toc.size() == 0)
-        return;
+    PartsUpdateJob job(m_header.getHashType(), m_header.getFileCompressionType(), m_toc, original_source, dest, *m_contentReader.get());
 
-    std::string rootname = m_toc.begin()->first.string();
-
-    PartsCompressionParameters params;
-    params.m_hashType = m_header.getHashType();
-    TableOfContents old_toc(original_source, params);
-
-    std::string old_rootname;
-    if (old_toc.size() != 0)
-        old_rootname = old_toc.begin()->first.string();
-
-    for (auto& entry : m_toc) {
-        boost::filesystem::path p;
-        std::string path_string = entry.first.string();
-        p = path_string.replace(path_string.find(rootname), rootname.size(), old_rootname);
-
-        auto old_entry = old_toc.find(p);
-
-        auto decompressor = DecompressorFactory::createDecompressor(m_header.getFileCompressionType());
-        entry.second->updateEntry(old_entry.get(), original_source.parent_path(), dest, *decompressor, *m_contentReader.get());
+    while(job) {
+        job.doNext();
     }
+}
+
+//==========================================================================================================================================
+std::unique_ptr<PartsJobInterface> PartsArchive::updateJob(const boost::filesystem::path& original_source, const boost::filesystem::path& dest)
+{
+    return std::make_unique<PartsUpdateJob>(m_header.getHashType(),
+                                            m_header.getFileCompressionType(),
+                                            m_toc,
+                                            original_source,
+                                            dest,
+                                            *m_contentReader.get());
+
 }

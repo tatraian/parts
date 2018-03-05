@@ -39,6 +39,9 @@ set(parts_SRCS
     logger_internal.h
     internal_definitions.h
     ${HTTP_SOURCES}
+    partsjobinterface.h
+    partsupdatejob.h
+    partsupdatejob.cpp
     )
 
 add_library(parts ${parts_SRCS})

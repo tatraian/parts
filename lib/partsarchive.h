@@ -6,6 +6,7 @@
 #include "header.h"
 #include "tableofcontents.h"
 #include "contentreadbackend.h"
+#include "partsjobinterface.h"
 
 namespace parts
 {
@@ -34,6 +35,14 @@ public:
     void extractArchive(const boost::filesystem::path& dest) const;
     void updateArchive(const boost::filesystem::path& original_source,
                        const boost::filesystem::path& dest);
+
+    // Job API!
+    // Take care auto job = updateJob(...);
+    // while(*job)
+    //     job->doNext()
+    // without '*' you check the unique_ptr...
+    std::unique_ptr<PartsJobInterface> updateJob(const boost::filesystem::path& original_source,
+                                                 const boost::filesystem::path& dest);
 
 protected:
     // destination for write mode
