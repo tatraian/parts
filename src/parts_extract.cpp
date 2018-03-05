@@ -14,9 +14,9 @@ using std::string;
 string usage()\
 {
 #ifdef BUILD_HTTP_FEATURES
-    return "parts_web_extract (-u url|-f file) [-o old_dir]";
+    return "parts_extract (-u url|-f file) [-o old_dir] -t target_dir";
 #else
-    return "parts_web_extract -f file [-o old_dir]";
+    return "parts_extract -f file [-o old_dir]";
 #endif
 }
 
@@ -75,7 +75,7 @@ int main(int argc, char** argv)
     boost::filesystem::path old_dir = options["o"].as<string>();
 
 
-    ConsoleLogger logger(LOG_LEVELS::DEBUG, true);
+    ConsoleLogger logger(LOG_LEVELS::INFO, true);
     set_logger(&logger);
     std::unique_ptr<ContentReadBackend> input_stream;
 
