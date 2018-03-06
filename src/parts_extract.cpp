@@ -66,7 +66,7 @@ int main(int argc, char** argv)
         }
 
         if (list_only) {
-            throw PartsException("Not implemented!");
+            archive.listArchive(std::cout);
         } else if (!updated_from) {
             archive.extractArchive(dest_dir);
         } else {

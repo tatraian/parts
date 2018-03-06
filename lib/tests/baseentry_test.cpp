@@ -21,14 +21,15 @@ public:
     TestBaseEntry(InputBuffer& buffer, const std::vector<std::string>& owners, const std::vector<std::string>& groups) :
         BaseEntry(buffer, owners, groups) {}
 
-    void compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend) override {};
-    void extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend) override {};
+    void compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend) override {}
+    void extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend) override {}
     void updateEntry(const BaseEntry* old_entry,
                      const boost::filesystem::path& old_root,
                      const boost::filesystem::path& dest_root,
                      Decompressor& decompressor,
-                     ContentReadBackend& backend) override {};
+                     ContentReadBackend& backend) override {}
 
+    std::string listEntry(size_t user_width, size_t size_width, std::tm* t) const override { return ""; }
 };
 }
 

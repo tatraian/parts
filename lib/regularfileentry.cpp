@@ -6,6 +6,7 @@
 
 #include <boost/filesystem.hpp>
 #include <fmt/format.h>
+#include <fmt/time.h>
 
 using namespace parts;
 
@@ -84,6 +85,15 @@ void RegularFileEntry::updateEntry(const BaseEntry* old_entry,
     LOG_TRACE("Copy file:    {}", m_file.string());
     boost::filesystem::copy_file(old_root / old_entry->file(), dest_root / m_file);
     setMetadata(dest_root);
+}
+
+//==========================================================================================================================================
+std::string RegularFileEntry::listEntry(size_t user_width, size_t size_width, std::tm* t) const
+{
+    auto group_user = fmt::format("{:<{}}", owner() + "/" + group(), user_width);
+    auto size_str = fmt::format("{:>{}}", m_uncompressedSize, size_width);
+    //2018-02-28 15:34
+    return fmt::format("{} {} {} {:%Y-%m-%d %R} {}", permissionsToString(), group_user, size_str, *t, file().string());
 }
 
 //==========================================================================================================================================

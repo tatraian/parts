@@ -23,7 +23,9 @@ const std::string TableOfContents::DEFAULT_GROUP = "__PARTS_DEFAULT_GROUP__";
 
 //==========================================================================================================================================
 TableOfContents::TableOfContents(const boost::filesystem::path& source, const PartsCompressionParameters& parameters) :
-    m_parameters(parameters)
+    m_parameters(parameters),
+    m_maxSize(0),
+    m_maxOwnerWidth(0)
 {
     LOG_TRACE("Source: {}", source.string());
     m_owners.push_back(DEFAULT_OWNER);
@@ -52,7 +54,9 @@ TableOfContents::TableOfContents(const boost::filesystem::path& source, const Pa
 
 //==========================================================================================================================================
 TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, const PartsCompressionParameters& parameters) :
-    m_parameters(parameters)
+    m_parameters(parameters),
+    m_maxSize(0),
+    m_maxOwnerWidth(0)
 {
     std::vector<uint8_t> compressed_toc(toc_size, 0);
     backend.read(compressed_toc);
@@ -73,6 +77,7 @@ TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, c
         switch (type) {
         case EntryTypes::RegularFile:
             entry.reset(new RegularFileEntry(uncompressed_toc, m_owners, m_groups, m_parameters.m_hashType));
+            m_maxSize = std::max(m_maxSize, std::dynamic_pointer_cast<RegularFileEntry>(entry)->uncompressedSize());
             break;
         case EntryTypes::Directory:
             entry.reset(new DirectoryEntry(uncompressed_toc, m_owners, m_groups));
@@ -83,6 +88,8 @@ TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, c
         default:
             throw PartsException("Unknown node type: " + std::to_string(tmp));
         }
+
+        m_maxOwnerWidth = std::max(m_maxOwnerWidth, entry->owner().size() + entry->group().size() + 1);
 
         LOG_DEBUG("TOC entry: {}", entry->toString());
         m_files[entry->file()] = entry;

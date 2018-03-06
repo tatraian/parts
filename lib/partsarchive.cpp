@@ -5,6 +5,7 @@
 #include "logger_internal.h"
 #include "partsupdatejob.h"
 #include <chrono>
+#include <ctime>
 
 #include <boost/filesystem.hpp>
 
@@ -30,6 +31,17 @@ PartsArchive::PartsArchive(std::unique_ptr<ContentReadBackend>&& backend) :
 {
     uint64_t head_and_compressed_toc_size = m_contentReader->position();
     m_toc.shiftOffsets(head_and_compressed_toc_size);
+}
+
+//==========================================================================================================================================
+void PartsArchive::listArchive(std::ostream& output) const
+{
+    time_t now = time(nullptr);
+    std::tm* t = std::localtime(&now);
+    for(auto name_entry : m_toc) {
+        BaseEntry* entry = name_entry.second.get();
+        output << entry->listEntry(m_toc.maxOwnerGroupWidth(), std::to_string(m_toc.maxSize()).size(), t) << std::endl;
+    }
 }
 
 //==========================================================================================================================================
@@ -64,7 +76,7 @@ void PartsArchive::createArchive(const boost::filesystem::path& archive)
 }
 
 //==========================================================================================================================================
-void PartsArchive::extractArchive(const boost::filesystem::path& dest) const
+void PartsArchive::extractArchive(const boost::filesystem::path& dest)
 {
     for (auto& entry : m_toc) {
         auto decompressor = DecompressorFactory::createDecompressor(m_header.getFileCompressionType());

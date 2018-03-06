@@ -50,6 +50,8 @@ public:
                              Decompressor& decompressor,
                              ContentReadBackend& backend) = 0;
 
+    virtual std::string listEntry(size_t user_width, size_t size_width, std::tm* t) const = 0;
+
     const boost::filesystem::path& file() const
     { return m_file; }
 
@@ -72,6 +74,8 @@ public:
 
 protected:
     void setMetadata(const boost::filesystem::path& dest_root);
+
+    std::string permissionsToString() const;
 
 protected:
     boost::filesystem::path m_file;

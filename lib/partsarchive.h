@@ -30,9 +30,11 @@ public:
     const TableOfContents& toc() const
     { return m_toc; }
 
+    void listArchive(std::ostream& output) const;
+
     void createArchive(const boost::filesystem::path& archive);
 
-    void extractArchive(const boost::filesystem::path& dest) const;
+    void extractArchive(const boost::filesystem::path& dest);
     void updateArchive(const boost::filesystem::path& original_source,
                        const boost::filesystem::path& dest);
 

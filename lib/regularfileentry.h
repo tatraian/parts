@@ -38,6 +38,8 @@ public:
                      Decompressor& decompressor,
                      ContentReadBackend& backend) override;
 
+    std::string listEntry(size_t user_width, size_t size_width, std::tm* t) const override;
+
     std::string toString() const override;
 
     const Hash& uncompressedHash() const

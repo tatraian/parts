@@ -45,6 +45,12 @@ public:
 
     std::shared_ptr<BaseEntry> find(const boost::filesystem::path& file);
 
+    uint64_t maxSize() const
+    { return m_maxSize; }
+
+    size_t maxOwnerGroupWidth() const
+    { return m_maxOwnerWidth; }
+
     static const std::string DEFAULT_OWNER;
     static const std::string DEFAULT_GROUP;
 
@@ -71,6 +77,9 @@ protected:
     std::vector<std::string> m_groups;
 
     PartsCompressionParameters m_parameters;
+
+    uint64_t m_maxSize;
+    size_t m_maxOwnerWidth;
 };
 
 }
