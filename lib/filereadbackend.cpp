@@ -6,19 +6,6 @@
 
 using namespace parts;
 
-namespace {
-
-//==========================================================================================================================================
-template<class Value>
-void read_internal(Value& value, std::ifstream& file) {
-    file.read(reinterpret_cast<char*>(&value), sizeof(Value));
-    if (file.gcount() != sizeof(Value))
-        throw PartsException("Not enough data in file");
-    boost::endian::big_to_native_inplace(value);
-}
-
-}
-
 //==========================================================================================================================================
 FileReadBackend::FileReadBackend(const boost::filesystem::path& filename) :
     m_path(filename),
@@ -32,35 +19,19 @@ FileReadBackend::FileReadBackend(const boost::filesystem::path& filename) :
 }
 
 //==========================================================================================================================================
-void FileReadBackend::read(uint8_t& data)
-{
-    read_internal(data, m_file);
-}
-
-//==========================================================================================================================================
-void FileReadBackend::read(uint16_t& data)
-{
-    read_internal(data, m_file);
-}
-
-//==========================================================================================================================================
-void FileReadBackend::read(uint32_t& data)
-{
-    read_internal(data, m_file);
-}
-
-//==========================================================================================================================================
-void FileReadBackend::read(uint64_t& data)
-{
-    read_internal(data, m_file);
-}
-
-//==========================================================================================================================================
 void FileReadBackend::read(std::vector<uint8_t>& data)
 {
     m_file.read(reinterpret_cast<char*>(data.data()), data.size());
     if (m_file.gcount() != data.size())
         throw PartsException("Not enough data to read in file: " + m_path.string());
+}
+
+//==========================================================================================================================================
+void FileReadBackend::read(InputBuffer& data, size_t size)
+{
+    size_t old_size = data.size();
+    data.append(size);
+    read(&(*(data.begin() + old_size)), size);
 }
 
 //==========================================================================================================================================

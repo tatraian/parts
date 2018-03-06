@@ -37,46 +37,6 @@ BOOST_AUTO_TEST_CASE(throws_if_file_not_exist) {
 }
 
 //==========================================================================================================================================
-BOOST_AUTO_TEST_CASE(file_backend_can_read_byte) {
-    create_file(read_test, {1});
-
-    FileReadBackend backend(read_test);
-    uint8_t result = 0;
-    backend.read(result);
-    BOOST_CHECK_EQUAL(result, 1);
-}
-
-//==========================================================================================================================================
-BOOST_AUTO_TEST_CASE(file_backend_can_read_short) {
-    create_file(read_test, {1, 2});
-
-    FileReadBackend backend(read_test);
-    uint16_t result = 0;
-    backend.read(result);
-    BOOST_CHECK_EQUAL(result, 0x0102);
-}
-
-//==========================================================================================================================================
-BOOST_AUTO_TEST_CASE(file_backend_can_read_int) {
-    create_file(read_test, {1,2,3,4});
-
-    FileReadBackend backend(read_test);
-    uint32_t result = 0;
-    backend.read(result);
-    BOOST_CHECK_EQUAL(result, 0x01020304);
-}
-
-//==========================================================================================================================================
-BOOST_AUTO_TEST_CASE(file_backend_can_read_long) {
-    create_file(read_test, {1,2,3,4,5,6,7,8});
-
-    FileReadBackend backend(read_test);
-    uint64_t result = 0;
-    backend.read(result);
-    BOOST_CHECK_EQUAL(result, 0x0102030405060708ull);
-}
-
-//==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(file_backend_can_read_to_vector) {
     create_file(read_test, {0,0,1,0,0});
 
@@ -110,11 +70,13 @@ BOOST_AUTO_TEST_CASE(file_backend_can_seek_in_file) {
     FileReadBackend backend(read_test);
     backend.seek(1);
 
-    uint16_t result = 0;
+    std::vector<uint8_t> result(2, 0);
     backend.read(result);
 
-    BOOST_CHECK_EQUAL(result, 0x0102);
+    BOOST_CHECK_EQUAL(result[0], 0x01);
+    BOOST_CHECK_EQUAL(result[1], 0x02);
 }
+
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(file_backend_throws_if_there_is_no_enough_data_scalar) {
@@ -122,7 +84,7 @@ BOOST_AUTO_TEST_CASE(file_backend_throws_if_there_is_no_enough_data_scalar) {
 
     FileReadBackend backend(read_test);
 
-    uint64_t result = 0;
+    std::vector<uint8_t> result(6, 0);
     BOOST_CHECK_THROW(backend.read(result), PartsException);
 }
 

@@ -18,12 +18,9 @@ public:
      std::string source() const override
      { return m_path.string(); }
 
-     void read(uint8_t& data) override;
-     void read(uint16_t& data) override;
-     void read(uint32_t& data) override;
-     void read(uint64_t& data) override;
-
      void read(std::vector<uint8_t>& data) override;
+
+     void read(InputBuffer& data, size_t size) override;
 
      void read(uint8_t* data, size_t size) override;
 

@@ -61,6 +61,9 @@ public:
         return size() == 0;
     }
 
+    void append(size_t bytes_to_append)
+    { m_buffer.resize(m_buffer.size() + bytes_to_append); }
+
     template<class T>
     iterator insert(iterator pos, T first, T last) {
         return m_buffer.insert(pos, first, last);

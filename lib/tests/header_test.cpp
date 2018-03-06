@@ -7,27 +7,27 @@
 using namespace parts;
 using namespace fakeit;
 
+
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(Header_can_be_read_from_backend) {
 
     Mock<ContentReadBackend> backend;
-    When(OverloadedMethod(backend, read, void(std::vector<uint8_t>&))).Do([](std::vector<uint8_t>& a){ a = {'p','a','r','t','s','!'}; });
+    When(OverloadedMethod(backend, read, void(InputBuffer&, size_t))).Do([](InputBuffer& b, size_t s){
+        if (s != 16) {
+            // Header has 16 bytes
+            BOOST_REQUIRE(false);
+        }
+        InputBuffer tmp = {'p','a','r','t','s','!',
+                          1,
+                          static_cast<uint8_t>(CompressionType::LZMA),
+                          static_cast<uint8_t>(CompressionType::LZMA),
+                          static_cast<uint8_t>(HashType::SHA256),
+                          0,
+                          0,
+                          0, 0, 0x11, 0xd7};
+        b = tmp;
+    });
 
-    When(OverloadedMethod(backend, read, void(uint8_t&))).
-            // version
-            Do([](uint8_t& a) {a = 1;}).
-            // toc compression type
-            Do([](uint8_t& a) {a = static_cast<uint8_t>(CompressionType::LZMA);}).
-            // file compressino type
-            Do([](uint8_t& a) {a = static_cast<uint8_t>(CompressionType::LZMA);}).
-            // hash type
-            Do([](uint8_t& a) {a = static_cast<uint8_t>(HashType::SHA256);}).
-            // dummys
-            Do([](uint8_t& a) {a = 0;}).
-            Do([](uint8_t& a) {a = 0;});
-
-
-    When(OverloadedMethod(backend, read, void(uint32_t&))).Do([](uint32_t& a){ a = 4567; });
     When(Method(backend, source)).AlwaysReturn("Test");
 
     std::unique_ptr<Header> header;
@@ -44,7 +44,10 @@ BOOST_AUTO_TEST_CASE(Header_can_be_read_from_backend) {
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(Header_throws_exception_in_case_of_bad_magic) {
     Mock<ContentReadBackend> backend;
-    When(OverloadedMethod(backend, read, void(std::vector<uint8_t>&))).Do([](std::vector<uint8_t>& a){ a = {'x','x','x','x','x','x'}; });
+    When(OverloadedMethod(backend, read, void(InputBuffer&, size_t))).Do([](InputBuffer& b, size_t s){
+        InputBuffer tmp = {'x','x','x','x','x','x', 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0};
+        b = tmp;
+    });
     When(Method(backend, source)).AlwaysReturn("Test");
 
     std::unique_ptr<Header> header;
@@ -55,12 +58,12 @@ BOOST_AUTO_TEST_CASE(Header_throws_exception_in_case_of_bad_magic) {
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(Header_throws_exception_if_bad_version) {
     Mock<ContentReadBackend> backend;
-    When(OverloadedMethod(backend, read, void(std::vector<uint8_t>&))).Do([](std::vector<uint8_t>& a){ a = {'p','a','r','t','s','!'}; });
+    When(OverloadedMethod(backend, read, void(InputBuffer&, size_t))).Do([](InputBuffer& b, size_t s){
+        InputBuffer tmp = {'p','a','r','t','s','!', 2, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0};
+        b = tmp;
+    });
     When(Method(backend, source)).AlwaysReturn("Test");
-
-    When(OverloadedMethod(backend, read, void(uint8_t&))).Do([](uint8_t& a) {a = 2;});
 
     std::unique_ptr<Header> header;
     BOOST_REQUIRE_THROW(header.reset(new Header(backend.get())), PartsException);
 }
-

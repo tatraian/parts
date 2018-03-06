@@ -100,36 +100,11 @@ void HttpReaderBackend::read(std::vector<uint8_t> &data)
     m_CurrentPos += data.size();
 }
 
-void HttpReaderBackend::read(uint8_t &data)
+void HttpReaderBackend::read(InputBuffer& data, size_t size)
 {
-    WriteDataStruct wd { sizeof(data),(uint8_t*)&data};
-    getFilePart(m_CurlHandle,m_CurrentPos, &wd, m_ReadStat);
-    m_CurrentPos += sizeof(data);
-    boost::endian::big_to_native_inplace(data);
-}
-
-void HttpReaderBackend::read(uint16_t &data)
-{
-    WriteDataStruct wd { sizeof(data),(uint8_t*)&data};
-    getFilePart(m_CurlHandle,m_CurrentPos, &wd, m_ReadStat);
-    m_CurrentPos += sizeof(data);
-    boost::endian::big_to_native_inplace(data);
-}
-
-void HttpReaderBackend::read(uint32_t &data)
-{
-    WriteDataStruct wd { sizeof(data),(uint8_t*)&data};
-    getFilePart(m_CurlHandle,m_CurrentPos, &wd, m_ReadStat);
-    m_CurrentPos += sizeof(data);
-    boost::endian::big_to_native_inplace(data);
-}
-
-void HttpReaderBackend::read(uint64_t &data)
-{
-    WriteDataStruct wd { sizeof(data),(uint8_t*)&data};
-    getFilePart(m_CurlHandle,m_CurrentPos, &wd, m_ReadStat);
-    m_CurrentPos += sizeof(data);
-    boost::endian::big_to_native_inplace(data);
+    size_t old_size = data.size();
+    data.append(size);
+    read(&(*(data.begin() + old_size)), size);
 }
 
 void HttpReaderBackend::read(uint8_t *data, size_t size)
