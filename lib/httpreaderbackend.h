@@ -8,36 +8,21 @@ namespace parts {
 
 class HttpReaderBackend : public ContentReadBackend
 {
-private:
-    std::string m_FileUrl;
-    void *m_CurlHandle;
-    uint64_t m_CurrentPos = 0;
 public:
     HttpReaderBackend(const std::string& file_url);
     ~HttpReaderBackend();
 
-    struct ReadStatistic
-    {
-        uint64_t* m_BytesRead = nullptr;
-        uint64_t* m_RequestsDone = nullptr;
-        void AddReadCount(uint64_t c) const { if(m_BytesRead) *m_BytesRead += c; }
-        void RequestDone() const { if(m_RequestsDone) ++*m_RequestsDone; }
-    };
-    ReadStatistic m_ReadStat;
-    // ContentReadBackend interface
-public:
-    std::string source() const override { return m_FileUrl; }
+    std::string source() const override { return m_fileUrl; }
     void read(std::vector<uint8_t> &data) override;
     void read(InputBuffer& data, size_t size) override;
     void read(uint8_t *data, size_t size) override;
     void seek(const uint64_t &position) override;
-    uint64_t position() override { return m_CurrentPos; }
-    uint64_t readBytes() const override
-    { return 0; }
+    uint64_t position() override { return m_currentPos; }
 
-    uint64_t sentRequests() const override
-    { return 0; }
-
+private:
+    std::string m_fileUrl;
+    void *m_curlHandle;
+    uint64_t m_currentPos = 0;
 };
 
 }

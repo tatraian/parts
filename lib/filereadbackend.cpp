@@ -21,9 +21,7 @@ FileReadBackend::FileReadBackend(const boost::filesystem::path& filename) :
 //==========================================================================================================================================
 void FileReadBackend::read(std::vector<uint8_t>& data)
 {
-    m_file.read(reinterpret_cast<char*>(data.data()), data.size());
-    if (m_file.gcount() != data.size())
-        throw PartsException("Not enough data to read in file: " + m_path.string());
+    read(data.data(), data.size());
 }
 
 //==========================================================================================================================================
@@ -40,6 +38,7 @@ void FileReadBackend::read(uint8_t* data, size_t size)
     m_file.read(reinterpret_cast<char*>(data), size);
     if (m_file.gcount() != size)
         throw PartsException("Not enough data to read in file: " + m_path.string());
+    m_readBytes += size;
 }
 
 //==========================================================================================================================================
@@ -48,6 +47,7 @@ void FileReadBackend::seek(const uint64_t& position)
     if (position >= m_filesize)
         throw PartsException("Seeking file: " + m_path.string() + " failed!");
     m_file.seekg(position);
+    ++m_sentRequests;
 }
 
 //==========================================================================================================================================

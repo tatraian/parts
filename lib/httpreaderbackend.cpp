@@ -11,27 +11,11 @@ using std::string;
 using std::vector;
 using std::uint8_t;
 
-namespace parts {
+using namespace parts;
 
-HttpReaderBackend::HttpReaderBackend(const string& file_url) :m_FileUrl(file_url)
-{
-    struct CurlInit
-    {
-        CurlInit() { curl_global_init(CURL_GLOBAL_ALL); }
-        ~CurlInit() { curl_global_cleanup(); }
-    };
-    static CurlInit __curl_init;
-    m_CurlHandle = curl_easy_init();
-    curl_easy_setopt(m_CurlHandle, CURLOPT_URL, file_url.c_str());
-    curl_easy_setopt(m_CurlHandle, CURLOPT_HTTPHEADER, NULL);
-}
+namespace {
 
-HttpReaderBackend::~HttpReaderBackend()
-{
-    curl_easy_cleanup(m_CurlHandle);
-}
-
-
+//==========================================================================================================================================
 struct WriteDataStruct
 {
     size_t size;
@@ -39,7 +23,8 @@ struct WriteDataStruct
     int overflow = 0;
 };
 
-static size_t write_data(void *ptr, size_t size, size_t nmemb, void *data_struct)
+//==========================================================================================================================================
+size_t write_data(void *ptr, size_t size, size_t nmemb, void *data_struct)
 {
   auto& out = * static_cast<WriteDataStruct*>(data_struct);
   size_t copyc = std::min(size * nmemb, out.size);
@@ -56,10 +41,10 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, void *data_struct
 
 }
 
-static void getFilePart(CURL *curl_handle , int start, WriteDataStruct* wds, const  HttpReaderBackend::ReadStatistic& statistic)
+//==========================================================================================================================================
+void getFilePart(CURL *curl_handle , int start, WriteDataStruct* wds)
 {
     LOG_DEBUG("Requesting part of file. Start {}, Size {}",start, wds->size);
-    auto requestedBytecount = wds->size;
     vector<uint8_t> res;
     res.clear();
     //setting requested range
@@ -89,17 +74,39 @@ static void getFilePart(CURL *curl_handle , int start, WriteDataStruct* wds, con
     {
         throw PartsException("Not enought data in received http response");
     }
-    statistic.RequestDone();
-    statistic.AddReadCount(requestedBytecount);
 }
 
+} // anonimous namespace
+
+
+//==========================================================================================================================================
+HttpReaderBackend::HttpReaderBackend(const string& file_url) :m_fileUrl(file_url)
+{
+    struct CurlInit
+    {
+        CurlInit() { curl_global_init(CURL_GLOBAL_ALL); }
+        ~CurlInit() { curl_global_cleanup(); }
+    };
+    static CurlInit __curl_init;
+    m_curlHandle = curl_easy_init();
+    curl_easy_setopt(m_curlHandle, CURLOPT_URL, file_url.c_str());
+    curl_easy_setopt(m_curlHandle, CURLOPT_HTTPHEADER, NULL);
+}
+
+//==========================================================================================================================================
+HttpReaderBackend::~HttpReaderBackend()
+{
+    curl_easy_cleanup(m_curlHandle);
+}
+
+
+//==========================================================================================================================================
 void HttpReaderBackend::read(std::vector<uint8_t> &data)
 {
-    WriteDataStruct wd { data.size(),&data[0]};
-    getFilePart(m_CurlHandle,m_CurrentPos, &wd, m_ReadStat);
-    m_CurrentPos += data.size();
+    read(data.data(), data.size());
 }
 
+//==========================================================================================================================================
 void HttpReaderBackend::read(InputBuffer& data, size_t size)
 {
     size_t old_size = data.size();
@@ -107,16 +114,18 @@ void HttpReaderBackend::read(InputBuffer& data, size_t size)
     read(&(*(data.begin() + old_size)), size);
 }
 
+//==========================================================================================================================================
 void HttpReaderBackend::read(uint8_t *data, size_t size)
 {
     WriteDataStruct wd { size,(uint8_t*)data};
-    getFilePart(m_CurlHandle,m_CurrentPos, &wd, m_ReadStat);
-    m_CurrentPos += size;
+    getFilePart(m_curlHandle,m_currentPos, &wd);
+    m_currentPos += size;
+    ++m_sentRequests;
+    m_readBytes += size;
 }
 
+//==========================================================================================================================================
 void HttpReaderBackend::seek(const uint64_t &position)
 {
-    m_CurrentPos = position;
-}
-
+    m_currentPos = position;
 }

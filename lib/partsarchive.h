@@ -44,6 +44,11 @@ public:
     std::unique_ptr<PartsJobInterface> updateJob(const boost::filesystem::path& original_source,
                                                  const boost::filesystem::path& dest);
 
+    uint64_t readBytes() const
+    { if (m_contentReader) return m_contentReader->readBytes(); else return 0; }
+    uint64_t sentRequests() const
+    { if (m_contentReader) return m_contentReader->sentRequests(); else return 0; }
+
 protected:
     // destination for write mode
     boost::filesystem::path m_root;

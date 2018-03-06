@@ -10,7 +10,14 @@ namespace parts {
 
 class ContentReadBackend {
 public:
-    virtual ~ContentReadBackend() {}
+    ContentReadBackend() : m_readBytes(0), m_sentRequests(0) {}
+    virtual ~ContentReadBackend() = default;
+
+    ContentReadBackend(const ContentReadBackend&) = delete;
+    ContentReadBackend& operator=(const ContentReadBackend&) = delete;
+
+    ContentReadBackend(ContentReadBackend&&) = default;
+    ContentReadBackend& operator=(ContentReadBackend&&) = default;
 
     virtual std::string source() const = 0;
 
@@ -25,9 +32,15 @@ public:
 
     virtual uint64_t position() = 0;
 
-    virtual uint64_t readBytes() const = 0;
+    uint64_t readBytes() const
+    { return m_readBytes; }
 
-    virtual uint64_t sentRequests() const = 0;
+    uint64_t sentRequests() const
+    { return m_sentRequests; }
+
+protected:
+    uint64_t m_readBytes;
+    uint64_t m_sentRequests;
 };
 
 }

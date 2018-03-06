@@ -22,7 +22,7 @@ std::string cut_slash(std::string orig) {
 //==========================================================================================================================================
 int main(int argc, char** argv)
 {
-    ConsoleLogger logger(LOG_LEVELS::INFO, true);
+    ConsoleLogger logger(LOG_LEVELS::INFO);
     set_logger(&logger);
 
     args::ArgumentParser parser("This program extracts or updates files from a \".parts\" archive");
@@ -73,7 +73,7 @@ int main(int argc, char** argv)
             archive.updateArchive(old_dir,dest_dir);
         }
 
-        //LOG_INFO("Requests: {}; Bytes received {}", input_stream->sentRequests(), input_stream->readBytes());
+        LOG_INFO("Requests: {}, Data received {} Kb", archive.sentRequests(), archive.readBytes() / 1024.);
 
         return 0;
     } catch (const args::Help&) {
@@ -85,6 +85,8 @@ int main(int argc, char** argv)
     } catch (const args::RequiredError& e) {
         std::cerr << "Error: " << e.what() << std::endl << std::endl;
         std::cerr << parser;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
     }
     return 1;
 
