@@ -94,6 +94,8 @@ int main(int argc, char** argv) {
     } catch (const args::RequiredError& e) {
         std::cerr << "Error: " << e.what() << std::endl << std::endl;
         std::cerr << parser;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
     }
     return 1;
 }
