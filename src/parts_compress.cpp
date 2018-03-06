@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
         archive.createArchive(archive_filename);
 
         return 0;
-    } catch(args::Help) {
+    } catch(const args::Help&) {
         std::cout << parser;
     } catch (const args::ParseError& e) {
         std::cerr << e.what() << std::endl;
