@@ -12,7 +12,7 @@ if (BUILD_CMDLINE)
     target_link_libraries(parts_list parts)
 
     add_executable(parts_extract parts_extract.cpp)
-    target_link_libraries(parts_extract parts cxxopts::cxxopts)
+    target_link_libraries(parts_extract parts)
 
     if (BUILD_HTTP)
         add_definitions( -DBUILD_HTTP_FEATURES=1 )

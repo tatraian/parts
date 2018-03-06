@@ -35,6 +35,11 @@ public:
     void read(uint8_t *data, size_t size) override;
     void seek(const uint64_t &position) override;
     uint64_t position() override { return m_CurrentPos; }
+    uint64_t readBytes() const override
+    { return 0; }
+
+    uint64_t sentRequests() const override
+    { return 0; }
 
 };
 

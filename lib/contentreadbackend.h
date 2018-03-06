@@ -24,6 +24,10 @@ public:
     virtual void seek(const uint64_t& position) = 0;
 
     virtual uint64_t position() = 0;
+
+    virtual uint64_t readBytes() const = 0;
+
+    virtual uint64_t sentRequests() const = 0;
 };
 
 }

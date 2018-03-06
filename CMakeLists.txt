@@ -26,11 +26,6 @@ if (BUILD_HTTP)
     hunter_add_package(CURL)
     find_package(CURL CONFIG REQUIRED)
 endif()
-if (BUILD_CMDLINE)
-    hunter_add_package(cxxopts)
-    find_package(cxxopts CONFIG REQUIRED)
-endif()
-
 
 if (BUILD_TESTS)
     hunter_add_package(Boost COMPONENTS test)

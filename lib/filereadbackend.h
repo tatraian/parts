@@ -31,6 +31,12 @@ public:
 
      uint64_t position() override;
 
+     uint64_t readBytes() const override
+     { return 0; }
+
+     uint64_t sentRequests() const override
+     { return 0; }
+
 protected:
      boost::filesystem::path m_path;
      std::ifstream m_file;
