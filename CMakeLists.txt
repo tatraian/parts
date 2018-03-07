@@ -67,3 +67,16 @@ install(
     FILES "${project_config}" "${version_config}"
     DESTINATION "${config_install_dir}"
 )
+
+include(InstallRequiredSystemLibraries)
+
+set(CPACK_GENERATOR RPM)
+set(CPACK_PACKAGE_NAME "Parts")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Archiving utility for embedded systems")
+set(CPACK_PACKAGE_DESCRIPTION "\".parts\" files hold the table of contents at the beggining of the file. So downloading and extracting "
+    "similar content (with small binary different) can be done only with the binary diff downloading.")
+set(CPACK_PACKAGE_VERSION ${Parts_VERSION})
+set(CPACK_RPM_PACKAGE_LICENSE "MIT")
+set(CPACK_STRIP_FILES TRUE)
+
+include(CPack)
