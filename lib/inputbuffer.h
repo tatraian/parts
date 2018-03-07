@@ -61,7 +61,7 @@ public:
         return size() == 0;
     }
 
-    void append(size_t bytes_to_append)
+    void append(std::size_t bytes_to_append)
     { m_buffer.resize(m_buffer.size() + bytes_to_append); }
 
     template<class T>
