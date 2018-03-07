@@ -51,6 +51,8 @@ public:
     uint64_t sentRequests() const
     { if (m_contentReader) return m_contentReader->sentRequests(); else return 0; }
 
+    bool extractToMc(const boost::filesystem::path& file_path, const boost::filesystem::path& dest_file);
+
 protected:
     // destination for write mode
     boost::filesystem::path m_root;

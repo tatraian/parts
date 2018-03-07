@@ -105,3 +105,15 @@ std::unique_ptr<PartsJobInterface> PartsArchive::updateJob(const boost::filesyst
                                             *m_contentReader.get());
 
 }
+
+//==========================================================================================================================================
+bool PartsArchive::extractToMc(const boost::filesystem::path& file_path, const boost::filesystem::path& dest_file)
+{
+    auto entry = m_toc.find(file_path);
+    if (!entry) {
+        return false;
+    }
+
+    auto decompressor = DecompressorFactory::createDecompressor(m_header.getFileCompressionType());
+    return entry->extractToMc(dest_file, *decompressor, *m_contentReader.get());
+}

@@ -51,9 +51,9 @@ target_link_libraries(parts PRIVATE lzma::lzma fmt::fmt ${HTTP_LINK})
 install(TARGETS parts
     EXPORT ${targets_export_name}
     INCLUDES DESTINATION include
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib)
+    RUNTIME DESTINATION  bin
+    LIBRARY DESTINATION  lib
+    ARCHIVE DESTINATION  lib)
 
 install(DIRECTORY "."
     DESTINATION "include/parts"

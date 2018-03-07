@@ -40,6 +40,7 @@ include_directories(thirdparty)
 add_subdirectory(lib)
 include_directories(lib)
 add_subdirectory(src)
+add_subdirectory(scripts)
 
 
 set(config_export_name "${PROJECT_NAME}Config")

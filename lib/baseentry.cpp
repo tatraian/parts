@@ -67,7 +67,6 @@ void BaseEntry::setMetadata(const boost::filesystem::path& dest_root)
 std::string BaseEntry::permissionsToString() const
 {
     std::stringstream output;
-    output << "-";
 
     output << ((m_permissions & S_IRUSR) ? "r" : "-");
     output << ((m_permissions & S_IWUSR) ? "w" : "-");

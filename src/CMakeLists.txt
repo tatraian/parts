@@ -8,4 +8,8 @@ if (BUILD_CMDLINE)
 
     add_executable(parts_extract parts_extract.cpp)
     target_link_libraries(parts_extract parts)
+
+    install(TARGETS parts_compress parts_extract
+            EXPORT ${targets_export_name}
+            RUNTIME DESTINATION "bin")
 endif()

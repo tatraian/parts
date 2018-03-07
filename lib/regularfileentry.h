@@ -40,6 +40,8 @@ public:
 
     std::string listEntry(size_t user_width, size_t size_width, std::tm* t) const override;
 
+    bool extractToMc(const boost::filesystem::path& dest_file, Decompressor& decompressor, ContentReadBackend& backend) override;
+
     std::string toString() const override;
 
     const Hash& uncompressedHash() const
@@ -56,6 +58,8 @@ public:
 
     void shiftOffset(uint64_t& shift)
     { m_offset += shift; }
+
+
 
 protected:
     Hash m_uncompressedHash;

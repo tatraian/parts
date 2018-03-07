@@ -33,6 +33,8 @@ int main(int argc, char** argv)
                                               "updated_from",
                                               "The 'old' version, that will be used to update",
                                               {'u', "--updated_from"});
+    args::ValueFlag<std::string> mc_extract_file(parser, "extract_file", "file to be extracted", {"mc_file"});
+    args::ValueFlag<std::string> mc_extract_dest_file(parser, "extract_dest_file", "temp file to extract", {"mc_dest_file"});
     args::Flag list_only(parser, "list_only", "Only list archive", {'l', "list_only"});
 
     try
@@ -59,14 +61,21 @@ int main(int argc, char** argv)
 
         PartsArchive archive(std::move(input_stream));
 
-        if(!boost::filesystem::exists(dest_dir))
-        {
-            LOG_INFO("Directory {} does not exists, creating it", dest_dir.string());
-            boost::filesystem::create_directory(dest_dir);
+        if ((mc_extract_file && !mc_extract_dest_file) ||
+            (!mc_extract_file && mc_extract_dest_file)){
+            throw args::ParseError("'mc_file' and 'mc_dest_file' parameters must be used together");
         }
 
-        if (list_only) {
+        if (mc_extract_file) {
+            if (archive.extractToMc(mc_extract_file.Get(), mc_extract_dest_file.Get())) {
+                return 0;
+            } else {
+                return 1;
+            }
+        } else if (list_only) {
             archive.listArchive(std::cout);
+            // to avoid writing summary line
+            return 0;
         } else if (!updated_from) {
             archive.extractArchive(dest_dir);
         } else {

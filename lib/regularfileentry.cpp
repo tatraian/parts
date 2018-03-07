@@ -90,10 +90,10 @@ void RegularFileEntry::updateEntry(const BaseEntry* old_entry,
 //==========================================================================================================================================
 std::string RegularFileEntry::listEntry(size_t user_width, size_t size_width, std::tm* t) const
 {
-    auto group_user = fmt::format("{:<{}}", owner() + "/" + group(), user_width);
+    auto group_user = fmt::format("{:<{}}", owner() + " " + group(), user_width);
     auto size_str = fmt::format("{:>{}}", m_uncompressedSize, size_width);
     //2018-02-28 15:34
-    return fmt::format("{} {} {} {:%Y-%m-%d %R} {}", permissionsToString(), group_user, size_str, *t, file().string());
+    return fmt::format("-{}   1 {} {} {:%m-%d-%Y %R} {}", permissionsToString(), group_user, size_str, *t, file().string());
 }
 
 //==========================================================================================================================================
@@ -105,4 +105,11 @@ std::string RegularFileEntry::toString() const
                        m_uncompressedSize,
                        m_uncompressedHash.hashString(),
                        m_compressedSize);
+}
+
+//==========================================================================================================================================
+bool RegularFileEntry::extractToMc(const boost::filesystem::path& dest_file, Decompressor& decompressor, ContentReadBackend& backend)
+{
+    decompressor.extractFile(dest_file, backend, m_offset, m_compressedSize);
+    return true;
 }

@@ -83,10 +83,10 @@ void LinkEntry::updateEntry(const BaseEntry* old_entry,
 //==========================================================================================================================================
 std::string LinkEntry::listEntry(size_t user_width, size_t size_width, std::tm* t) const
 {
-    auto group_user = fmt::format("{:<{}}", owner() + "/" + group(), user_width);
+    auto group_user = fmt::format("{:<{}}", owner() + " " + group(), user_width);
     auto size_str = fmt::format("{:>{}}", 0, size_width);
     //2018-02-28 15:34
-    return fmt::format("{} {} {} {:%Y-%m-%d %R} {} -> {}",
+    return fmt::format("l{}   1 {} {} {:%m-%d-%Y %R} {} -> {}",
                        permissionsToString(),
                        group_user,
                        size_str,

@@ -52,6 +52,9 @@ public:
 
     virtual std::string listEntry(size_t user_width, size_t size_width, std::tm* t) const = 0;
 
+    virtual bool extractToMc(const boost::filesystem::path& dest_file, Decompressor& decompressor, ContentReadBackend& backend)
+    { return false; }
+
     const boost::filesystem::path& file() const
     { return m_file; }
 
