@@ -36,6 +36,7 @@ int main(int argc, char** argv)
     args::ValueFlag<std::string> mc_extract_file(parser, "extract_file", "file to be extracted", {"mc_file"});
     args::ValueFlag<std::string> mc_extract_dest_file(parser, "extract_dest_file", "temp file to extract", {"mc_dest_file"});
     args::Flag list_only(parser, "list_only", "Only list archive", {'l', "list_only"});
+    args::Flag check_existing(parser, "check_existing", "Check existing files during update", {'c', "check_existing"});
 
     try
     {
@@ -79,7 +80,7 @@ int main(int argc, char** argv)
         } else if (!updated_from) {
             archive.extractArchive(dest_dir);
         } else {
-            archive.updateArchive(old_dir,dest_dir);
+            archive.updateArchive(old_dir,dest_dir,check_existing);
         }
 
         LOG_INFO("Requests: {}, Data received {} Kb", archive.sentRequests(), archive.readBytes() / 1024.);

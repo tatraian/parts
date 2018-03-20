@@ -35,8 +35,10 @@ public:
     void createArchive(const boost::filesystem::path& archive);
 
     void extractArchive(const boost::filesystem::path& dest);
+    /** checkExisting is to continue an aborted/failed update */
     void updateArchive(const boost::filesystem::path& original_source,
-                       const boost::filesystem::path& dest);
+                       const boost::filesystem::path& dest,
+                       bool checkExisting = false);
 
     // Job API!
     // Take care auto job = updateJob(...);

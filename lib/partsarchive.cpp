@@ -85,12 +85,12 @@ void PartsArchive::extractArchive(const boost::filesystem::path& dest)
 }
 
 //==========================================================================================================================================
-void PartsArchive::updateArchive(const boost::filesystem::path& original_source, const boost::filesystem::path& dest)
+void PartsArchive::updateArchive(const boost::filesystem::path& original_source, const boost::filesystem::path& dest, bool checkExisting)
 {
     PartsUpdateJob job(m_header.getHashType(), m_header.getFileCompressionType(), m_toc, original_source, dest, *m_contentReader.get());
 
     while(job) {
-        job.doNext();
+        job.doNext(checkExisting);
     }
 }
 

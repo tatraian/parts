@@ -74,8 +74,18 @@ void LinkEntry::updateEntry(const BaseEntry* old_entry,
                             const boost::filesystem::path& old_root,
                             const boost::filesystem::path& dest_root,
                             Decompressor& decompressor,
-                            ContentReadBackend& backend)
+                            ContentReadBackend& backend,
+                            bool checkExisting)
 {
+    if (checkExisting) {
+        boost::system::error_code l_ec;
+        auto link_target = boost::filesystem::canonical( dest_root / m_file, l_ec );
+        if (l_ec.value() == 0 && boost::filesystem::exists( link_target ) ) {
+            LOG_TRACE("Link already exists, don't create:    {}", (dest_root / m_file).string());
+            return;
+        }
+    }
+
     // Do the same in this case too, since there is no data extraction
     extractEntry(dest_root, decompressor, backend);
 }

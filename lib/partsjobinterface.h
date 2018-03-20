@@ -17,7 +17,8 @@ public:
 
     virtual operator bool() const = 0;
     virtual const BaseEntry* nextEntry() const = 0;
-    virtual void doNext() = 0;
+    /** checkExisting is to continue an aborted job */
+    virtual void doNext(bool checkExisting) = 0;
 };
 
 }

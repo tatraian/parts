@@ -26,7 +26,7 @@ public:
     const BaseEntry* nextEntry() const override
     { return m_actualElement->second.get(); }
 
-    void doNext() override;
+    void doNext(bool checkExisting) override;
 
 protected:
     CompressionType m_compressionType;

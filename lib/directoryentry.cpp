@@ -61,8 +61,15 @@ void DirectoryEntry::updateEntry(const BaseEntry* old_entry,
                                  const boost::filesystem::path& old_root,
                                  const boost::filesystem::path& dest_root,
                                  Decompressor& decompressor,
-                                 ContentReadBackend& backend)
+                                 ContentReadBackend& backend,
+                                 bool checkExisting)
 {
+    if (checkExisting && boost::filesystem::exists( dest_root / m_file )) {
+        LOG_TRACE("Directory already exists, don't create:    {}", (dest_root / m_file).string());
+        setMetadata(dest_root);
+        return;
+    }
+
     // Do the same as in case of extract, (that is good if the old entry is file or link too)
     extractEntry(dest_root, decompressor, backend);
 }

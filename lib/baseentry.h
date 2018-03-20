@@ -44,11 +44,13 @@ public:
 
     virtual void extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend) = 0;
 
+    /** checkExisting can be used to continue a previous extract, e.g. check if the target already exists */
     virtual void updateEntry(const BaseEntry* old_entry,
                              const boost::filesystem::path& old_root,
                              const boost::filesystem::path& dest_root,
                              Decompressor& decompressor,
-                             ContentReadBackend& backend) = 0;
+                             ContentReadBackend& backend,
+                             bool checkExisting) = 0;
 
     virtual std::string listEntry(size_t user_width, size_t size_width, std::tm* t) const = 0;
 

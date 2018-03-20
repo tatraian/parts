@@ -74,11 +74,18 @@ void RegularFileEntry::updateEntry(const BaseEntry* old_entry,
                                    const boost::filesystem::path& old_root,
                                    const boost::filesystem::path& dest_root,
                                    Decompressor& decompressor,
-                                   ContentReadBackend& backend)
+                                   ContentReadBackend& backend,
+                                   bool checkExisting)
 {
     auto file_old_entry = dynamic_cast<const RegularFileEntry*>(old_entry);
     if (file_old_entry == nullptr || file_old_entry->m_uncompressedHash != m_uncompressedHash) {
         extractEntry(dest_root, decompressor, backend);
+        return;
+    }
+
+    if (checkExisting && boost::filesystem::exists( dest_root / m_file ) ) {
+        LOG_TRACE("File already exists, don't copy:    {}", m_file.string());
+        setMetadata(dest_root);
         return;
     }
 
