@@ -17,6 +17,10 @@ public:
 
     std::vector<uint8_t> getRaw() const;
 
+    void setDecompressedTocSize(uint32_t size);
+    uint32_t getDecompressedTocSize() const
+    { return m_decompressedTocSize; }
+
     void setTocSize(uint32_t size);
     uint32_t getTocSize() const
     { return m_tocSize; }
@@ -31,13 +35,15 @@ public:
     { return m_hashType; }
 
 protected:
+    /** 32 bytes header */
     char* m_magic; // "parts!" - 6 bytes
+    uint8_t m_dummy[14];
     uint8_t m_version;
     CompressionType m_tocCompressionType;
     CompressionType m_fileCompressionType;
     HashType m_hashType;
-    uint8_t m_dummy[2];
     uint32_t m_tocSize;
+    uint32_t m_decompressedTocSize;
 };
 
 }

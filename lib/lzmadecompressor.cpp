@@ -75,7 +75,7 @@ void extractInternal(lzma_stream& lzma_context,
 }
 
 //==========================================================================================================================================
-InputBuffer LzmaDecompressor::extractBuffer(const std::vector<uint8_t>& buffer)
+InputBuffer LzmaDecompressor::extractBuffer(const std::vector<uint8_t>& buffer, size_t decompressed_size)
 {
     lzma_stream lzma_context;
     setupXZLib(lzma_context);
@@ -102,7 +102,8 @@ InputBuffer LzmaDecompressor::extractBuffer(const std::vector<uint8_t>& buffer)
 void LzmaDecompressor::extractFile(const boost::filesystem::path& file,
                                    ContentReadBackend& backend,
                                    size_t position,
-                                   size_t compressed_size)
+                                   size_t compressed_size,
+                                   size_t decompressed_size)
 {
     lzma_stream lzma_context;
     setupXZLib(lzma_context);

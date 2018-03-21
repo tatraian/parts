@@ -72,7 +72,7 @@ void RegularFileEntry::compressEntry(const boost::filesystem::path& root, Compre
 void RegularFileEntry::extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend)
 {
     LOG_TRACE("Extract file: {}", m_file.string());
-    decompressor.extractFile(dest_root / m_file, backend, m_offset, m_compressedSize);
+    decompressor.extractFile(dest_root / m_file, backend, m_offset, m_compressedSize, m_uncompressedSize);
 
     setMetadata(dest_root);
 }
@@ -125,6 +125,6 @@ std::string RegularFileEntry::toString() const
 //==========================================================================================================================================
 bool RegularFileEntry::extractToMc(const boost::filesystem::path& dest_file, Decompressor& decompressor, ContentReadBackend& backend)
 {
-    decompressor.extractFile(dest_file, backend, m_offset, m_compressedSize);
+    decompressor.extractFile(dest_file, backend, m_offset, m_compressedSize, m_uncompressedSize);
     return true;
 }

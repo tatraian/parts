@@ -22,12 +22,13 @@ public:
 
     virtual ~Decompressor() = default;
 
-    virtual InputBuffer extractBuffer(const std::vector<uint8_t>& buffer) = 0;
+    virtual InputBuffer extractBuffer(const std::vector<uint8_t>& buffer, size_t decompressed_size) = 0;
 
     virtual void extractFile(const boost::filesystem::path& file,
                              ContentReadBackend& backend,
                              size_t position,
-                             size_t compressed_size) = 0;
+                             size_t compressed_size,
+                             size_t decompressed_size) = 0;
 };
 
 }

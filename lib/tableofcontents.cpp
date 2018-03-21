@@ -53,7 +53,7 @@ TableOfContents::TableOfContents(const boost::filesystem::path& source, const Pa
 }
 
 //==========================================================================================================================================
-TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, const PartsCompressionParameters& parameters) :
+TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, size_t decompressed_toc_size, const PartsCompressionParameters& parameters) :
     m_parameters(parameters),
     m_maxSize(0),
     m_maxOwnerWidth(0)
@@ -63,7 +63,7 @@ TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, c
 
     LOG_DEBUG("Decompressing TOC");
     auto decompressor = DecompressorFactory::createDecompressor(m_parameters.m_tocCompression);
-    InputBuffer uncompressed_toc = decompressor->extractBuffer(compressed_toc);
+    InputBuffer uncompressed_toc = decompressor->extractBuffer(compressed_toc, decompressed_toc_size);
 
     unpackNames(uncompressed_toc, m_owners);
     unpackNames(uncompressed_toc, m_groups);

@@ -25,9 +25,8 @@ PartsArchive::PartsArchive(const boost::filesystem::path& source, const PartsCom
 PartsArchive::PartsArchive(std::unique_ptr<ContentReadBackend>&& backend) :
     m_contentReader(std::move(backend)),
     m_header(*m_contentReader.get()),
-    m_toc(*m_contentReader.get(), m_header.getTocSize(), PartsCompressionParameters(m_header.getHashType(),
-                                                                                    m_header.getTocCompressionType(),
-                                                                                    m_header.getFileCompressionType()))
+    m_toc(*m_contentReader.get(), m_header.getTocSize(), m_header.getDecompressedTocSize(), 
+          PartsCompressionParameters(m_header.getHashType(), m_header.getTocCompressionType(), m_header.getFileCompressionType()))
 {
     uint64_t head_and_compressed_toc_size = m_contentReader->position();
     m_toc.shiftOffsets(head_and_compressed_toc_size);
@@ -67,6 +66,7 @@ void PartsArchive::createArchive(const boost::filesystem::path& archive)
     std::vector<uint8_t> compressed_toc;
     LOG_DEBUG("Compressing TOC");
     toc_compressior->compressBuffer(uncompressed_toc, compressed_toc);
+    m_header.setDecompressedTocSize(uncompressed_toc.size());
     m_header.setTocSize(compressed_toc.size());
     LOG_DEBUG("Compressed TOC size: {}", compressed_toc.size());
 
