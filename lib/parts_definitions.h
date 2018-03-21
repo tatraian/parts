@@ -11,6 +11,8 @@ namespace parts
 enum class CompressionType {
     None = 0,
     LZMA = 1,
+    /** In case other than LZMA, Decompressor provided externall */
+    EXTERNAL,
 };
 
 enum class HashType {

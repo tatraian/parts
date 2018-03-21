@@ -11,7 +11,7 @@ using namespace fakeit;
 BOOST_AUTO_TEST_CASE(compress_fills_missing_entries_and_after_it_is_packed_correctly) {
     // Sorry, since it is much to create data entry, I put the two tests in one case...
     Hash hash(HashType::SHA256, {0,1,2,3});
-    RegularFileEntry entry("file1", 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1, hash, 4);
+    RegularFileEntry entry("file1", 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1, hash, CompressionType::LZMA, 4);
 
     Mock<Compressor> compressor_mock;
 
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(compress_fills_missing_entries_and_after_it_is_packed_corre
 
     entry.append(result);
 
-    BOOST_REQUIRE_EQUAL(result.size(), 70);
+    BOOST_REQUIRE_EQUAL(result.size(), 71);
     BOOST_REQUIRE_EQUAL(result[0], static_cast<uint8_t>(EntryTypes::RegularFile));
 
     // base entry check
@@ -66,25 +66,28 @@ BOOST_AUTO_TEST_CASE(compress_fills_missing_entries_and_after_it_is_packed_corre
     BOOST_REQUIRE_EQUAL(result[52], 0);
     BOOST_REQUIRE_EQUAL(result[53], 4);
 
+    // compression type
+    BOOST_REQUIRE_EQUAL(result[54], 1);
+
     // compressed size
-    BOOST_REQUIRE_EQUAL(result[54], 0);
     BOOST_REQUIRE_EQUAL(result[55], 0);
     BOOST_REQUIRE_EQUAL(result[56], 0);
     BOOST_REQUIRE_EQUAL(result[57], 0);
     BOOST_REQUIRE_EQUAL(result[58], 0);
     BOOST_REQUIRE_EQUAL(result[59], 0);
     BOOST_REQUIRE_EQUAL(result[60], 0);
-    BOOST_REQUIRE_EQUAL(result[61], 2);
+    BOOST_REQUIRE_EQUAL(result[61], 0);
+    BOOST_REQUIRE_EQUAL(result[62], 2);
 
     // offset
-    BOOST_REQUIRE_EQUAL(result[62], 0);
     BOOST_REQUIRE_EQUAL(result[63], 0);
     BOOST_REQUIRE_EQUAL(result[64], 0);
     BOOST_REQUIRE_EQUAL(result[65], 0);
     BOOST_REQUIRE_EQUAL(result[66], 0);
     BOOST_REQUIRE_EQUAL(result[67], 0);
     BOOST_REQUIRE_EQUAL(result[68], 0);
-    BOOST_REQUIRE_EQUAL(result[69], 100);
+    BOOST_REQUIRE_EQUAL(result[69], 0);
+    BOOST_REQUIRE_EQUAL(result[70], 100);
 }
 
 //==========================================================================================================================================
@@ -97,6 +100,8 @@ BOOST_AUTO_TEST_CASE(regular_file_entry_can_be_created_from_input_stream) {
                                  0xa3, 0xe1, 0x61, 0x93, 0x6f, 0x03, 0x15, 0x89,
                                  // uncompressed size
                                  0, 0, 0, 0, 0, 0, 0, 100,
+                                 // compression type
+                                 1,
                                  // compressed size
                                  0, 0, 0, 0, 0, 0, 0, 42,
                                  // offset
@@ -106,7 +111,7 @@ BOOST_AUTO_TEST_CASE(regular_file_entry_can_be_created_from_input_stream) {
     std::vector<std::string> owners = {"DEFAULT_OWNER"};
     std::vector<std::string> groups = {"DEFAULT_GROUP"};
 
-    RegularFileEntry entry(input, owners, groups, HashType::SHA256);
+    RegularFileEntry entry(input, owners, groups, HashType::SHA256, CompressionType::LZMA);
 
     BOOST_REQUIRE_EQUAL(input.size(), 0);
     //base entries

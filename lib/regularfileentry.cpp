@@ -19,10 +19,12 @@ RegularFileEntry::RegularFileEntry(const boost::filesystem::path& file,
                                    const std::string& group,
                                    uint16_t group_id,
                                    Hash uncompressed_hash,
+                                   CompressionType compression_type,
                                    uint64_t uncompressed_size) :
     BaseEntry(file, permissions, owner, owner_id, group, group_id),
     m_uncompressedHash(uncompressed_hash),
     m_uncompressedSize(uncompressed_size),
+    m_compressionType(compression_type),
     m_compressedSize(0),
     m_offset(0)
 {
@@ -32,11 +34,16 @@ RegularFileEntry::RegularFileEntry(const boost::filesystem::path& file,
 RegularFileEntry::RegularFileEntry(InputBuffer& buffer,
                                    const std::vector<std::string>& owners,
                                    const std::vector<std::string>& groups,
-                                   HashType hash_type) :
+                                   HashType hash_type,
+                                   CompressionType compression_type) :
     BaseEntry(buffer, owners, groups),
-    m_uncompressedHash(hash_type, buffer)
+    m_uncompressedHash(hash_type, buffer),
+    m_compressionType(compression_type)
 {
     Packager::pop_front(buffer, m_uncompressedSize);
+    uint8_t l_compressionType;
+    Packager::pop_front(buffer, l_compressionType);
+    m_compressionType = static_cast<CompressionType>(l_compressionType);
     Packager::pop_front(buffer, m_compressedSize);
     Packager::pop_front(buffer, m_offset);
 }
@@ -48,6 +55,7 @@ void RegularFileEntry::append(std::vector<uint8_t>& buffer) const
     BaseEntry::append(buffer);
     Packager::append(buffer, m_uncompressedHash.hash());
     Packager::append(buffer, m_uncompressedSize);
+    Packager::append(buffer, static_cast<uint8_t>(m_compressionType));
     Packager::append(buffer, m_compressedSize);
     Packager::append(buffer, m_offset);
 }

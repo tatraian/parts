@@ -17,12 +17,14 @@ public:
                      const std::string& group,
                      uint16_t group_id,
                      Hash uncompressed_hash,
+                     CompressionType compression_type,
                      uint64_t uncompressed_size);
 
     RegularFileEntry(InputBuffer& buffer,
                      const std::vector<std::string>& owners,
                      const std::vector<std::string>& groups,
-                     HashType hash_type);
+                     HashType hash_type,
+                     CompressionType compression_type);
 
     ~RegularFileEntry() override = default;
 
@@ -51,6 +53,13 @@ public:
     const uint64_t& uncompressedSize() const
     { return m_uncompressedSize; }
 
+    /**
+     * This is purely for background compatibility, in case it turns out that
+     * the given file was stored as not compressed (.VER)
+     */
+    CompressionType compressionType() const
+    { return m_compressionType; }
+
     const uint64_t& compressedSize() const
     { return m_compressedSize; }
 
@@ -65,6 +74,7 @@ public:
 protected:
     Hash m_uncompressedHash;
     uint64_t m_uncompressedSize;
+    CompressionType m_compressionType;
     uint64_t m_compressedSize;
     uint64_t m_offset;
 };

@@ -76,7 +76,7 @@ TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, c
         std::shared_ptr<BaseEntry> entry;
         switch (type) {
         case EntryTypes::RegularFile:
-            entry.reset(new RegularFileEntry(uncompressed_toc, m_owners, m_groups, m_parameters.m_hashType));
+            entry.reset(new RegularFileEntry(uncompressed_toc, m_owners, m_groups, m_parameters.m_hashType, m_parameters.m_fileCompression));
             m_maxSize = std::max(m_maxSize, std::dynamic_pointer_cast<RegularFileEntry>(entry)->uncompressedSize());
             break;
         case EntryTypes::Directory:
@@ -175,6 +175,7 @@ void TableOfContents::add(const boost::filesystem::path& root, const boost::file
                                          m_groups[group_id],
                                          group_id,
                                          hash,
+                                         m_parameters.m_fileCompression,
                                          boost::filesystem::file_size(file)));
     } else {
         // TODO log here!
