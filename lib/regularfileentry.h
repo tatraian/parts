@@ -26,6 +26,22 @@ public:
                      const PartsCompressionParameters & compression_parameters,
                      uint64_t uncompressed_size);
 
+    /** 
+     * This variant is required so that we can setup the hash from outside 
+     * E.g. we have a NOT Parts archive, from which we read hash from
+     **/
+    RegularFileEntry(const boost::filesystem::path& relfile,
+                     const boost::filesystem::path& file,
+                     uint16_t permissions,
+                     const std::string& owner,
+                     uint16_t owner_id,
+                     const std::string& group,
+                     uint16_t group_id,
+                     const Hash & uncompressed_hash,
+                     CompressionType compression_hint,
+                     const PartsCompressionParameters & compression_parameters,
+                     uint64_t uncompressed_size);
+
     RegularFileEntry(InputBuffer& buffer,
                      const std::vector<std::string>& owners,
                      const std::vector<std::string>& groups,

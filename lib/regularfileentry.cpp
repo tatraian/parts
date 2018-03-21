@@ -36,6 +36,28 @@ RegularFileEntry::RegularFileEntry(const boost::filesystem::path& relfile,
 }
 
 //==========================================================================================================================================
+RegularFileEntry::RegularFileEntry(const boost::filesystem::path& relfile,
+                                   const boost::filesystem::path& file,
+                                   uint16_t permissions,
+                                   const std::string& owner,
+                                   uint16_t owner_id,
+                                   const std::string& group,
+                                   uint16_t group_id,
+                                   const Hash & uncompressed_hash,
+                                   CompressionType compression_hint,
+                                   const PartsCompressionParameters & compression_parameters,
+                                   uint64_t uncompressed_size) :
+    BaseEntry(relfile, permissions, owner, owner_id, group, group_id),
+    m_uncompressedHash(uncompressed_hash),
+    m_uncompressedSize(uncompressed_size),
+    m_compressionHint(compression_hint),
+    m_compressionParameters(compression_parameters),
+    m_compressedSize(0),
+    m_offset(0)
+{
+}
+
+//==========================================================================================================================================
 RegularFileEntry::RegularFileEntry(InputBuffer& buffer,
                                    const std::vector<std::string>& owners,
                                    const std::vector<std::string>& groups,
