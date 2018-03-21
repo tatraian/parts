@@ -49,7 +49,7 @@ set(parts_SRCS
 
 add_library(parts ${parts_SRCS})
 target_link_libraries(parts PUBLIC Boost::system Boost::filesystem)
-target_link_libraries(parts PRIVATE lzma::lzma fmt::fmt ${HTTP_LINK})
+target_link_libraries(parts PRIVATE lzma::lzma ZLIB::zlib fmt::fmt ${HTTP_LINK})
 
 install(TARGETS parts
     EXPORT ${targets_export_name}
