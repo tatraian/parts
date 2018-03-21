@@ -39,18 +39,20 @@ void DirectoryEntry::append(std::vector<uint8_t>& buffer) const
 }
 
 //==========================================================================================================================================
-void DirectoryEntry::compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend)
+void DirectoryEntry::compressEntry(const boost::filesystem::path& root, ContentWriteBackend& backend)
 {
     // Do nothing
     LOG_TRACE("Compressing dir:  {}", m_file.string());
 }
 
 //==========================================================================================================================================
-void DirectoryEntry::extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend)
+void DirectoryEntry::extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend)
 {
     LOG_TRACE("Create dir:   {}", m_file.string());
     // Do not decompression, but creates the directory with the correct rights
-    if (!boost::filesystem::create_directory(dest_root / m_file))
+    boost::system::error_code ec;
+    boost::filesystem::create_directory(dest_root / m_file, ec);
+    if (ec)
         throw PartsException("Cannot create directory: " + (dest_root / m_file).string());
 
     setMetadata(dest_root);
@@ -60,7 +62,6 @@ void DirectoryEntry::extractEntry(const boost::filesystem::path& dest_root, Deco
 void DirectoryEntry::updateEntry(const BaseEntry* old_entry,
                                  const boost::filesystem::path& old_root,
                                  const boost::filesystem::path& dest_root,
-                                 Decompressor& decompressor,
                                  ContentReadBackend& backend,
                                  bool checkExisting)
 {
@@ -71,7 +72,7 @@ void DirectoryEntry::updateEntry(const BaseEntry* old_entry,
     }
 
     // Do the same as in case of extract, (that is good if the old entry is file or link too)
-    extractEntry(dest_root, decompressor, backend);
+    extractEntry(dest_root, backend);
 }
 
 //==========================================================================================================================================

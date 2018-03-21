@@ -22,7 +22,7 @@ std::string cut_slash(std::string orig) {
 //==========================================================================================================================================
 int main(int argc, char** argv)
 {
-    ConsoleLogger logger(LOG_LEVELS::INFO);
+    ConsoleLogger logger(LOG_LEVELS::DEBUG);
     set_logger(&logger);
 
     args::ArgumentParser parser("This program extracts or updates files from a \".parts\" archive");

@@ -1,7 +1,10 @@
 #include <boost/test/auto_unit_test.hpp>
 #include <fakeit/boost/fakeit.hpp>
 
+#include <fstream>
+
 #include "../regularfileentry.h"
+#include "../compressor.h"
 #include "../internal_definitions.h"
 
 using namespace parts;
@@ -10,84 +13,102 @@ using namespace fakeit;
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(compress_fills_missing_entries_and_after_it_is_packed_correctly) {
     // Sorry, since it is much to create data entry, I put the two tests in one case...
-    Hash hash(HashType::SHA256, {0,1,2,3});
-    RegularFileEntry entry("file1", 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1, hash, CompressionType::LZMA, 4);
+    boost::filesystem::path path("/tmp/file1");
+    std::vector<uint8_t> input(4, 0);
+    for(size_t tmp = 0; tmp != input.size(); ++tmp)
+        input[tmp] = tmp;
 
-    Mock<Compressor> compressor_mock;
+    std::ofstream file(path.string(), std::ios::binary | std::ios::ate);
+    file.write(reinterpret_cast<char*>(&input[0]), input.size());
+    file.close();
 
-    When(Method(compressor_mock, compressFile)).Return(2);
+    Hash hash(HashType::SHA256, input);
+    PartsCompressionParameters parameters;
+    parameters.m_fileCompression = CompressionType::None;
+    RegularFileEntry entry(path, path, 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1, HashType::SHA256, CompressionType::None, parameters, input.size());
 
+    std::vector<uint8_t> compressed;
     Mock<ContentWriteBackend> backend_mock;
-
     When(Method(backend_mock, getPosition)).Return(100);
+    When(OverloadedMethod(backend_mock, append, void(const std::vector<uint8_t>&))).AlwaysDo([&](const std::vector<uint8_t>& a){compressed = a;});
 
-    entry.compressEntry(boost::filesystem::path("nowhere"), compressor_mock.get(), backend_mock.get());
+    /** YES, we compress the same file */
+    entry.compressEntry("", backend_mock.get());
 
-    Verify(Method(compressor_mock, compressFile)).Once();
     Verify(Method(backend_mock, getPosition)).Once();
 
+    BOOST_REQUIRE_EQUAL_COLLECTIONS(input.begin(), input.end(), compressed.begin(), compressed.end());
+
     BOOST_REQUIRE_EQUAL(entry.uncompressedSize(), 4);
-    BOOST_REQUIRE_EQUAL(entry.compressedSize(), 2);
+    BOOST_REQUIRE_EQUAL(entry.compressedSize(), 4);
     BOOST_REQUIRE_EQUAL(entry.offset(), 100);
 
     std::vector<uint8_t> result;
 
     entry.append(result);
 
-    BOOST_REQUIRE_EQUAL(result.size(), 71);
+    BOOST_REQUIRE_EQUAL(result.size(), 76);
     BOOST_REQUIRE_EQUAL(result[0], static_cast<uint8_t>(EntryTypes::RegularFile));
 
     // base entry check
     BOOST_REQUIRE_EQUAL(result[1], 0u);
-    BOOST_REQUIRE_EQUAL(result[2], 5u);
+    BOOST_REQUIRE_EQUAL(result[2], 10u);
 
-    BOOST_REQUIRE_EQUAL(result[3], 'f');
-    BOOST_REQUIRE_EQUAL(result[7], '1');
+    BOOST_REQUIRE_EQUAL(result[3], '/');
+    BOOST_REQUIRE_EQUAL(result[4], 't');
+    BOOST_REQUIRE_EQUAL(result[5], 'm');
+    BOOST_REQUIRE_EQUAL(result[6], 'p');
+    BOOST_REQUIRE_EQUAL(result[7], '/');
+    BOOST_REQUIRE_EQUAL(result[8], 'f');
+    BOOST_REQUIRE_EQUAL(result[9], 'i');
+    BOOST_REQUIRE_EQUAL(result[10], 'l');
+    BOOST_REQUIRE_EQUAL(result[11], 'e');
+    BOOST_REQUIRE_EQUAL(result[12], '1');
 
-    BOOST_REQUIRE_EQUAL(result[8], 1u);
-    BOOST_REQUIRE_EQUAL(result[9], 0244);
-
-    BOOST_REQUIRE_EQUAL(result[10], 0u);
-    BOOST_REQUIRE_EQUAL(result[11], 2u);
-
-    BOOST_REQUIRE_EQUAL(result[12], 0u);
     BOOST_REQUIRE_EQUAL(result[13], 1u);
+    BOOST_REQUIRE_EQUAL(result[14], 0244);
+
+    BOOST_REQUIRE_EQUAL(result[15], 0u);
+    BOOST_REQUIRE_EQUAL(result[16], 2u);
+
+    BOOST_REQUIRE_EQUAL(result[17], 0u);
+    BOOST_REQUIRE_EQUAL(result[18], 1u);
 
     // Regular file entry
     // Hash
-    BOOST_REQUIRE_EQUAL_COLLECTIONS(result.begin() + 14, result.begin() + 14 + 32, hash.hash().begin(), hash.hash().end());
+    BOOST_REQUIRE_EQUAL_COLLECTIONS(result.begin() + 19, result.begin() + 19 + 32, hash.hash().begin(), hash.hash().end());
     // uncompressed size
-    BOOST_REQUIRE_EQUAL(result[46], 0);
-    BOOST_REQUIRE_EQUAL(result[47], 0);
-    BOOST_REQUIRE_EQUAL(result[48], 0);
-    BOOST_REQUIRE_EQUAL(result[49], 0);
-    BOOST_REQUIRE_EQUAL(result[50], 0);
     BOOST_REQUIRE_EQUAL(result[51], 0);
     BOOST_REQUIRE_EQUAL(result[52], 0);
-    BOOST_REQUIRE_EQUAL(result[53], 4);
-
-    // compression type
-    BOOST_REQUIRE_EQUAL(result[54], 1);
-
-    // compressed size
+    BOOST_REQUIRE_EQUAL(result[53], 0);
+    BOOST_REQUIRE_EQUAL(result[54], 0);
     BOOST_REQUIRE_EQUAL(result[55], 0);
     BOOST_REQUIRE_EQUAL(result[56], 0);
     BOOST_REQUIRE_EQUAL(result[57], 0);
-    BOOST_REQUIRE_EQUAL(result[58], 0);
+    BOOST_REQUIRE_EQUAL(result[58], 4);
+
+    // compression type
     BOOST_REQUIRE_EQUAL(result[59], 0);
+
+    // compressed size
     BOOST_REQUIRE_EQUAL(result[60], 0);
     BOOST_REQUIRE_EQUAL(result[61], 0);
-    BOOST_REQUIRE_EQUAL(result[62], 2);
-
-    // offset
+    BOOST_REQUIRE_EQUAL(result[62], 0);
     BOOST_REQUIRE_EQUAL(result[63], 0);
     BOOST_REQUIRE_EQUAL(result[64], 0);
     BOOST_REQUIRE_EQUAL(result[65], 0);
     BOOST_REQUIRE_EQUAL(result[66], 0);
-    BOOST_REQUIRE_EQUAL(result[67], 0);
+    BOOST_REQUIRE_EQUAL(result[67], 4);
+
+    // offset
     BOOST_REQUIRE_EQUAL(result[68], 0);
     BOOST_REQUIRE_EQUAL(result[69], 0);
-    BOOST_REQUIRE_EQUAL(result[70], 100);
+    BOOST_REQUIRE_EQUAL(result[70], 0);
+    BOOST_REQUIRE_EQUAL(result[71], 0);
+    BOOST_REQUIRE_EQUAL(result[72], 0);
+    BOOST_REQUIRE_EQUAL(result[73], 0);
+    BOOST_REQUIRE_EQUAL(result[74], 0);
+    BOOST_REQUIRE_EQUAL(result[75], 100);
 }
 
 //==========================================================================================================================================
@@ -111,7 +132,9 @@ BOOST_AUTO_TEST_CASE(regular_file_entry_can_be_created_from_input_stream) {
     std::vector<std::string> owners = {"DEFAULT_OWNER"};
     std::vector<std::string> groups = {"DEFAULT_GROUP"};
 
-    RegularFileEntry entry(input, owners, groups, HashType::SHA256, CompressionType::LZMA);
+    PartsCompressionParameters parameters;
+    parameters.m_fileCompression = CompressionType::None;
+    RegularFileEntry entry(input, owners, groups, HashType::SHA256, CompressionType::None, parameters);
 
     BOOST_REQUIRE_EQUAL(input.size(), 0);
     //base entries

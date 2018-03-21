@@ -3,6 +3,8 @@
 #include "internal_definitions.h"
 #include "packager.h"
 #include "logger_internal.h"
+#include "compressorfactory.h"
+#include "decompressorfactory.h"
 
 #include <boost/filesystem.hpp>
 #include <fmt/format.h>
@@ -12,19 +14,22 @@ using namespace parts;
 
 
 //==========================================================================================================================================
-RegularFileEntry::RegularFileEntry(const boost::filesystem::path& file,
+RegularFileEntry::RegularFileEntry(const boost::filesystem::path& relfile,
+                                   const boost::filesystem::path& file,
                                    uint16_t permissions,
                                    const std::string& owner,
                                    uint16_t owner_id,
                                    const std::string& group,
                                    uint16_t group_id,
-                                   Hash uncompressed_hash,
-                                   CompressionType compression_type,
+                                   HashType hash_type,
+                                   CompressionType compression_hint,
+                                   const PartsCompressionParameters & compression_parameters,
                                    uint64_t uncompressed_size) :
-    BaseEntry(file, permissions, owner, owner_id, group, group_id),
-    m_uncompressedHash(uncompressed_hash),
+    BaseEntry(relfile, permissions, owner, owner_id, group, group_id),
+    m_uncompressedHash(hash_type, file),
     m_uncompressedSize(uncompressed_size),
-    m_compressionType(compression_type),
+    m_compressionHint(compression_hint),
+    m_compressionParameters(compression_parameters),
     m_compressedSize(0),
     m_offset(0)
 {
@@ -35,15 +40,17 @@ RegularFileEntry::RegularFileEntry(InputBuffer& buffer,
                                    const std::vector<std::string>& owners,
                                    const std::vector<std::string>& groups,
                                    HashType hash_type,
-                                   CompressionType compression_type) :
+                                   CompressionType compression_hint,
+                                   const PartsCompressionParameters & compression_parameters) :
     BaseEntry(buffer, owners, groups),
     m_uncompressedHash(hash_type, buffer),
-    m_compressionType(compression_type)
+    m_compressionHint(compression_hint),
+    m_compressionParameters(compression_parameters)
 {
     Packager::pop_front(buffer, m_uncompressedSize);
-    uint8_t l_compressionType;
-    Packager::pop_front(buffer, l_compressionType);
-    m_compressionType = static_cast<CompressionType>(l_compressionType);
+    uint8_t l_compressionHint;
+    Packager::pop_front(buffer, l_compressionHint);
+    m_compressionHint = static_cast<CompressionType>(l_compressionHint);
     Packager::pop_front(buffer, m_compressedSize);
     Packager::pop_front(buffer, m_offset);
 }
@@ -55,24 +62,26 @@ void RegularFileEntry::append(std::vector<uint8_t>& buffer) const
     BaseEntry::append(buffer);
     Packager::append(buffer, m_uncompressedHash.hash());
     Packager::append(buffer, m_uncompressedSize);
-    Packager::append(buffer, static_cast<uint8_t>(m_compressionType));
+    Packager::append(buffer, static_cast<uint8_t>(m_compressionHint));
     Packager::append(buffer, m_compressedSize);
     Packager::append(buffer, m_offset);
 }
 
 //==========================================================================================================================================
-void RegularFileEntry::compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend)
+void RegularFileEntry::compressEntry(const boost::filesystem::path& root, ContentWriteBackend& backend)
 {
     LOG_TRACE("Compressing file: {}", m_file.string());
     m_offset = backend.getPosition();
-    m_compressedSize = compressor.compressFile(root / m_file, backend);
+    auto compressor = CompressorFactory::createCompressor(m_compressionHint, m_compressionParameters);
+    m_compressedSize = compressor->compressFile(root / m_file, backend);
 }
 
 //==========================================================================================================================================
-void RegularFileEntry::extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend)
+void RegularFileEntry::extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend)
 {
     LOG_TRACE("Extract file: {}", m_file.string());
-    decompressor.extractFile(dest_root / m_file, backend, m_offset, m_compressedSize, m_uncompressedSize);
+    auto decompressor = DecompressorFactory::createDecompressor(m_compressionHint);
+    decompressor->extractFile(dest_root / m_file, backend, m_offset, m_compressedSize, m_uncompressedSize);
 
     setMetadata(dest_root);
 }
@@ -81,13 +90,12 @@ void RegularFileEntry::extractEntry(const boost::filesystem::path& dest_root, De
 void RegularFileEntry::updateEntry(const BaseEntry* old_entry,
                                    const boost::filesystem::path& old_root,
                                    const boost::filesystem::path& dest_root,
-                                   Decompressor& decompressor,
                                    ContentReadBackend& backend,
                                    bool checkExisting)
 {
     auto file_old_entry = dynamic_cast<const RegularFileEntry*>(old_entry);
     if (file_old_entry == nullptr || file_old_entry->m_uncompressedHash != m_uncompressedHash) {
-        extractEntry(dest_root, decompressor, backend);
+        extractEntry(dest_root, backend);
         return;
     }
 
@@ -123,8 +131,9 @@ std::string RegularFileEntry::toString() const
 }
 
 //==========================================================================================================================================
-bool RegularFileEntry::extractToMc(const boost::filesystem::path& dest_file, Decompressor& decompressor, ContentReadBackend& backend)
+bool RegularFileEntry::extractToMc(const boost::filesystem::path& dest_file, ContentReadBackend& backend)
 {
-    decompressor.extractFile(dest_file, backend, m_offset, m_compressedSize, m_uncompressedSize);
+    auto decompressor = DecompressorFactory::createDecompressor(m_compressionHint);
+    decompressor->extractFile(dest_file, backend, m_offset, m_compressedSize, m_uncompressedSize);
     return true;
 }

@@ -53,8 +53,7 @@ void PartsArchive::createArchive(const boost::filesystem::path& archive)
     FileWriteBackend temp(p);
 
     for(auto& entry : m_toc) {
-        auto compressor = CompressorFactory::createCompressor(m_compressionParameters.m_fileCompression, m_compressionParameters);
-        entry.second->compressEntry(m_root, *compressor, temp);
+        entry.second->compressEntry(m_root, temp);
     }
 
     LOG_DEBUG("Files compressed sum: {}", temp.getPosition());
@@ -79,8 +78,7 @@ void PartsArchive::createArchive(const boost::filesystem::path& archive)
 void PartsArchive::extractArchive(const boost::filesystem::path& dest)
 {
     for (auto& entry : m_toc) {
-        auto decompressor = DecompressorFactory::createDecompressor(m_header.getFileCompressionType());
-        entry.second->extractEntry(dest, *decompressor, *m_contentReader.get());
+        entry.second->extractEntry(dest, *m_contentReader.get());
     }
 }
 
@@ -114,6 +112,5 @@ bool PartsArchive::extractToMc(const boost::filesystem::path& file_path, const b
         return false;
     }
 
-    auto decompressor = DecompressorFactory::createDecompressor(m_header.getFileCompressionType());
-    return entry->extractToMc(dest_file, *decompressor, *m_contentReader.get());
+    return entry->extractToMc(dest_file, *m_contentReader.get());
 }

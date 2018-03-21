@@ -40,7 +40,6 @@ void PartsUpdateJob::doNext(bool checkExisting)
     m_actualElement->second->updateEntry(old_entry.get(),
                                          m_oldRootDir,
                                          m_dest,
-                                         *decompressor,
                                          m_contentReader,
                                          checkExisting);
     ++m_actualElement;

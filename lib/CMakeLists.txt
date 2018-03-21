@@ -15,6 +15,7 @@ set(parts_SRCS
     compressor.h
     plaincompressor.cpp
     lzmacompressor.cpp
+    zlibcompressor.cpp
     tableofcontents.cpp
     baseentry.cpp
     regularfileentry.cpp
@@ -34,6 +35,8 @@ set(parts_SRCS
     inputbuffer.h
     plaindecompressor.h
     plaindecompressor.cpp
+    zlibdecompressor.h
+    zlibdecompressor.cpp
     compressorfactory.h
     compressorfactory.cpp
     logger_internal.h
@@ -69,6 +72,7 @@ if(BUILD_TESTS)
         tests/hash_test.cpp
         tests/plaincompressor_test.cpp
         tests/lzmacompressor_test.cpp
+        tests/zlibcompressor_test.cpp
         tests/baseentry_test.cpp
         tests/regularfileentry_test.cpp
         tests/directoryentry_test.cpp
@@ -77,6 +81,7 @@ if(BUILD_TESTS)
         tests/tableofcontents_test.cpp
         tests/header_test.cpp
         tests/lzmadecompressor_test.cpp
+        tests/zlibdecompressor_test.cpp
         tests/filereadbackend_test.cpp)
     target_link_libraries(parts_lib_tests parts FakeIt::FakeIt Boost::test_exec_monitor c++)
     add_test(parts_lib_tester parts_lib_tests)
