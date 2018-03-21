@@ -62,9 +62,11 @@ protected:
     std::unique_ptr<ContentReadBackend> m_contentReader;
 
     Header m_header;
-    TableOfContents m_toc;
+
     // Compression parameters (in case of compression)
     PartsCompressionParameters m_compressionParameters;
+
+    TableOfContents m_toc;
 };
 
 }
