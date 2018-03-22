@@ -174,6 +174,7 @@ void TableOfContents::add(const boost::filesystem::path& root, const boost::file
                                          owner_id,
                                          m_groups[group_id],
                                          group_id,
+                                         m_parameters.m_fileCompression,
                                          m_parameters,
                                          0,
                                          boost::filesystem::file_size(file),
