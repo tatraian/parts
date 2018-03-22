@@ -139,6 +139,15 @@ void RegularFileEntry::updateEntry(const BaseEntry* old_entry,
 
     LOG_TRACE("Copy file:    {}", m_file.string());
     boost::filesystem::copy_file(old_root / old_entry->file(), dest_root / m_file);
+
+    if (m_compressionParameters.m_compareHash) {
+        LOG_TRACE("Checking hash for file: {}", m_file.string());
+        Hash hash(m_uncompressedHash.type(), dest_root / m_file);
+        if (hash != m_uncompressedHash) {
+            throw PartsException("Invalid hash " + hash.hashString() + "<>" + m_uncompressedHash.hashString() + " for " + m_file.string());
+        }
+    }
+
     setMetadata(dest_root);
 }
 
