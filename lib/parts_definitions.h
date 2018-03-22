@@ -53,17 +53,23 @@ struct PartsCompressionParameters
     PartsCompressionParameters(HashType hash_type = HashType::SHA256,
                                CompressionType toc_compression = CompressionType::LZMA,
                                CompressionType file_compression = CompressionType::LZMA,
-                               bool save_owners = false) :
+                               bool save_owners = false,
+                               bool compare_hash = false) :
         m_hashType(hash_type),
         m_tocCompression(toc_compression),
         m_fileCompression(file_compression),
-        m_saveOwners(save_owners)
+        m_saveOwners(save_owners),
+        m_compareHash(compare_hash)
     {}
 
     HashType m_hashType;
     CompressionType m_tocCompression;
     CompressionType m_fileCompression;
     bool m_saveOwners;
+    /**
+     * In case set to true, after file extraction the generated hash is checked against the stored one
+     */
+    bool m_compareHash;
 
     LzmaCompressorParameters m_lzmaParameters;
 };

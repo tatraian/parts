@@ -25,10 +25,14 @@ public:
      * @brief PartsArchive constructor for extracting archive
      * @param backend Backend should now the destination
      */
-    PartsArchive(std::unique_ptr<ContentReadBackend>&& backend);
+    PartsArchive(std::unique_ptr<ContentReadBackend>&& backend, const PartsCompressionParameters& parameters);
 
     const TableOfContents& toc() const
     { return m_toc; }
+
+    /** Don't set it to const, the whole idea is to be able to set it from the outside world */
+    PartsCompressionParameters & compressionParameters()
+    { return m_compressionParameters; }
 
     void listArchive(std::ostream& output) const;
 

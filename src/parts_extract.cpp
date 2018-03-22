@@ -38,6 +38,7 @@ int main(int argc, char** argv)
     args::ValueFlag<std::string> mc_extract_dest_file(parser, "extract_dest_file", "temp file to extract", {"mc_dest_file"});
     args::Flag list_only(parser, "list_only", "Only list archive", {'l', "list_only"});
     args::Flag check_existing(parser, "check_existing", "Check existing files during update", {'c', "check_existing"});
+    args::Flag compare_hash(parser, "compare_hash", "Check hash after file extract", {"compare_hash"});
 
     try
     {
@@ -61,7 +62,9 @@ int main(int argc, char** argv)
 
         boost::filesystem::path dest_dir = cut_slash(dest_root_dir.Get());
 
-        PartsArchive archive(std::move(input_stream));
+        PartsCompressionParameters parameters;
+        parameters.m_compareHash = compare_hash;
+        PartsArchive archive(std::move(input_stream), parameters);
 
         if ((mc_extract_file && !mc_extract_dest_file) ||
             (!mc_extract_file && mc_extract_dest_file)){

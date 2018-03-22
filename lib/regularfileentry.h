@@ -21,8 +21,6 @@ public:
                      uint16_t owner_id,
                      const std::string& group,
                      uint16_t group_id,
-                     HashType hash_type,
-                     CompressionType compression_hint,
                      const PartsCompressionParameters & compression_parameters,
                      uint64_t compressed_size,
                      uint64_t uncompressed_size,
@@ -40,7 +38,6 @@ public:
                      const std::string& group,
                      uint16_t group_id,
                      const Hash & uncompressed_hash,
-                     CompressionType compression_hint,
                      const PartsCompressionParameters & compression_parameters,
                      uint64_t compressed_size,
                      uint64_t uncompressed_size,
@@ -49,8 +46,6 @@ public:
     RegularFileEntry(InputBuffer& buffer,
                      const std::vector<std::string>& owners,
                      const std::vector<std::string>& groups,
-                     HashType hash_type,
-                     CompressionType compression_hint,
                      const PartsCompressionParameters & compression_parameters);
 
     ~RegularFileEntry() override = default;

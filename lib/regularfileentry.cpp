@@ -21,16 +21,14 @@ RegularFileEntry::RegularFileEntry(const boost::filesystem::path& relfile,
                                    uint16_t owner_id,
                                    const std::string& group,
                                    uint16_t group_id,
-                                   HashType hash_type,
-                                   CompressionType compression_hint,
                                    const PartsCompressionParameters & compression_parameters,
                                    uint64_t compressed_size,
                                    uint64_t uncompressed_size,
                                    uint64_t offset) :
     BaseEntry(relfile, permissions, owner, owner_id, group, group_id),
-    m_uncompressedHash(hash_type, file),
+    m_uncompressedHash(compression_parameters.m_hashType, file),
     m_uncompressedSize(uncompressed_size),
-    m_compressionHint(compression_hint),
+    m_compressionHint(compression_parameters.m_fileCompression),
     m_compressionParameters(compression_parameters),
     m_compressedSize(compressed_size),
     m_offset(offset)
@@ -46,7 +44,6 @@ RegularFileEntry::RegularFileEntry(const boost::filesystem::path& relfile,
                                    const std::string& group,
                                    uint16_t group_id,
                                    const Hash & uncompressed_hash,
-                                   CompressionType compression_hint,
                                    const PartsCompressionParameters & compression_parameters,
                                    uint64_t compressed_size,
                                    uint64_t uncompressed_size,
@@ -54,7 +51,7 @@ RegularFileEntry::RegularFileEntry(const boost::filesystem::path& relfile,
     BaseEntry(relfile, permissions, owner, owner_id, group, group_id),
     m_uncompressedHash(uncompressed_hash),
     m_uncompressedSize(uncompressed_size),
-    m_compressionHint(compression_hint),
+    m_compressionHint(compression_parameters.m_fileCompression),
     m_compressionParameters(compression_parameters),
     m_compressedSize(compressed_size),
     m_offset(offset)
@@ -65,12 +62,10 @@ RegularFileEntry::RegularFileEntry(const boost::filesystem::path& relfile,
 RegularFileEntry::RegularFileEntry(InputBuffer& buffer,
                                    const std::vector<std::string>& owners,
                                    const std::vector<std::string>& groups,
-                                   HashType hash_type,
-                                   CompressionType compression_hint,
                                    const PartsCompressionParameters & compression_parameters) :
     BaseEntry(buffer, owners, groups),
-    m_uncompressedHash(hash_type, buffer),
-    m_compressionHint(compression_hint),
+    m_uncompressedHash(compression_parameters.m_hashType, buffer),
+    m_compressionHint(compression_parameters.m_fileCompression),
     m_compressionParameters(compression_parameters)
 {
     Packager::pop_front(buffer, m_uncompressedSize);
@@ -109,6 +104,14 @@ void RegularFileEntry::extractEntry(const boost::filesystem::path& dest_root, Co
     auto decompressor = DecompressorFactory::createDecompressor(m_compressionHint);
     decompressor->extractFile(dest_root / m_file, backend, m_offset, m_compressedSize, m_uncompressedSize);
 
+    if (m_compressionParameters.m_compareHash) {
+        LOG_TRACE("Checking hash for file: {}", m_file.string());
+        Hash hash(m_uncompressedHash.type(), dest_root / m_file);
+        if (hash != m_uncompressedHash) {
+            throw PartsException("Invalid hash " + hash.hashString() + "<>" + m_uncompressedHash.hashString() + " for " + m_file.string());
+        }
+    }
+
     setMetadata(dest_root);
 }
 
@@ -120,6 +123,7 @@ void RegularFileEntry::updateEntry(const BaseEntry* old_entry,
                                    bool checkExisting)
 {
     auto file_old_entry = dynamic_cast<const RegularFileEntry*>(old_entry);
+
     if (file_old_entry == nullptr || file_old_entry->m_uncompressedHash != m_uncompressedHash) {
         extractEntry(dest_root, backend);
         return;

@@ -17,12 +17,16 @@ public:
     Hash(HashType type, const boost::filesystem::path& path);
     Hash(HashType type, const std::vector<uint8_t>& data);
     Hash(HashType type, InputBuffer& data);
+    Hash(HashType type) : m_type(type) {}
 
     HashType type() const
     { return m_type; }
 
     const std::vector<uint8_t>& hash() const
     { return m_hash; }
+
+    void setHash(const std::vector<uint8_t> & hash)
+    { m_hash = hash; }
 
     std::string hashString() const;
 
