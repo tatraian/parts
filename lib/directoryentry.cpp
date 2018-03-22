@@ -51,9 +51,11 @@ void DirectoryEntry::extractEntry(const boost::filesystem::path& dest_root, Cont
     LOG_TRACE("Create dir:   {}", m_file.string());
     // Do not decompression, but creates the directory with the correct rights
     boost::system::error_code ec;
-    boost::filesystem::create_directory(dest_root / m_file, ec);
+    boost::filesystem::create_directories(dest_root / m_file, ec);
     if (ec)
+    {
         throw PartsException("Cannot create directory: " + (dest_root / m_file).string());
+    }
 
     setMetadata(dest_root);
 }

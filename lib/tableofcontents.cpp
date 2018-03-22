@@ -177,7 +177,9 @@ void TableOfContents::add(const boost::filesystem::path& root, const boost::file
                                          m_parameters.m_hashType,
                                          m_parameters.m_fileCompression,
                                          m_parameters,
-                                         boost::filesystem::file_size(file)));
+                                         0,
+                                         boost::filesystem::file_size(file),
+                                         0));
     } else {
         // TODO log here!
         return;

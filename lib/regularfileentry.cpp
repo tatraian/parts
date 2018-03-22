@@ -24,14 +24,16 @@ RegularFileEntry::RegularFileEntry(const boost::filesystem::path& relfile,
                                    HashType hash_type,
                                    CompressionType compression_hint,
                                    const PartsCompressionParameters & compression_parameters,
-                                   uint64_t uncompressed_size) :
+                                   uint64_t compressed_size,
+                                   uint64_t uncompressed_size,
+                                   uint64_t offset) :
     BaseEntry(relfile, permissions, owner, owner_id, group, group_id),
     m_uncompressedHash(hash_type, file),
     m_uncompressedSize(uncompressed_size),
     m_compressionHint(compression_hint),
     m_compressionParameters(compression_parameters),
-    m_compressedSize(0),
-    m_offset(0)
+    m_compressedSize(compressed_size),
+    m_offset(offset)
 {
 }
 
@@ -46,14 +48,16 @@ RegularFileEntry::RegularFileEntry(const boost::filesystem::path& relfile,
                                    const Hash & uncompressed_hash,
                                    CompressionType compression_hint,
                                    const PartsCompressionParameters & compression_parameters,
-                                   uint64_t uncompressed_size) :
+                                   uint64_t compressed_size,
+                                   uint64_t uncompressed_size,
+                                   uint64_t offset) :
     BaseEntry(relfile, permissions, owner, owner_id, group, group_id),
     m_uncompressedHash(uncompressed_hash),
     m_uncompressedSize(uncompressed_size),
     m_compressionHint(compression_hint),
     m_compressionParameters(compression_parameters),
-    m_compressedSize(0),
-    m_offset(0)
+    m_compressedSize(compressed_size),
+    m_offset(offset)
 {
 }
 

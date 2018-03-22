@@ -6,6 +6,7 @@
 #endif
 #include <filereadbackend.h>
 #include <consolelogger.h>
+#include <logger_internal.h>
 #include <args/args.hxx>
 
 using namespace parts;

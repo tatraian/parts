@@ -13,7 +13,6 @@ using namespace parts;
 size_t ZlibCompressor::compressFile(const boost::filesystem::path& path, ContentWriteBackend& backend)
 {
     z_stream context;
-    auto guard = SimpleGuard<std::function<void()>>([&](){deflateEnd(&context); });
     size_t compressed_size = 0;
 
     std::ifstream input_file(path.string(), std::ios::binary | std::ios::in);
@@ -34,6 +33,8 @@ size_t ZlibCompressor::compressFile(const boost::filesystem::path& path, Content
     if (deflateInit(&context, Z_BEST_COMPRESSION)) {
         throw PartsException("Zlib compression setup error");
     }
+
+    auto guard = SimpleGuard<std::function<void()>>([&](){deflateEnd(&context); });
 
     int action = Z_NO_FLUSH;
     for(;;) {
@@ -78,7 +79,6 @@ size_t ZlibCompressor::compressFile(const boost::filesystem::path& path, Content
 size_t ZlibCompressor::compressBuffer(const std::vector<uint8_t>& buffer, std::vector<uint8_t>& backend)
 {
     z_stream context;
-    auto guard = SimpleGuard<std::function<void()>>([&](){deflateEnd(&context); });
     size_t compressed_size = 0;
 
     std::vector<uint8_t> output(MB,0);
@@ -94,6 +94,8 @@ size_t ZlibCompressor::compressBuffer(const std::vector<uint8_t>& buffer, std::v
     if (deflateInit(&context, Z_BEST_COMPRESSION)) {
         throw PartsException("Zlib compression setup error");
     }
+
+    auto guard = SimpleGuard<std::function<void()>>([&](){deflateEnd(&context); });
 
     for(;;) {
         int result = deflate(&context, Z_FINISH);

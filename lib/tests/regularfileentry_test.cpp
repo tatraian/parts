@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(compress_fills_missing_entries_and_after_it_is_packed_corre
     Hash hash(HashType::SHA256, input);
     PartsCompressionParameters parameters;
     parameters.m_fileCompression = CompressionType::None;
-    RegularFileEntry entry(path, path, 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1, HashType::SHA256, CompressionType::None, parameters, input.size());
+    RegularFileEntry entry(path, path, 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1, HashType::SHA256, CompressionType::None, parameters, 0, input.size(), 0);
 
     std::vector<uint8_t> compressed;
     Mock<ContentWriteBackend> backend_mock;

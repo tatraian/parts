@@ -32,6 +32,8 @@ void extractInternal(z_stream& context,
         throw PartsException("Zlib decompression setup error");
     }
 
+    SimpleGuard< std::function<void()> > guard([&](){inflateEnd(&context);});
+
     int action = Z_NO_FLUSH;
 
     for(;;){
@@ -71,7 +73,12 @@ void extractInternal(z_stream& context,
 parts::InputBuffer ZlibDecompressor::extractBuffer(const std::vector<uint8_t>& buffer, size_t decompressed_size)
 {
     z_stream context;
-    SimpleGuard< std::function<void()> > guard([&](){inflateEnd(&context);});
+
+    if (buffer.empty() || decompressed_size == 0)
+    {
+        InputBuffer result;
+        return result;
+    }
 
     size_t start = 0;
     auto reader = [&](uint8_t* dest, size_t size) {
@@ -98,10 +105,14 @@ void ZlibDecompressor::extractFile(const boost::filesystem::path& file,
                                    size_t decompressed_size)
 {
     z_stream context;
-    SimpleGuard< std::function<void()> > guard([&](){inflateEnd(&context);});
 
     LOG_DEBUG("Seeking position: {}", position);
     backend.seek(position);
+
+    if (compressed_size == 0 || decompressed_size == 0)
+    {
+        return;
+    }
 
     size_t read_bytes = 0;
     auto reader = [&](uint8_t* dest, size_t size) {

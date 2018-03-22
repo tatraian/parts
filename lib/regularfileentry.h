@@ -24,7 +24,9 @@ public:
                      HashType hash_type,
                      CompressionType compression_hint,
                      const PartsCompressionParameters & compression_parameters,
-                     uint64_t uncompressed_size);
+                     uint64_t compressed_size,
+                     uint64_t uncompressed_size,
+                     uint64_t offset);
 
     /** 
      * This variant is required so that we can setup the hash from outside 
@@ -40,7 +42,9 @@ public:
                      const Hash & uncompressed_hash,
                      CompressionType compression_hint,
                      const PartsCompressionParameters & compression_parameters,
-                     uint64_t uncompressed_size);
+                     uint64_t compressed_size,
+                     uint64_t uncompressed_size,
+                     uint64_t offset);
 
     RegularFileEntry(InputBuffer& buffer,
                      const std::vector<std::string>& owners,

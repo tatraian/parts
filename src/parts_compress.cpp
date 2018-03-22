@@ -1,5 +1,6 @@
 #include <partsarchive.h>
 #include <consolelogger.h>
+#include <logger_internal.h>
 #include <args/args.hxx>
 
 #include <iostream>
