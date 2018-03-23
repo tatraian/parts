@@ -36,7 +36,7 @@ public:
     HashType getHashType() const
     { return m_hashType; }
 
-    bool checkMagic(const std::vector<uint8_t> & header, size_t offset) const;
+    static bool checkMagic(const std::vector<uint8_t> & header, size_t offset);
 
 protected:
     /** 32 bytes header */

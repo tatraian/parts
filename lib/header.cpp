@@ -20,7 +20,7 @@ Header::Header(const PartsCompressionParameters& parameters) :
 {
 }
 
-bool Header::checkMagic(const std::vector<uint8_t> & header, size_t offset) const
+bool Header::checkMagic(const std::vector<uint8_t> & header, size_t offset)
 {
     if (offset + 6 > header.size())
         throw PartsException ("Too short header record");
