@@ -20,17 +20,28 @@ Header::Header(const PartsCompressionParameters& parameters) :
 {
 }
 
+bool Header::checkMagic(const std::vector<uint8_t> & header, size_t offset) const
+{
+    if (offset + 6 > header.size())
+        throw PartsException ("Too short header record");
+
+    for(size_t tmp = 0; tmp != 6; ++tmp)
+        if (magic[tmp] != header[offset + tmp])
+            return false;
+
+    return true;
+}
+
 //==========================================================================================================================================
 Header::Header(ContentReadBackend& reader)
 {
     InputBuffer buffer;
-    reader.read(buffer, 32);
+    reader.read(buffer, HEADER_SIZE);
 
     std::vector<uint8_t> read_magic(6,0);
     Packager::pop_front(buffer, read_magic);
-    for(size_t tmp = 0; tmp != 6; ++tmp)
-        if (magic[tmp] != read_magic[tmp])
-            throw PartsException("Not parts archive: " + reader.source());
+    if (!checkMagic(read_magic, 0))
+        throw PartsException("Not parts archive: " + reader.source());
 
     m_magic = magic;
 
@@ -62,7 +73,7 @@ Header::Header(ContentReadBackend& reader)
 std::vector<uint8_t> Header::getRaw() const
 {
     std::vector<uint8_t> result;
-    result.resize(32);
+    result.resize(HEADER_SIZE);
     result.clear();
 
     for(int tmp = 0; tmp != 6; ++tmp)
