@@ -59,6 +59,9 @@ public:
 
     bool extractToMc(const boost::filesystem::path& file_path, const boost::filesystem::path& dest_file);
 
+    std::string source() const
+    { if (m_contentReader) return m_contentReader->source(); else return ""; }
+
 protected:
     // destination for write mode
     boost::filesystem::path m_root;
