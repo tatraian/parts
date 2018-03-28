@@ -28,7 +28,7 @@ PartsUpdateJob::PartsUpdateJob(HashType hash_type,
 }
 
 //==========================================================================================================================================
-void PartsUpdateJob::doNext(bool checkExisting)
+std::string PartsUpdateJob::doNext(bool checkExisting)
 {
     boost::filesystem::path p;
     std::string path_string = m_actualElement->first.string();
@@ -42,5 +42,7 @@ void PartsUpdateJob::doNext(bool checkExisting)
                                          m_dest,
                                          m_contentReader,
                                          checkExisting);
+    auto ret = m_actualElement->second->file().string();
     ++m_actualElement;
+    return ret;
 }
