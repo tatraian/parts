@@ -38,6 +38,14 @@ public:
     uint64_t sentRequests() const
     { return m_sentRequests; }
 
+    /** 
+     * For read backends that supports caching, 
+     * there must be a way to be able to tell the
+     * backend when to stop using cache
+     * (e.g. normally you would only use header + toc
+     */
+    virtual void disableCaching() {}
+
 protected:
     uint64_t m_readBytes;
     uint64_t m_sentRequests;

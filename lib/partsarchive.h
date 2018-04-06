@@ -62,6 +62,8 @@ public:
     std::string source() const
     { if (m_contentReader) return m_contentReader->source(); else return ""; }
 
+    void disableCaching() { if (m_contentReader) m_contentReader->disableCaching(); }
+
 protected:
     // destination for write mode
     boost::filesystem::path m_root;
