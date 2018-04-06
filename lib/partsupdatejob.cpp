@@ -30,6 +30,11 @@ PartsUpdateJob::PartsUpdateJob(HashType hash_type,
 //==========================================================================================================================================
 std::string PartsUpdateJob::doNext(bool checkExisting)
 {
+    if (m_actualElement == m_toc.end())
+    {
+        throw PartsException ("Job error, already finished.");
+    }
+
     boost::filesystem::path p;
     std::string path_string = m_actualElement->first.string();
     p = path_string.replace(path_string.find(m_rootname), m_rootname.size(), m_oldRootName);
@@ -37,12 +42,12 @@ std::string PartsUpdateJob::doNext(bool checkExisting)
     auto old_entry = m_oldToc.find(p);
 
     auto decompressor = DecompressorFactory::createDecompressor(m_compressionType);
+    std::string ret = m_actualElement->second->file().string();
     m_actualElement->second->updateEntry(old_entry.get(),
                                          m_oldRootDir,
                                          m_dest,
                                          m_contentReader,
                                          checkExisting);
-    auto ret = m_actualElement->second->file().string();
     ++m_actualElement;
     return ret;
 }

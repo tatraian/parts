@@ -31,6 +31,12 @@ TableOfContents::TableOfContents(const boost::filesystem::path& source, const Pa
     m_owners.push_back(DEFAULT_OWNER);
     m_groups.push_back(DEFAULT_GROUP);
 
+    if (source.string().empty())
+    {
+        LOG_INFO ("Empty source directory provided, skip scanning directory.");
+        return;
+    }
+
     if (!boost::filesystem::exists(source))
         throw PartsException("Source doesn't exist: " + source.string());
 

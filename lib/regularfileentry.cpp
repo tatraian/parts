@@ -107,10 +107,14 @@ void RegularFileEntry::extractEntry(const boost::filesystem::path& dest_root, Co
     decompressor->extractFile(dest_root / m_file, backend, m_offset, m_compressedSize, m_uncompressedSize);
 
     if (m_compressionParameters.m_compareHash) {
-        LOG_TRACE("Checking hash for file: {}", m_file.string());
-        Hash hash(m_uncompressedHash.type(), dest_root / m_file);
-        if (hash != m_uncompressedHash) {
-            throw PartsException("Invalid hash " + hash.hashString() + "<>" + m_uncompressedHash.hashString() + " for " + m_file.string());
+        if (m_uncompressedHash.hash().empty()) {
+            LOG_INFO ("No hash defined for file: {}, skipping check", m_file.string());
+        } else {
+            LOG_TRACE("Checking hash for file: {}", m_file.string());
+            Hash hash(m_uncompressedHash.type(), dest_root / m_file);
+            if (hash != m_uncompressedHash) {
+                throw PartsException("Invalid hash " + hash.hashString() + "<>" + m_uncompressedHash.hashString() + " for " + m_file.string());
+            }
         }
     }
 
@@ -141,10 +145,14 @@ void RegularFileEntry::updateEntry(const BaseEntry* old_entry,
     boost::filesystem::copy_file(old_root / old_entry->file(), dest_root / m_file);
 
     if (m_compressionParameters.m_compareHash) {
-        LOG_TRACE("Checking hash for file: {}", m_file.string());
-        Hash hash(m_uncompressedHash.type(), dest_root / m_file);
-        if (hash != m_uncompressedHash) {
-            throw PartsException("Invalid hash " + hash.hashString() + "<>" + m_uncompressedHash.hashString() + " for " + m_file.string());
+        if (m_uncompressedHash.hash().empty()) {
+            LOG_INFO ("No hash defined for file: {}, skipping check", m_file.string());
+        } else {
+            LOG_TRACE("Checking hash for file: {}", m_file.string());
+            Hash hash(m_uncompressedHash.type(), dest_root / m_file);
+            if (hash != m_uncompressedHash) {
+                throw PartsException("Invalid hash " + hash.hashString() + "<>" + m_uncompressedHash.hashString() + " for " + m_file.string());
+            }
         }
     }
 
