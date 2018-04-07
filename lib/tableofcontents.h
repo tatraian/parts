@@ -20,8 +20,8 @@ namespace parts
 class TableOfContents
 {
 public:
-    typedef std::map<boost::filesystem::path, std::shared_ptr<BaseEntry>>::iterator iterator;
-    typedef std::map<boost::filesystem::path, std::shared_ptr<BaseEntry>>::const_iterator const_iterator;
+    typedef std::vector<std::pair<boost::filesystem::path, std::shared_ptr<BaseEntry>>>::iterator iterator;
+    typedef std::vector<std::pair<boost::filesystem::path, std::shared_ptr<BaseEntry>>>::const_iterator const_iterator;
 
     TableOfContents(const boost::filesystem::path& source, const PartsCompressionParameters& parameters);
     TableOfContents(ContentReadBackend& backend, size_t toc_size, size_t decompressed_toc_size, const PartsCompressionParameters& parameters);
@@ -72,7 +72,12 @@ protected:
     TableOfContents(const PartsCompressionParameters& params);
 
 protected:
-    std::map<boost::filesystem::path, std::shared_ptr<BaseEntry> > m_files;
+    /** 
+        Do NOT let it be a map. The reason is simple:
+        TOC entry: foo/bar/dir1/-file.txt: ....
+        TOC entry: foo/bar/dir1/: ....
+     */
+    std::vector<std::pair<boost::filesystem::path, std::shared_ptr<BaseEntry> > > m_files;
     std::vector<std::string> m_owners;
     std::vector<std::string> m_groups;
 

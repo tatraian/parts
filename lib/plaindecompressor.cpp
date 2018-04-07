@@ -1,4 +1,5 @@
 #include "plaindecompressor.h"
+#include "parts_definitions.h"
 #include "internal_definitions.h"
 #include "logger_internal.h"
 
@@ -23,6 +24,9 @@ void PlainDecompressor::extractFile(const boost::filesystem::path& file,
                                     size_t decompressed_size)
 {
     std::ofstream output(file.string(), std::ios::binary | std::ios::ate);
+    if (!output) {
+        throw PartsException ("Cannot create file "+file.string());
+    }
 
     // if the last entry of the file is uncompressed empty file than we want to positioning outside of the archive...
     if (compressed_size == 0)

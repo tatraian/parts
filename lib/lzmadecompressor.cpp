@@ -121,6 +121,10 @@ void LzmaDecompressor::extractFile(const boost::filesystem::path& file,
     };
 
     std::ofstream output(file.string(), std::ios::binary | std::ios::ate);
+    if (!output) {
+        throw PartsException ("Cannot create file "+file.string());
+    }
+
     auto writer = [&](uint8_t* src, size_t size) {
         output.write(reinterpret_cast<char*>(src), size);
     };

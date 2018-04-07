@@ -98,7 +98,7 @@ TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, s
         m_maxOwnerWidth = std::max(m_maxOwnerWidth, entry->owner().size() + entry->group().size() + 1);
 
         LOG_DEBUG("TOC entry: {}", entry->toString());
-        m_files[entry->file()] = entry;
+        m_files.push_back(std::make_pair(entry->file(), entry));
     }
 }
 
@@ -131,7 +131,9 @@ void TableOfContents::shiftOffsets(uint64_t& data_start)
 //==========================================================================================================================================
 std::shared_ptr<BaseEntry> TableOfContents::find(const boost::filesystem::path& file)
 {
-    auto it = m_files.find(file);
+    auto it = std::find_if( m_files.begin(), m_files.end(),
+        [&file](const std::pair<boost::filesystem::path, std::shared_ptr<parts::BaseEntry> >& element) { return element.first == file;} );
+
     if (it == m_files.end())
         return std::shared_ptr<BaseEntry>();
 
@@ -191,7 +193,7 @@ void TableOfContents::add(const boost::filesystem::path& root, const boost::file
     }
     LOG_DEBUG("Adding TOC entry: {}", entry->toString());
 
-    m_files[entry->file()] = entry;
+    m_files.push_back(std::make_pair(entry->file(), entry));
 }
 
 //==========================================================================================================================================
