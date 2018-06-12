@@ -14,6 +14,7 @@ namespace parts
 class Hash
 {
 public:
+    Hash();
     Hash(HashType type, const boost::filesystem::path& path);
     Hash(HashType type, const std::vector<uint8_t>& data);
     Hash(HashType type, InputBuffer& data);
@@ -25,6 +26,9 @@ public:
     { return m_hash; }
 
     std::string hashString() const;
+
+    bool isValid() const
+    { return !m_hash.empty(); }
 
 protected:
     HashType m_type;

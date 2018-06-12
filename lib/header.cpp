@@ -11,9 +11,8 @@ char magic[] = {'p','a','r','t','s','!'};
 //==========================================================================================================================================
 Header::Header(const PartsCompressionParameters& parameters) :
     m_magic(magic),
-    m_version(1),
+    m_version(2),
     m_tocCompressionType(parameters.m_tocCompression),
-    m_fileCompressionType(parameters.m_fileCompression),
     m_hashType(parameters.m_hashType),
     m_tocSize(0)
 {
@@ -34,7 +33,10 @@ Header::Header(ContentReadBackend& reader)
 
     m_magic = magic;
     Packager::pop_front(buffer, m_version);
-    if (m_version != 1)
+    if (m_version == 1)
+        throw PartsException("Unhandled version: " + std::to_string(m_version));
+
+    if (m_version != 2)
         throw PartsException("Unknown archive version: " + std::to_string(m_version));
 
     uint8_t tmp;
@@ -42,13 +44,11 @@ Header::Header(ContentReadBackend& reader)
     m_tocCompressionType = static_cast<CompressionType>(tmp);
 
     Packager::pop_front(buffer, tmp);
-    m_fileCompressionType = static_cast<CompressionType>(tmp);
-
-    Packager::pop_front(buffer, tmp);
     m_hashType = static_cast<HashType>(tmp);
 
     Packager::pop_front(buffer, m_dummy[0]);
     Packager::pop_front(buffer, m_dummy[1]);
+    Packager::pop_front(buffer, m_dummy[2]);
 
     Packager::pop_front(buffer, m_tocSize);
 }
@@ -65,10 +65,10 @@ std::vector<uint8_t> Header::getRaw() const
 
     Packager::append(result, m_version);
     Packager::append(result, static_cast<uint8_t>(m_tocCompressionType));
-    Packager::append(result, static_cast<uint8_t>(m_fileCompressionType));
     Packager::append(result, static_cast<uint8_t>(m_hashType));
     Packager::append(result, m_dummy[0]);
     Packager::append(result, m_dummy[1]);
+    Packager::append(result, m_dummy[2]);
     Packager::append(result, m_tocSize);
 
     return result;

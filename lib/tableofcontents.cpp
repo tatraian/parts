@@ -167,15 +167,13 @@ void TableOfContents::add(const boost::filesystem::path& root, const boost::file
                                        m_groups[group_id],
                                        group_id));
     } else if (boost::filesystem::is_regular_file(file)) {
-        Hash hash(m_parameters.m_hashType, file);
         entry.reset(new RegularFileEntry(filename,
                                          permissions,
                                          m_owners[owner_id],
                                          owner_id,
                                          m_groups[group_id],
                                          group_id,
-                                         hash,
-                                         boost::filesystem::file_size(file)));
+                                         m_parameters));
     } else {
         // TODO log here!
         return;

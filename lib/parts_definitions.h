@@ -18,6 +18,15 @@ enum class HashType {
     SHA256 = 1,
 };
 
+inline constexpr const char* to_string(CompressionType type) {
+    switch (type) {
+    case CompressionType::None:
+        return "Plain";
+    case CompressionType::LZMA:
+        return "LZMA";
+    }
+}
+
 class PartsException : public std::runtime_error {
 public:
     PartsException(const std::string& msg) : std::runtime_error(msg) {}

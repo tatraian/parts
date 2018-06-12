@@ -24,9 +24,6 @@ public:
     CompressionType getTocCompressionType() const
     { return m_tocCompressionType; }
 
-    CompressionType getFileCompressionType() const
-    { return m_fileCompressionType; }
-
     HashType getHashType() const
     { return m_hashType; }
 
@@ -34,9 +31,8 @@ protected:
     char* m_magic; // "parts!" - 6 bytes
     uint8_t m_version;
     CompressionType m_tocCompressionType;
-    CompressionType m_fileCompressionType;
     HashType m_hashType;
-    uint8_t m_dummy[2];
+    uint8_t m_dummy[3];
     uint32_t m_tocSize;
 };
 

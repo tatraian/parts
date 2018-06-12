@@ -1,17 +1,14 @@
 #include "partsupdatejob.h"
 
-#include "decompressorfactory.h"
-
 using namespace parts;
 
 //==========================================================================================================================================
 PartsUpdateJob::PartsUpdateJob(HashType hash_type,
-                               CompressionType compression_type,
                                TableOfContents& new_toc,
                                const boost::filesystem::path& orig_source,
-                               const boost::filesystem::path& dest, ContentReadBackend& content_reader,
+                               const boost::filesystem::path& dest,
+                               ContentReadBackend& content_reader,
                                bool cont) :
-    m_compressionType(compression_type),
     m_oldToc(orig_source, PartsCompressionParameters(hash_type)),
     m_toc(new_toc),
     m_actualElement(m_toc.begin()),
@@ -38,11 +35,9 @@ void PartsUpdateJob::doNext()
 
     auto old_entry = m_oldToc.find(p);
 
-    auto decompressor = DecompressorFactory::createDecompressor(m_compressionType);
     m_actualElement->second->updateEntry(old_entry.get(),
                                          m_oldRootDir,
                                          m_dest,
-                                         *decompressor,
                                          m_contentReader,
                                          m_continue);
     ++m_actualElement;

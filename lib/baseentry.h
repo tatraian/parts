@@ -1,8 +1,6 @@
 #ifndef BASEENTRY_H
 #define BASEENTRY_H
 
-#include "compressor.h"
-#include "decompressor.h"
 #include "contentwritebackend.h"
 #include "contentreadbackend.h"
 
@@ -40,20 +38,19 @@ public:
 
     virtual void append(std::vector<uint8_t>& buffer) const;
 
-    virtual void compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend) = 0;
+    virtual void compressEntry(const boost::filesystem::path& root, ContentWriteBackend& backend) = 0;
 
-    virtual void extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend) = 0;
+    virtual void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend) = 0;
 
     virtual void updateEntry(const BaseEntry* old_entry,
                              const boost::filesystem::path& old_root,
                              const boost::filesystem::path& dest_root,
-                             Decompressor& decompressor,
                              ContentReadBackend& backend,
                              bool cont) = 0;
 
     virtual std::string listEntry(size_t user_width, size_t size_width, std::tm* t) const = 0;
 
-    virtual bool extractToMc(const boost::filesystem::path& dest_file, Decompressor& decompressor, ContentReadBackend& backend)
+    virtual bool extractToMc(const boost::filesystem::path& dest_file, ContentReadBackend& backend)
     { return false; }
 
     const boost::filesystem::path& file() const

@@ -12,7 +12,6 @@ class PartsUpdateJob : public PartsJobInterface
 {
 public:
     PartsUpdateJob(HashType hash_type,
-                   CompressionType compression_type,
                    TableOfContents& new_toc,
                    const boost::filesystem::path& orig_source,
                    const boost::filesystem::path& dest,
@@ -30,8 +29,6 @@ public:
     void doNext() override;
 
 protected:
-    CompressionType m_compressionType;
-
     std::string m_oldRootName;
     std::string m_rootname;
 

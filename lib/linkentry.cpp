@@ -53,14 +53,14 @@ void LinkEntry::append(std::vector<uint8_t>& buffer) const
 }
 
 //==========================================================================================================================================
-void LinkEntry::compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend)
+void LinkEntry::compressEntry(const boost::filesystem::path& root, ContentWriteBackend& backend)
 {
     // This function is empty, since there is no file to be compressed
     LOG_TRACE("Compressing link: {}", m_file.string());
 }
 
 //==========================================================================================================================================
-void LinkEntry::extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend)
+void LinkEntry::extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend)
 {
     LOG_TRACE("Create link:  {}", m_file.string());
     boost::system::error_code ec;
@@ -73,7 +73,6 @@ void LinkEntry::extractEntry(const boost::filesystem::path& dest_root, Decompres
 void LinkEntry::updateEntry(const BaseEntry* old_entry,
                             const boost::filesystem::path& old_root,
                             const boost::filesystem::path& dest_root,
-                            Decompressor& decompressor,
                             ContentReadBackend& backend,
                             bool cont)
 {
@@ -82,7 +81,7 @@ void LinkEntry::updateEntry(const BaseEntry* old_entry,
         return;
 
     // Do the same in this case too, since there is no data extraction
-    extractEntry(dest_root, decompressor, backend);
+    extractEntry(dest_root, backend);
 }
 
 //==========================================================================================================================================

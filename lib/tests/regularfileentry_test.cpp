@@ -8,33 +8,59 @@ using namespace parts;
 using namespace fakeit;
 
 //==========================================================================================================================================
-BOOST_AUTO_TEST_CASE(compress_fills_missing_entries_and_after_it_is_packed_correctly) {
+class FakeCompressor : public Compressor {
+public:
+    FakeCompressor() : Compressor() {}
+
+    size_t compressFile(const boost::filesystem::path& path,
+                        ContentWriteBackend& backend) override {
+        return 2;
+    }
+
+    size_t compressBuffer(const std::vector<uint8_t>& buffer,
+                          std::vector<uint8_t>& backend) override { return 0; }
+
+};
+
+//==========================================================================================================================================
+class TestRegularFileEntry : public RegularFileEntry {
+public:
+    TestRegularFileEntry() : RegularFileEntry("file1", 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1, PartsCompressionParameters())
+    {}
+
+    void setHashAndSize(const boost::filesystem::path&) {
+        m_uncompressedHash = Hash(HashType::SHA256, {0,1,2,3});
+        m_uncompressedSize = 4;
+    }
+
+    std::unique_ptr<Compressor> createCompressor() {
+        return std::unique_ptr<Compressor>(new FakeCompressor());
+    }
+
+};
+
+//==========================================================================================================================================
+BOOST_FIXTURE_TEST_CASE(compress_fills_missing_entries_and_after_it_is_packed_correctly, TestRegularFileEntry) {
     // Sorry, since it is much to create data entry, I put the two tests in one case...
     Hash hash(HashType::SHA256, {0,1,2,3});
-    RegularFileEntry entry("file1", 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1, hash, 4);
-
-    Mock<Compressor> compressor_mock;
-
-    When(Method(compressor_mock, compressFile)).Return(2);
 
     Mock<ContentWriteBackend> backend_mock;
-
     When(Method(backend_mock, getPosition)).Return(100);
 
-    entry.compressEntry(boost::filesystem::path("nowhere"), compressor_mock.get(), backend_mock.get());
+    compressEntry(boost::filesystem::path("nowhere"), backend_mock.get());
 
-    Verify(Method(compressor_mock, compressFile)).Once();
     Verify(Method(backend_mock, getPosition)).Once();
 
-    BOOST_REQUIRE_EQUAL(entry.uncompressedSize(), 4);
-    BOOST_REQUIRE_EQUAL(entry.compressedSize(), 2);
-    BOOST_REQUIRE_EQUAL(entry.offset(), 100);
+    BOOST_REQUIRE(m_compressionType == CompressionType::LZMA);
+    BOOST_REQUIRE_EQUAL(m_uncompressedSize, 4);
+    BOOST_REQUIRE_EQUAL(m_compressedSize, 2);
+    BOOST_REQUIRE_EQUAL(m_offset, 100);
 
     std::vector<uint8_t> result;
 
-    entry.append(result);
+    append(result);
 
-    BOOST_REQUIRE_EQUAL(result.size(), 70);
+    BOOST_REQUIRE_EQUAL(result.size(), 71);
     BOOST_REQUIRE_EQUAL(result[0], static_cast<uint8_t>(EntryTypes::RegularFile));
 
     // base entry check
@@ -56,35 +82,37 @@ BOOST_AUTO_TEST_CASE(compress_fills_missing_entries_and_after_it_is_packed_corre
     // Regular file entry
     // Hash
     BOOST_REQUIRE_EQUAL_COLLECTIONS(result.begin() + 14, result.begin() + 14 + 32, hash.hash().begin(), hash.hash().end());
+    // compression type
+    BOOST_REQUIRE_EQUAL(result[46], 1);
     // uncompressed size
-    BOOST_REQUIRE_EQUAL(result[46], 0);
     BOOST_REQUIRE_EQUAL(result[47], 0);
     BOOST_REQUIRE_EQUAL(result[48], 0);
     BOOST_REQUIRE_EQUAL(result[49], 0);
     BOOST_REQUIRE_EQUAL(result[50], 0);
     BOOST_REQUIRE_EQUAL(result[51], 0);
     BOOST_REQUIRE_EQUAL(result[52], 0);
-    BOOST_REQUIRE_EQUAL(result[53], 4);
+    BOOST_REQUIRE_EQUAL(result[53], 0);
+    BOOST_REQUIRE_EQUAL(result[54], 4);
 
     // compressed size
-    BOOST_REQUIRE_EQUAL(result[54], 0);
     BOOST_REQUIRE_EQUAL(result[55], 0);
     BOOST_REQUIRE_EQUAL(result[56], 0);
     BOOST_REQUIRE_EQUAL(result[57], 0);
     BOOST_REQUIRE_EQUAL(result[58], 0);
     BOOST_REQUIRE_EQUAL(result[59], 0);
     BOOST_REQUIRE_EQUAL(result[60], 0);
-    BOOST_REQUIRE_EQUAL(result[61], 2);
+    BOOST_REQUIRE_EQUAL(result[61], 0);
+    BOOST_REQUIRE_EQUAL(result[62], 2);
 
     // offset
-    BOOST_REQUIRE_EQUAL(result[62], 0);
     BOOST_REQUIRE_EQUAL(result[63], 0);
     BOOST_REQUIRE_EQUAL(result[64], 0);
     BOOST_REQUIRE_EQUAL(result[65], 0);
     BOOST_REQUIRE_EQUAL(result[66], 0);
     BOOST_REQUIRE_EQUAL(result[67], 0);
     BOOST_REQUIRE_EQUAL(result[68], 0);
-    BOOST_REQUIRE_EQUAL(result[69], 100);
+    BOOST_REQUIRE_EQUAL(result[69], 0);
+    BOOST_REQUIRE_EQUAL(result[70], 100);
 }
 
 //==========================================================================================================================================
@@ -95,6 +123,8 @@ BOOST_AUTO_TEST_CASE(regular_file_entry_can_be_created_from_input_stream) {
                                  0x13, 0xb8, 0x45, 0xfc, 0xf2, 0x89, 0x57, 0x9d,
                                  0x20, 0x9c, 0x89, 0x78, 0x23, 0xb9, 0x21, 0x7d,
                                  0xa3, 0xe1, 0x61, 0x93, 0x6f, 0x03, 0x15, 0x89,
+                                 // compression type
+                                 0x01, // LZMA
                                  // uncompressed size
                                  0, 0, 0, 0, 0, 0, 0, 100,
                                  // compressed size
@@ -117,6 +147,7 @@ BOOST_AUTO_TEST_CASE(regular_file_entry_can_be_created_from_input_stream) {
     BOOST_CHECK_EQUAL(entry.ownerId(), 0);
     BOOST_CHECK_EQUAL(entry.groupId(), 0);
 
+    BOOST_CHECK(entry.compressionType() == CompressionType::LZMA);
     BOOST_CHECK_EQUAL(entry.uncompressedHash().hashString(), "88d4266fd4e6338d13b845fcf289579d209c897823b9217da3e161936f031589");
     BOOST_CHECK_EQUAL(entry.uncompressedSize(), 100u);
     BOOST_CHECK_EQUAL(entry.compressedSize(), 42u);

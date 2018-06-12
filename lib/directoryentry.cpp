@@ -39,14 +39,14 @@ void DirectoryEntry::append(std::vector<uint8_t>& buffer) const
 }
 
 //==========================================================================================================================================
-void DirectoryEntry::compressEntry(const boost::filesystem::path& root, Compressor& compressor, ContentWriteBackend& backend)
+void DirectoryEntry::compressEntry(const boost::filesystem::path& root, ContentWriteBackend& backend)
 {
     // Do nothing
     LOG_TRACE("Compressing dir:  {}", m_file.string());
 }
 
 //==========================================================================================================================================
-void DirectoryEntry::extractEntry(const boost::filesystem::path& dest_root, Decompressor& decompressor, ContentReadBackend& backend)
+void DirectoryEntry::extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend)
 {
     LOG_TRACE("Create dir:   {}", m_file.string());
     // Do not decompression, but creates the directory with the correct rights
@@ -60,14 +60,13 @@ void DirectoryEntry::extractEntry(const boost::filesystem::path& dest_root, Deco
 void DirectoryEntry::updateEntry(const BaseEntry* old_entry,
                                  const boost::filesystem::path& old_root,
                                  const boost::filesystem::path& dest_root,
-                                 Decompressor& decompressor,
                                  ContentReadBackend& backend,
                                  bool cont)
 {
     if (cont && boost::filesystem::is_directory(dest_root / m_file))
         setMetadata(dest_root);
     else
-        extractEntry(dest_root, decompressor, backend);
+        extractEntry(dest_root, backend);
 }
 
 //==========================================================================================================================================

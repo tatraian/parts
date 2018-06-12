@@ -224,9 +224,9 @@ BOOST_FIXTURE_TEST_CASE(detects_files_correctly, FakeTableOfContents) {
     BOOST_REQUIRE(entry);
     std::shared_ptr<RegularFileEntry> file = std::dynamic_pointer_cast<RegularFileEntry>(entry);
     BOOST_REQUIRE(file);
-    BOOST_CHECK_EQUAL(file->uncompressedHash().hashString(), "9834876dcfb05cb167a5c24953eba58c4ac89b1adf57f28f2f9d09af107ee8f0");
-    BOOST_CHECK_EQUAL(file->uncompressedSize(), 3);
     // Since currently it is not compressed
+    BOOST_CHECK(!file->uncompressedHash().isValid());
+    BOOST_CHECK_EQUAL(file->uncompressedSize(), 0);
     BOOST_CHECK_EQUAL(file->compressedSize(), 0);
 
     entry = toc.find(test_absolute_link.lexically_relative(test_root));
