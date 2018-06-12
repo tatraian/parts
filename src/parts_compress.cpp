@@ -5,6 +5,8 @@
 #include <iostream>
 #include <lzma.h>
 
+#include <boost/filesystem.hpp>
+
 using namespace parts;
 
 //==========================================================================================================================================
@@ -65,7 +67,10 @@ int main(int argc, char** argv) {
     try
     {
         parser.ParseCLI(argc, argv);
-        std::string compress_entry = cut_slash(compress_dir.Get());
+        boost::filesystem::path compress_path(cut_slash(compress_dir.Get()));
+        if (compress_path.is_relative()) {
+            compress_path = boost::filesystem::system_complete(compress_path);
+        }
 
         parts::PartsCompressionParameters parameters;
         if (use_zlib) {
@@ -88,7 +93,7 @@ int main(int argc, char** argv) {
         if (archive_filename.size() <= 6 /* .parts */ || archive_filename.substr(archive_filename.size() - 6) != ".parts")
             archive_filename += ".parts";
 
-        parts::PartsArchive archive(compress_entry, parameters);
+        parts::PartsArchive archive(compress_path, parameters);
 
         archive.createArchive(archive_filename);
 
