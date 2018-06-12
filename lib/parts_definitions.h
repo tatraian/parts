@@ -11,6 +11,7 @@ namespace parts
 enum class CompressionType {
     None = 0,
     LZMA = 1,
+    ZLIB = 2,
 };
 
 enum class HashType {
@@ -24,6 +25,8 @@ inline constexpr const char* to_string(CompressionType type) {
         return "Plain";
     case CompressionType::LZMA:
         return "LZMA";
+    case CompressionType::ZLIB:
+        return "ZLIB";
     }
 }
 
@@ -54,7 +57,6 @@ struct LzmaCompressorParameters
     // currently threads are not supported since stream_encoder_mt is not in hunter base package (cannot be compiled...)
     //uint32_t m_threads;
 };
-
 
 struct PartsCompressionParameters
 {

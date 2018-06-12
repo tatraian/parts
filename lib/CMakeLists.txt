@@ -42,11 +42,15 @@ set(parts_SRCS
     partsjobinterface.h
     partsupdatejob.h
     partsupdatejob.cpp
+    zlibcompressor.h
+    zlibcompressor.cpp
+    zlibdecompressor.h
+    zlibdecompressor.cpp
     )
 
 add_library(parts ${parts_SRCS})
 target_link_libraries(parts PUBLIC Boost::system Boost::filesystem)
-target_link_libraries(parts PRIVATE lzma::lzma fmt::fmt ${HTTP_LINK})
+target_link_libraries(parts PRIVATE lzma::lzma ZLIB::zlib fmt::fmt ${HTTP_LINK})
 
 install(TARGETS parts
     EXPORT ${targets_export_name}
@@ -77,6 +81,8 @@ if(BUILD_TESTS)
         tests/tableofcontents_test.cpp
         tests/header_test.cpp
         tests/lzmadecompressor_test.cpp
+        tests/zlibcompressor_test.cpp
+        tests/zlibdecompressor_test.cpp
         tests/filereadbackend_test.cpp)
     target_link_libraries(parts_lib_tests parts FakeIt::FakeIt Boost::test_exec_monitor c++)
     add_test(parts_lib_tester parts_lib_tests)

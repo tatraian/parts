@@ -58,6 +58,7 @@ int main(int argc, char** argv) {
     args::Flag lzma_extrem(parser, "lzma_extrem", "Extrem flag of LZMA compression", {"lzma_extrem"});
     args::Flag lzma_machine_code(parser, "lzma_machine_code", "Switch on LZMA machine code optimization (for X86)", {"lzma_machine_code"});
     args::ValueFlag<int, LzmaLevelReader> lzma_level(parser, "lzma_level", "Set lzma compression level (1-9)", {"lzma_level"}, 6);
+    args::Flag use_zlib(parser, "zlib", "use zlib with highest compression ratio", {"zlib"});
     args::Positional<std::string> archive_name(parser, "archive_name", "The name of the archive", args::Options::Required);
     args::Positional<std::string> compress_dir(parser, "compress_dir", "The file/dir to be compressed", args::Options::Required);
 
@@ -67,8 +68,14 @@ int main(int argc, char** argv) {
         std::string compress_entry = cut_slash(compress_dir.Get());
 
         parts::PartsCompressionParameters parameters;
-        parameters.m_fileCompression = CompressionType::LZMA;
-        parameters.m_tocCompression = CompressionType::LZMA;
+        if (use_zlib) {
+            parameters.m_fileCompression = CompressionType::ZLIB;
+            parameters.m_tocCompression  = CompressionType::ZLIB;
+        } else {
+            parameters.m_fileCompression = CompressionType::LZMA;
+            parameters.m_tocCompression = CompressionType::LZMA;
+        }
+
         parameters.m_hashType = hash_type.Get();
 
         parameters.m_lzmaParameters.m_compressionLevel = lzma_level.Get();
