@@ -48,7 +48,8 @@ public:
                              const boost::filesystem::path& old_root,
                              const boost::filesystem::path& dest_root,
                              Decompressor& decompressor,
-                             ContentReadBackend& backend) = 0;
+                             ContentReadBackend& backend,
+                             bool cont) = 0;
 
     virtual std::string listEntry(size_t user_width, size_t size_width, std::tm* t) const = 0;
 

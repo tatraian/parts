@@ -16,7 +16,8 @@ public:
                    TableOfContents& new_toc,
                    const boost::filesystem::path& orig_source,
                    const boost::filesystem::path& dest,
-                   ContentReadBackend& content_reader);
+                   ContentReadBackend& content_reader,
+                   bool cont);
 
     ~PartsUpdateJob() = default;
 
@@ -41,6 +42,7 @@ protected:
     boost::filesystem::path m_oldRootDir;
     boost::filesystem::path m_dest;
     ContentReadBackend& m_contentReader;
+    bool m_continue;
 };
 
 }

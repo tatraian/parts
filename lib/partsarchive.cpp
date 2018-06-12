@@ -85,9 +85,17 @@ void PartsArchive::extractArchive(const boost::filesystem::path& dest)
 }
 
 //==========================================================================================================================================
-void PartsArchive::updateArchive(const boost::filesystem::path& original_source, const boost::filesystem::path& dest)
+void PartsArchive::updateArchive(const boost::filesystem::path& original_source,
+                                 const boost::filesystem::path& dest,
+                                 bool cont)
 {
-    PartsUpdateJob job(m_header.getHashType(), m_header.getFileCompressionType(), m_toc, original_source, dest, *m_contentReader.get());
+    PartsUpdateJob job(m_header.getHashType(),
+                       m_header.getFileCompressionType(),
+                       m_toc,
+                       original_source,
+                       dest,
+                       *m_contentReader.get(),
+                       cont);
 
     while(job) {
         job.doNext();
@@ -95,14 +103,17 @@ void PartsArchive::updateArchive(const boost::filesystem::path& original_source,
 }
 
 //==========================================================================================================================================
-std::unique_ptr<PartsJobInterface> PartsArchive::updateJob(const boost::filesystem::path& original_source, const boost::filesystem::path& dest)
+std::unique_ptr<PartsJobInterface> PartsArchive::updateJob(const boost::filesystem::path& original_source,
+                                                           const boost::filesystem::path& dest,
+                                                           bool cont)
 {
     return std::make_unique<PartsUpdateJob>(m_header.getHashType(),
                                             m_header.getFileCompressionType(),
                                             m_toc,
                                             original_source,
                                             dest,
-                                            *m_contentReader.get());
+                                            *m_contentReader.get(),
+                                            cont);
 
 }
 

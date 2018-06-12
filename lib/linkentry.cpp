@@ -74,8 +74,13 @@ void LinkEntry::updateEntry(const BaseEntry* old_entry,
                             const boost::filesystem::path& old_root,
                             const boost::filesystem::path& dest_root,
                             Decompressor& decompressor,
-                            ContentReadBackend& backend)
+                            ContentReadBackend& backend,
+                            bool cont)
 {
+    // Symlink already created, since we continues the update this won't cause problem.
+    if (cont && boost::filesystem::is_symlink(dest_root / m_file) && boost::filesystem::read_symlink(dest_root / m_file) == m_destination)
+        return;
+
     // Do the same in this case too, since there is no data extraction
     extractEntry(dest_root, decompressor, backend);
 }

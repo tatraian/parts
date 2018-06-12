@@ -32,7 +32,8 @@ public:
                      const boost::filesystem::path& old_root,
                      const boost::filesystem::path& dest_root,
                      Decompressor& decompressor,
-                     ContentReadBackend& backend) override;
+                     ContentReadBackend& backend,
+                     bool cont) override;
 
     std::string listEntry(size_t user_width, size_t size_width, std::tm* t) const override;
 

@@ -74,8 +74,23 @@ void RegularFileEntry::updateEntry(const BaseEntry* old_entry,
                                    const boost::filesystem::path& old_root,
                                    const boost::filesystem::path& dest_root,
                                    Decompressor& decompressor,
-                                   ContentReadBackend& backend)
+                                   ContentReadBackend& backend,
+                                   bool cont)
 {
+
+    // if we continue the extracting
+    if (cont && boost::filesystem::is_regular_file(dest_root / m_file)) {
+        Hash existing_hash(m_uncompressedHash.type(), dest_root / m_file);
+        LOG_DEBUG("Hashes: {}\n        {}", existing_hash.hashString(), m_uncompressedHash.hashString());
+        if (existing_hash == m_uncompressedHash) {
+            LOG_TRACE("File already exists: {}", m_file.string());
+            setMetadata(dest_root);
+            return;
+        }
+        LOG_TRACE("Erasing half extracted entry: {}", m_file.string());
+        boost::filesystem::remove(dest_root / m_file);
+    }
+
     auto file_old_entry = dynamic_cast<const RegularFileEntry*>(old_entry);
     if (file_old_entry == nullptr || file_old_entry->m_uncompressedHash != m_uncompressedHash) {
         extractEntry(dest_root, decompressor, backend);

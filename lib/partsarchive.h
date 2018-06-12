@@ -36,7 +36,8 @@ public:
 
     void extractArchive(const boost::filesystem::path& dest);
     void updateArchive(const boost::filesystem::path& original_source,
-                       const boost::filesystem::path& dest);
+                       const boost::filesystem::path& dest,
+                       bool cont);
 
     // Job API!
     // Take care auto job = updateJob(...);
@@ -44,7 +45,8 @@ public:
     //     job->doNext()
     // without '*' you check the unique_ptr...
     std::unique_ptr<PartsJobInterface> updateJob(const boost::filesystem::path& original_source,
-                                                 const boost::filesystem::path& dest);
+                                                 const boost::filesystem::path& dest,
+                                                 bool cont);
 
     uint64_t readBytes() const
     { if (m_contentReader) return m_contentReader->readBytes(); else return 0; }
