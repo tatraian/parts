@@ -46,9 +46,14 @@ void DirectoryEntry::compressEntry(const boost::filesystem::path& root, ContentW
 }
 
 //==========================================================================================================================================
-void DirectoryEntry::extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend)
+void DirectoryEntry::extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont)
 {
     LOG_TRACE("Create dir:   {}", m_file.string());
+    if (cont && boost::filesystem::is_directory(dest_root / m_file)) {
+        setMetadata(dest_root);
+        return;
+    }
+
     // Do not decompression, but creates the directory with the correct rights
     if (!boost::filesystem::create_directory(dest_root / m_file))
         throw PartsException("Cannot create directory: " + (dest_root / m_file).string());
@@ -63,10 +68,7 @@ void DirectoryEntry::updateEntry(const BaseEntry* old_entry,
                                  ContentReadBackend& backend,
                                  bool cont)
 {
-    if (cont && boost::filesystem::is_directory(dest_root / m_file))
-        setMetadata(dest_root);
-    else
-        extractEntry(dest_root, backend);
+    extractEntry(dest_root, backend, cont);
 }
 
 //==========================================================================================================================================

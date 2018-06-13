@@ -40,7 +40,7 @@ public:
 
     virtual void compressEntry(const boost::filesystem::path& root, ContentWriteBackend& backend) = 0;
 
-    virtual void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend) = 0;
+    virtual void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont) = 0;
 
     virtual void updateEntry(const BaseEntry* old_entry,
                              const boost::filesystem::path& old_root,

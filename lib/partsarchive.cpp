@@ -74,10 +74,10 @@ void PartsArchive::createArchive(const boost::filesystem::path& archive)
 }
 
 //==========================================================================================================================================
-void PartsArchive::extractArchive(const boost::filesystem::path& dest)
+void PartsArchive::extractArchive(const boost::filesystem::path& dest, bool cont)
 {
     for (auto& entry : m_toc) {
-        entry.second->extractEntry(dest, *m_contentReader.get());
+        entry.second->extractEntry(dest, *m_contentReader.get(), cont);
     }
 }
 

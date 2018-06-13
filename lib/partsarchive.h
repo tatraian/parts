@@ -34,7 +34,7 @@ public:
 
     void createArchive(const boost::filesystem::path& archive);
 
-    void extractArchive(const boost::filesystem::path& dest);
+    void extractArchive(const boost::filesystem::path& dest, bool cont);
     void updateArchive(const boost::filesystem::path& original_source,
                        const boost::filesystem::path& dest,
                        bool cont);

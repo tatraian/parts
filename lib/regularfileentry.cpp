@@ -75,9 +75,14 @@ void RegularFileEntry::compressEntry(const boost::filesystem::path& root, Conten
 }
 
 //==========================================================================================================================================
-void RegularFileEntry::extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend)
+void RegularFileEntry::extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont)
 {
     LOG_TRACE("Extract file: {}", m_file.string());
+    if (cont && checkExisting(dest_root)) {
+        setMetadata(dest_root);
+        return;
+    }
+
     auto decompressor = DecompressorFactory::createDecompressor(m_compressionType);
     decompressor->extractFile(dest_root / m_file, backend, m_offset, m_compressedSize);
 
@@ -91,28 +96,22 @@ void RegularFileEntry::updateEntry(const BaseEntry* old_entry,
                                    ContentReadBackend& backend,
                                    bool cont)
 {
-    // if we continue the extracting
-    if (cont && boost::filesystem::is_regular_file(dest_root / m_file)) {
-        Hash existing_hash(m_uncompressedHash.type(), dest_root / m_file);
-        LOG_DEBUG("Hashes: {}\n        {}", existing_hash.hashString(), m_uncompressedHash.hashString());
-        if (existing_hash == m_uncompressedHash) {
-            LOG_TRACE("File already exists: {}", m_file.string());
-            setMetadata(dest_root);
-            return;
-        }
-        LOG_TRACE("Erasing half extracted entry: {}", m_file.string());
-        boost::filesystem::remove(dest_root / m_file);
-    }
-
     auto file_old_entry = dynamic_cast<const RegularFileEntry*>(old_entry);
     if (file_old_entry == nullptr || file_old_entry->m_uncompressedHash != m_uncompressedHash) {
-        extractEntry(dest_root, backend);
+        extractEntry(dest_root, backend, cont);
         return;
     }
 
+    // in case of copy we also have to check the possibility of continue:
     LOG_TRACE("Copy file:    {}", m_file.string());
+    if (cont && checkExisting(dest_root)) {
+        setMetadata(dest_root);
+        return;
+    }
+
     boost::filesystem::copy_file(old_root / old_entry->file(), dest_root / m_file);
     setMetadata(dest_root);
+
 }
 
 //==========================================================================================================================================
@@ -154,6 +153,29 @@ std::unique_ptr<Compressor> RegularFileEntry::createCompressor()
         m_compressionType = m_compressionParameters.m_fileCompression;
         return CompressorFactory::createCompressor(m_compressionParameters.m_fileCompression,  m_compressionParameters);
     }
+}
+
+//==========================================================================================================================================
+bool RegularFileEntry::checkHashMatch(const boost::filesystem::path& path)
+{
+    Hash existing_hash(m_uncompressedHash.type(), path);
+    LOG_DEBUG("Hashes: {}\n        {}", existing_hash.hashString(), m_uncompressedHash.hashString());
+    return existing_hash == m_uncompressedHash;
+}
+
+//==========================================================================================================================================
+bool RegularFileEntry::checkExisting(const boost::filesystem::path& dest_root)
+{
+    if (boost::filesystem::is_regular_file(dest_root / m_file)) {
+        if (checkHashMatch(dest_root / m_file)) {
+            LOG_TRACE("File already exsists: {}", m_file.string());
+            return true;
+        }
+        LOG_TRACE("Erasing half extracted entry: {}", m_file.string());
+        boost::filesystem::remove(dest_root / m_file);
+    }
+
+    return false;
 }
 
 //==========================================================================================================================================

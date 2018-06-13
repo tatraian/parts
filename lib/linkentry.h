@@ -28,7 +28,7 @@ public:
 
     void compressEntry(const boost::filesystem::path& root, ContentWriteBackend& backend) override;
 
-    void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend) override;
+    void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont) override;
 
     void updateEntry(const BaseEntry* old_entry,
                      const boost::filesystem::path& old_root,

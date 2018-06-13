@@ -60,9 +60,14 @@ void LinkEntry::compressEntry(const boost::filesystem::path& root, ContentWriteB
 }
 
 //==========================================================================================================================================
-void LinkEntry::extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend)
+void LinkEntry::extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont)
 {
     LOG_TRACE("Create link:  {}", m_file.string());
+
+    // Symlink already created, since we continues the update this won't cause problem.
+    if (cont && boost::filesystem::is_symlink(dest_root / m_file) && boost::filesystem::read_symlink(dest_root / m_file) == m_destination)
+        return;
+
     boost::system::error_code ec;
     boost::filesystem::create_symlink(m_destination, dest_root / m_file, ec);
     if (ec)
@@ -76,12 +81,8 @@ void LinkEntry::updateEntry(const BaseEntry* old_entry,
                             ContentReadBackend& backend,
                             bool cont)
 {
-    // Symlink already created, since we continues the update this won't cause problem.
-    if (cont && boost::filesystem::is_symlink(dest_root / m_file) && boost::filesystem::read_symlink(dest_root / m_file) == m_destination)
-        return;
-
     // Do the same in this case too, since there is no data extraction
-    extractEntry(dest_root, backend);
+    extractEntry(dest_root, backend, cont);
 }
 
 //==========================================================================================================================================

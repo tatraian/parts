@@ -31,7 +31,7 @@ public:
 
     void compressEntry(const boost::filesystem::path& root, ContentWriteBackend& backend) override;
 
-    void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend) override;
+    void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont) override;
 
     void updateEntry(const BaseEntry* old_entry,
                      const boost::filesystem::path& old_root,
@@ -69,9 +69,13 @@ public:
 
 protected:
     // help fake unit test
-    virtual void setHashAndSize(const boost::filesystem::path &path);
+    virtual void setHashAndSize(const boost::filesystem::path& path);
     // help fake unit test
     virtual std::unique_ptr<Compressor> createCompressor();
+
+    bool checkHashMatch(const boost::filesystem::path& path);
+
+    bool checkExisting(const boost::filesystem::path& dest_root);
 
 
 protected:

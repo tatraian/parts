@@ -36,13 +36,9 @@ int main(int argc, char** argv)
     args::ValueFlag<std::string> mc_extract_file(parser, "extract_file", "file to be extracted", {"mc_file"});
     args::ValueFlag<std::string> mc_extract_dest_file(parser, "extract_dest_file", "temp file to extract", {"mc_dest_file"});
     args::Flag list_only(parser, "list_only", "Only list archive", {'l', "list_only"});
-    args::Flag continue_(parser, "continue", "Continue an already started extraction in case of update,"
-                                             " so content in the destination\n"
-                                             "will be updated. Note: if there are content in the desctination "
-                                             "directory that is not part\n"
-                                             "any of source or base content then it will be part of the "
-                                             "destination directory after "
-                                             "extracting", {'c', "continue"});
+    args::Flag continue_(parser, "continue", "Continue an already started extraction. The content in the destination will be checked and "
+                                             " if a file's hash differs from the archive version, then it will be reextracted",
+                         {'c', "continue"});
 
     try
     {
@@ -84,7 +80,7 @@ int main(int argc, char** argv)
             // to avoid writing summary line
             return 0;
         } else if (!updated_from) {
-            archive.extractArchive(dest_dir);
+            archive.extractArchive(dest_dir, continue_);
         } else {
             archive.updateArchive(old_dir,dest_dir, continue_);
         }
