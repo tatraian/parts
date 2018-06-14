@@ -22,7 +22,7 @@ std::string cut_slash(std::string orig) {
 //==========================================================================================================================================
 int main(int argc, char** argv)
 {
-    ConsoleLogger logger(LOG_LEVELS::INFO);
+    ConsoleLogger logger(LOG_LEVELS::DEBUG);
     set_logger(&logger);
 
     args::ArgumentParser parser("This program extracts or updates files from a \".parts\" archive");
@@ -58,9 +58,9 @@ int main(int argc, char** argv)
 
         boost::filesystem::path old_dir;
         if (updated_from)
-             old_dir= cut_slash(cut_slash(updated_from.Get()));
+             old_dir= boost::filesystem::system_complete(cut_slash(cut_slash(updated_from.Get())));
 
-        boost::filesystem::path dest_dir = cut_slash(dest_root_dir.Get());
+        boost::filesystem::path dest_dir = boost::filesystem::system_complete(cut_slash(dest_root_dir.Get()));
 
         PartsArchive archive(std::move(input_stream));
 
