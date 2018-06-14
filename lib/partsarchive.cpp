@@ -53,7 +53,7 @@ void PartsArchive::createArchive(const boost::filesystem::path& archive)
     FileWriteBackend temp(p);
 
     for(auto& entry : m_toc) {
-        entry.second->compressEntry(m_root, temp);
+        entry.second->compressEntry(temp);
     }
 
     LOG_DEBUG("Files compressed sum: {}", temp.getPosition());

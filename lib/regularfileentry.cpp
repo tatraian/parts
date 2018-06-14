@@ -17,20 +17,21 @@ using namespace parts;
 
 
 //==========================================================================================================================================
-RegularFileEntry::RegularFileEntry(const boost::filesystem::path& file,
-                                   uint16_t permissions,
-                                   const std::string& owner,
-                                   uint16_t owner_id,
-                                   const std::string& group,
-                                   uint16_t group_id,
+RegularFileEntry::RegularFileEntry(const boost::filesystem::path& root,
+                                   const boost::filesystem::path& file,
+                                   std::vector<std::string>& owners,
+                                   std::vector<std::string>& groups,
+                                   bool save_owner,
                                    PartsCompressionParameters compression_parameters) :
-    BaseEntry(file, permissions, owner, owner_id, group, group_id),
+    BaseEntry(root, file, owners, groups, save_owner),
     m_compressionType(compression_parameters.m_fileCompression),
     m_uncompressedSize(0),
     m_compressedSize(0),
     m_offset(0),
     m_compressionParameters(compression_parameters)
 {
+    m_uncompressedHash = Hash(m_compressionParameters.m_hashType, root/file);
+    m_uncompressedSize = boost::filesystem::file_size(root/file);
 }
 
 //==========================================================================================================================================
@@ -63,15 +64,14 @@ void RegularFileEntry::append(std::vector<uint8_t>& buffer) const
 }
 
 //==========================================================================================================================================
-void RegularFileEntry::compressEntry(const boost::filesystem::path& root, ContentWriteBackend& backend)
+void RegularFileEntry::compressEntry(ContentWriteBackend& backend)
 {
     LOG_TRACE("Compressing file: {}", m_file.string());
-    setHashAndSize(root / m_file);
 
     auto compressor = createCompressor();
 
     m_offset = backend.getPosition();
-    m_compressedSize = compressor->compressFile(root / m_file, backend);
+    m_compressedSize = compressor->compressFile(m_root / m_file, backend);
 }
 
 //==========================================================================================================================================
@@ -133,13 +133,6 @@ std::string RegularFileEntry::toString() const
                        m_uncompressedSize,
                        m_uncompressedHash.hashString(),
                        m_compressedSize);
-}
-
-//==========================================================================================================================================
-void RegularFileEntry::setHashAndSize(const boost::filesystem::path& path)
-{
-    m_uncompressedHash = Hash(m_compressionParameters.m_hashType, path);
-    m_uncompressedSize = boost::filesystem::file_size(path);
 }
 
 //==========================================================================================================================================

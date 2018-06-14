@@ -9,14 +9,11 @@ namespace parts
 class LinkEntry : public BaseEntry
 {
 public:
-    LinkEntry(const boost::filesystem::path& file,
-              uint16_t permissions,
-              const std::string& owner,
-              uint16_t owner_id,
-              const std::string& group,
-              uint16_t group_id,
-              const boost::filesystem::path& destination,
-              bool absolute = false);
+    LinkEntry(const boost::filesystem::path& root,
+              const boost::filesystem::path& file,
+              std::vector<std::string>& owners,
+              std::vector<std::string>& groups,
+              bool save_owner);
 
     LinkEntry(InputBuffer& buffer,
               const std::vector<std::string>& owners,
@@ -26,7 +23,7 @@ public:
 
     void append(std::vector<uint8_t> &buffer) const override;
 
-    void compressEntry(const boost::filesystem::path& root, ContentWriteBackend& backend) override;
+    void compressEntry(ContentWriteBackend& backend) override;
 
     void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont) override;
 
@@ -43,13 +40,25 @@ public:
     const boost::filesystem::path& destination() const
     { return m_destination; }
 
-    bool absolute() const
-    { return m_absolute; }
+protected:
+    // Constructor for only unit tests
+    LinkEntry(const boost::filesystem::path& root,
+              const boost::filesystem::path& file,
+              uint16_t permissions,
+              const std::string& owner,
+              uint16_t owner_id,
+              const std::string& group,
+              uint16_t group_id,
+              const boost::filesystem::path& destination,
+              bool absolute) :
+        BaseEntry(root, file, permissions, owner, owner_id, group, group_id),
+        m_destination(destination)
+    {}
+
+    static bool fileInsideRoot(const boost::filesystem::path& root, const boost::filesystem::path& file);
 
 protected:
     boost::filesystem::path m_destination;
-    /// TODO: should remove this...
-    bool m_absolute;
 };
 
 }

@@ -51,7 +51,7 @@ struct LzmaLevelReader
 
 //==========================================================================================================================================
 int main(int argc, char** argv) {
-    ConsoleLogger logger(LOG_LEVELS::TRACE);
+    ConsoleLogger logger(LOG_LEVELS::INFO);
     set_logger(&logger);
 
     args::ArgumentParser parser("This program compresses a directory or a file into '.parts' format.");

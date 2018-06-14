@@ -25,10 +25,8 @@ public:
 //==========================================================================================================================================
 class TestRegularFileEntry : public RegularFileEntry {
 public:
-    TestRegularFileEntry() : RegularFileEntry("file1", 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1, PartsCompressionParameters())
-    {}
-
-    void setHashAndSize(const boost::filesystem::path&) {
+    TestRegularFileEntry() : RegularFileEntry("nowhere", "file1", 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1, PartsCompressionParameters())
+    {
         m_uncompressedHash = Hash(HashType::SHA256, {0,1,2,3});
         m_uncompressedSize = 4;
     }
@@ -47,7 +45,7 @@ BOOST_FIXTURE_TEST_CASE(compress_fills_missing_entries_and_after_it_is_packed_co
     Mock<ContentWriteBackend> backend_mock;
     When(Method(backend_mock, getPosition)).Return(100);
 
-    compressEntry(boost::filesystem::path("nowhere"), backend_mock.get());
+    compressEntry(backend_mock.get());
 
     Verify(Method(backend_mock, getPosition)).Once();
 
@@ -153,3 +151,137 @@ BOOST_AUTO_TEST_CASE(regular_file_entry_can_be_created_from_input_stream) {
     BOOST_CHECK_EQUAL(entry.compressedSize(), 42u);
     BOOST_CHECK_EQUAL(entry.offset(), 256u);
 }
+
+
+//==========================================================================================================================================
+BOOST_FIXTURE_TEST_CASE(names_in_tables_are_find_correctly, TestRegularFileEntry) {
+    std::vector<std::string> owners;
+
+    BOOST_REQUIRE_EQUAL(findOrInsert("aaa", owners), 0);
+    BOOST_REQUIRE_EQUAL(findOrInsert("aaa", owners), 0);
+    BOOST_REQUIRE_EQUAL(findOrInsert("bbb", owners), 1);
+}
+
+//==========================================================================================================================================
+BOOST_FIXTURE_TEST_CASE(owner_will_be_default_if_owner_saving_is_disabled, TestRegularFileEntry) {
+    std::vector<std::string> owners;
+    owners.push_back("default");
+
+    struct stat nothing;
+    BOOST_REQUIRE_EQUAL(getOwnerId(&nothing, owners, false), 0);
+}
+
+
+//==========================================================================================================================================
+BOOST_FIXTURE_TEST_CASE(group_will_be_default_if_owner_saving_is_disabled, TestRegularFileEntry) {
+    std::vector<std::string> owners;
+    owners.push_back("default");
+
+    struct stat nothing;
+    BOOST_REQUIRE_EQUAL(getGroupId(&nothing, owners, false), 0);
+}
+
+
+//==========================================================================================================================================
+BOOST_FIXTURE_TEST_CASE(permessions_are_saved_correctly, TestRegularFileEntry) {
+    struct stat file_stat;
+
+    // If this test fails than your OP represents different ways the permissions. So we won't work there...
+    file_stat.st_mode = 040755; //drwxr-xr-x
+    uint16_t perms = getPermissions(&file_stat);
+    BOOST_CHECK((perms & S_ISUID) == 0);
+    BOOST_CHECK((perms & S_ISGID) == 0);
+    BOOST_CHECK(perms & S_IRUSR);
+    BOOST_CHECK(perms & S_IWUSR);
+    BOOST_CHECK(perms & S_IXUSR);
+
+    BOOST_CHECK(perms & S_IRGRP);
+    BOOST_CHECK((perms & S_IWGRP) == 0);
+    BOOST_CHECK(perms & S_IXGRP);
+
+    BOOST_CHECK(perms & S_IROTH);
+    BOOST_CHECK((perms & S_IWOTH) == 0);
+    BOOST_CHECK(perms & S_IXOTH);
+
+    file_stat.st_mode = 0100644; //-rw-r--r--
+    perms = getPermissions(&file_stat);
+    BOOST_CHECK((perms & S_ISUID) == 0);
+    BOOST_CHECK((perms & S_ISGID) == 0);
+    BOOST_CHECK(perms & S_IRUSR);
+    BOOST_CHECK(perms & S_IWUSR);
+    BOOST_CHECK((perms & S_IXUSR) == 0);
+
+    BOOST_CHECK(perms & S_IRGRP);
+    BOOST_CHECK((perms & S_IWGRP) == 0);
+    BOOST_CHECK((perms & S_IXGRP) == 0);
+
+    BOOST_CHECK(perms & S_IROTH);
+    BOOST_CHECK((perms & S_IWOTH) == 0);
+    BOOST_CHECK((perms & S_IXOTH) == 0);
+
+    file_stat.st_mode = 0100755;//-rwxr-xr-x
+    perms = getPermissions(&file_stat);
+    BOOST_CHECK((perms & S_ISUID) == 0);
+    BOOST_CHECK((perms & S_ISGID) == 0);
+    BOOST_CHECK(perms & S_IRUSR);
+    BOOST_CHECK(perms & S_IWUSR);
+    BOOST_CHECK(perms & S_IXUSR);
+
+    BOOST_CHECK(perms & S_IRGRP);
+    BOOST_CHECK((perms & S_IWGRP) == 0);
+    BOOST_CHECK(perms & S_IXGRP);
+
+    BOOST_CHECK(perms & S_IROTH);
+    BOOST_CHECK((perms & S_IWOTH) == 0);
+    BOOST_CHECK(perms & S_IXOTH);
+
+    file_stat.st_mode = 0104755; //-rwxr-xr-x with SUID
+    perms = getPermissions(&file_stat);
+    BOOST_CHECK(perms & S_ISUID);
+    BOOST_CHECK((perms & S_ISGID) == 0);
+    BOOST_CHECK(perms & S_IRUSR);
+    BOOST_CHECK(perms & S_IWUSR);
+    BOOST_CHECK(perms & S_IXUSR);
+
+    BOOST_CHECK(perms & S_IRGRP);
+    BOOST_CHECK((perms & S_IWGRP) == 0);
+    BOOST_CHECK(perms & S_IXGRP);
+
+    BOOST_CHECK(perms & S_IROTH);
+    BOOST_CHECK((perms & S_IWOTH) == 0);
+    BOOST_CHECK(perms & S_IXOTH);
+
+    file_stat.st_mode = 0102755; //-rwxr-xr-x with GUID
+    perms = getPermissions(&file_stat);
+    BOOST_CHECK((perms & S_ISUID) == 0);
+    BOOST_CHECK(perms & S_ISGID);
+    BOOST_CHECK(perms & S_IRUSR);
+    BOOST_CHECK(perms & S_IWUSR);
+    BOOST_CHECK(perms & S_IXUSR);
+
+    BOOST_CHECK(perms & S_IRGRP);
+    BOOST_CHECK((perms & S_IWGRP) == 0);
+    BOOST_CHECK(perms & S_IXGRP);
+
+    BOOST_CHECK(perms & S_IROTH);
+    BOOST_CHECK((perms & S_IWOTH) == 0);
+    BOOST_CHECK(perms & S_IXOTH);
+
+    file_stat.st_mode = 0120777; //softlink
+    perms = getPermissions(&file_stat);
+    BOOST_CHECK((perms & S_ISUID) == 0);
+    BOOST_CHECK((perms & S_ISGID) == 0);
+    BOOST_CHECK(perms & S_IRUSR);
+    BOOST_CHECK(perms & S_IWUSR);
+    BOOST_CHECK(perms & S_IXUSR);
+
+    BOOST_CHECK(perms & S_IRGRP);
+    BOOST_CHECK(perms & S_IWGRP);
+    BOOST_CHECK(perms & S_IXGRP);
+
+    BOOST_CHECK(perms & S_IROTH);
+    BOOST_CHECK(perms & S_IWOTH);
+    BOOST_CHECK(perms & S_IXOTH);
+}
+
+

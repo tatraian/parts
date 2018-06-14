@@ -9,11 +9,6 @@
 
 #include <boost/filesystem.hpp>
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <pwd.h>
-#include <grp.h>
-
 #include <chrono>
 
 using namespace parts;
@@ -137,102 +132,21 @@ void TableOfContents::add(const boost::filesystem::path& root, const boost::file
 {
     boost::filesystem::path filename = file.lexically_relative(root);
 
-    // getting stat
-    struct stat file_stat;
-    lstat(file.c_str(), &file_stat);
-
-    uint16_t permissions = getPermissions(&file_stat);
-    uint16_t owner_id    = getOwnerId(&file_stat);
-    uint16_t group_id    = getGroupId(&file_stat);
-
     std::shared_ptr<BaseEntry> entry;
     // must check this first, because depending of the target of the link is_regular_file and is_directory are also true...
     if (boost::filesystem::is_symlink(file)) {
-        boost::filesystem::path target = boost::filesystem::read_symlink(file);
-
-        entry.reset(new LinkEntry(filename,
-                                  permissions,
-                                  m_owners[owner_id],
-                                  owner_id,
-                                  m_groups[group_id],
-                                  group_id,
-                                  // order is important otherwise fileInsideRoot will die with relative paths
-                                  target.is_absolute() && fileInsideRoot(root, target) ? target.lexically_relative(root) : target,
-                                  target.is_absolute()));
+        entry.reset(new LinkEntry(root, filename, m_owners, m_groups, m_parameters.m_saveOwners));
     } else if (boost::filesystem::is_directory(file)) {
-        entry.reset(new DirectoryEntry(filename,
-                                       permissions,
-                                       m_owners[owner_id],
-                                       owner_id,
-                                       m_groups[group_id],
-                                       group_id));
+        entry.reset(new DirectoryEntry(root, filename, m_owners, m_groups, m_parameters.m_saveOwners));
     } else if (boost::filesystem::is_regular_file(file)) {
-        entry.reset(new RegularFileEntry(filename,
-                                         permissions,
-                                         m_owners[owner_id],
-                                         owner_id,
-                                         m_groups[group_id],
-                                         group_id,
-                                         m_parameters));
+        entry.reset(new RegularFileEntry(root, filename, m_owners, m_groups, m_parameters.m_saveOwners, m_parameters));
     } else {
-        // TODO log here!
+        LOG_WARNING("Unknown file type: {}", file.string());
         return;
     }
     LOG_DEBUG("Adding TOC entry: {}", entry->toString());
 
     m_files[entry->file()] = entry;
-}
-
-//==========================================================================================================================================
-uint16_t TableOfContents::getOwnerId(const struct stat *file_stat)
-{
-    // if owner is not saved, we return with the default user
-    if (!m_parameters.m_saveOwners)
-        return 0;
-
-    struct passwd* pw = getpwuid(file_stat->st_uid);
-    std::string owner(pw->pw_name);
-    return findOrInsert(owner, m_owners);
-}
-
-//==========================================================================================================================================
-uint16_t TableOfContents::getGroupId(const struct stat *file_stat)
-{
-    // if owner is not saved, we return with the default user
-    if (!m_parameters.m_saveOwners)
-        return 0;
-
-    struct group*  gr = getgrgid(file_stat->st_gid);
-    std::string group(gr->gr_name);
-    return findOrInsert(group, m_groups);
-}
-
-//==========================================================================================================================================
-uint16_t TableOfContents::getPermissions(const struct stat *file_stat)
-{
-    return static_cast<uint16_t>(file_stat->st_mode & (S_IRWXU|S_IRWXO|S_IRWXG|S_ISUID|S_ISGID));
-}
-
-//==========================================================================================================================================
-uint16_t TableOfContents::findOrInsert(const std::string& name, std::vector<std::string>& table)
-{
-    auto it = std::find(table.begin(), table.end(), name);
-    if (it == table.end())
-    {
-        table.push_back(name);
-        return table.size() - 1;
-    }
-
-    return it - table.begin();
-}
-
-//==========================================================================================================================================
-bool TableOfContents::fileInsideRoot(const boost::filesystem::path& root, const boost::filesystem::path& file)
-{
-    auto real_root = boost::filesystem::canonical(root);
-    auto real_file = boost::filesystem::canonical(file);
-
-    return real_file.string().find(real_root.string()) == 0;
 }
 
 //==========================================================================================================================================

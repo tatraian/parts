@@ -12,13 +12,12 @@
 using namespace parts;
 
 //==========================================================================================================================================
-DirectoryEntry::DirectoryEntry(const boost::filesystem::path& file,
-                               uint16_t permissions,
-                               const std::string& owner,
-                               uint16_t owner_id,
-                               const std::string& group,
-                               uint16_t group_id) :
-    BaseEntry(file, permissions, owner, owner_id, group, group_id)
+DirectoryEntry::DirectoryEntry(const boost::filesystem::path& root,
+                               const boost::filesystem::path& file,
+                               std::vector<std::string>& owners,
+                               std::vector<std::string>& groups,
+                               bool save_owner) :
+    BaseEntry(root, file, owners, groups, save_owner)
 {
 }
 
@@ -39,7 +38,7 @@ void DirectoryEntry::append(std::vector<uint8_t>& buffer) const
 }
 
 //==========================================================================================================================================
-void DirectoryEntry::compressEntry(const boost::filesystem::path& root, ContentWriteBackend& backend)
+void DirectoryEntry::compressEntry(ContentWriteBackend& backend)
 {
     // Do nothing
     LOG_TRACE("Compressing dir:  {}", m_file.string());

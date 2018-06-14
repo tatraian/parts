@@ -13,33 +13,22 @@ using namespace parts;
 
 
 //==========================================================================================================================================
-LinkEntry::LinkEntry(const boost::filesystem::path& file,
-                     uint16_t permissions,
-                     const std::string& owner,
-                     uint16_t owner_id,
-                     const std::string& group,
-                     uint16_t group_id,
-                     const boost::filesystem::path& destination,
-                     bool absolute) :
-    BaseEntry(file,
-              permissions,
-              owner,
-              owner_id,
-              group,
-              group_id),
-    m_destination(destination),
-    m_absolute(absolute)
+LinkEntry::LinkEntry(const boost::filesystem::path& root,
+                     const boost::filesystem::path& file,
+                     std::vector<std::string>& owners,
+                     std::vector<std::string>& groups,
+                     bool save_owner) :
+    BaseEntry(root, file, owners, groups, save_owner)
 {
+    boost::filesystem::path target = boost::filesystem::read_symlink(root/file);
+
+    m_destination =target;
 }
 
 //==========================================================================================================================================
 LinkEntry::LinkEntry(InputBuffer& buffer, const std::vector<std::string>& owners, const std::vector<std::string>& groups) :
     BaseEntry(buffer, owners, groups)
 {
-    uint8_t tmp = 0;
-    Packager::pop_front(buffer, tmp);
-    m_absolute = tmp;
-
     Packager::pop_front(buffer, m_destination);
 }
 
@@ -48,12 +37,11 @@ void LinkEntry::append(std::vector<uint8_t>& buffer) const
 {
     buffer.push_back(static_cast<uint8_t>(EntryTypes::Link));
     BaseEntry::append(buffer);
-    Packager::append(buffer, static_cast<uint8_t>(m_absolute));
     Packager::append(buffer, m_destination);
 }
 
 //==========================================================================================================================================
-void LinkEntry::compressEntry(const boost::filesystem::path& root, ContentWriteBackend& backend)
+void LinkEntry::compressEntry(ContentWriteBackend& backend)
 {
     // This function is empty, since there is no file to be compressed
     LOG_TRACE("Compressing link: {}", m_file.string());
@@ -105,3 +93,13 @@ std::string LinkEntry::toString() const
 {
     return fmt::format("{} --- type: link, target: {}", BaseEntry::toString(), m_destination.string());
 }
+
+//==========================================================================================================================================
+bool LinkEntry::fileInsideRoot(const boost::filesystem::path& root, const boost::filesystem::path& file)
+{
+    auto real_root = boost::filesystem::canonical(root);
+    auto real_file = boost::filesystem::canonical(file);
+
+    return real_file.string().find(real_root.string()) == 0;
+}
+

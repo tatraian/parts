@@ -12,12 +12,11 @@ namespace parts
 class RegularFileEntry : public BaseEntry
 {
 public:
-    RegularFileEntry(const boost::filesystem::path& file,
-                     uint16_t permissions,
-                     const std::string& owner,
-                     uint16_t owner_id,
-                     const std::string& group,
-                     uint16_t group_id,
+    RegularFileEntry(const boost::filesystem::path& root,
+                     const boost::filesystem::path& file,
+                     std::vector<std::string>& owners,
+                     std::vector<std::string>& groups,
+                     bool save_owner,
                      PartsCompressionParameters compression_parameters);
 
     RegularFileEntry(InputBuffer& buffer,
@@ -29,7 +28,7 @@ public:
 
     void append(std::vector<uint8_t>& buffer) const override;
 
-    void compressEntry(const boost::filesystem::path& root, ContentWriteBackend& backend) override;
+    void compressEntry(ContentWriteBackend& backend) override;
 
     void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont) override;
 
@@ -69,8 +68,22 @@ public:
 
 protected:
     // help fake unit test
-    virtual void setHashAndSize(const boost::filesystem::path& path);
-    // help fake unit test
+    RegularFileEntry(const boost::filesystem::path& root,
+                     const boost::filesystem::path& file,
+                     uint16_t permissions,
+                     const std::string& owner,
+                     uint16_t owner_id,
+                     const std::string& group,
+                     uint16_t group_id,
+                     PartsCompressionParameters compression_parameters) :
+        BaseEntry(root, file, permissions, owner, owner_id, group, group_id),
+        m_compressionType(compression_parameters.m_fileCompression),
+        m_uncompressedSize(0),
+        m_compressedSize(0),
+        m_offset(0),
+        m_compressionParameters(compression_parameters)
+    {}
+
     virtual std::unique_ptr<Compressor> createCompressor();
 
     bool checkHashMatch(const boost::filesystem::path& path);
