@@ -86,7 +86,8 @@ void PartsArchive::updateArchive(const boost::filesystem::path& original_source,
                                  const boost::filesystem::path& dest,
                                  bool cont)
 {
-    PartsUpdateJob job(m_header.getHashType(),
+    std::unique_ptr<TableOfContents> old_toc(new TableOfContents(original_source, PartsCompressionParameters(m_header.getHashType())));
+    PartsUpdateJob job(std::move(old_toc),
                        m_toc,
                        original_source,
                        dest,
@@ -103,7 +104,8 @@ std::unique_ptr<PartsJobInterface> PartsArchive::updateJob(const boost::filesyst
                                                            const boost::filesystem::path& dest,
                                                            bool cont)
 {
-    return std::make_unique<PartsUpdateJob>(m_header.getHashType(),
+    std::unique_ptr<TableOfContents> old_toc(new TableOfContents(original_source, PartsCompressionParameters(m_header.getHashType())));
+    return std::make_unique<PartsUpdateJob>(std::move(old_toc),
                                             m_toc,
                                             original_source,
                                             dest,

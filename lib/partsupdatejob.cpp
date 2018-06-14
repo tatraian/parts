@@ -3,13 +3,13 @@
 using namespace parts;
 
 //==========================================================================================================================================
-PartsUpdateJob::PartsUpdateJob(HashType hash_type,
+PartsUpdateJob::PartsUpdateJob(std::unique_ptr<TableOfContents>&& old_toc,
                                TableOfContents& new_toc,
                                const boost::filesystem::path& orig_source,
                                const boost::filesystem::path& dest,
                                ContentReadBackend& content_reader,
                                bool cont) :
-    m_oldToc(orig_source, PartsCompressionParameters(hash_type)),
+    m_oldToc(std::move(old_toc)),
     m_toc(new_toc),
     m_actualElement(m_toc.begin()),
     m_oldRootDir(orig_source.parent_path()),
@@ -22,8 +22,8 @@ PartsUpdateJob::PartsUpdateJob(HashType hash_type,
 
     m_rootname = m_toc.begin()->first.string();
 
-    if (m_oldToc.size() != 0)
-        m_oldRootName = m_oldToc.begin()->first.string();
+    if (m_oldToc->size() != 0)
+        m_oldRootName = m_oldToc->begin()->first.string();
 }
 
 //==========================================================================================================================================
@@ -33,7 +33,7 @@ void PartsUpdateJob::doNext()
     std::string path_string = m_actualElement->first.string();
     p = path_string.replace(path_string.find(m_rootname), m_rootname.size(), m_oldRootName);
 
-    auto old_entry = m_oldToc.find(p);
+    auto old_entry = m_oldToc->find(p);
 
     m_actualElement->second->updateEntry(old_entry.get(),
                                          m_oldRootDir,
