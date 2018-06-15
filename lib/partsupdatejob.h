@@ -11,7 +11,7 @@ namespace parts
 class PartsUpdateJob : public PartsJobInterface
 {
 public:
-    PartsUpdateJob(std::unique_ptr<TableOfContents>&& old_toc,
+    PartsUpdateJob(HashType hash_type,
                    TableOfContents& new_toc,
                    const boost::filesystem::path& orig_source,
                    const boost::filesystem::path& dest,
@@ -32,7 +32,7 @@ protected:
     std::string m_oldRootName;
     std::string m_rootname;
 
-    std::unique_ptr<TableOfContents> m_oldToc;
+    TableOfContents m_oldToc;
     TableOfContents& m_toc;
 
     TableOfContents::iterator m_actualElement;
