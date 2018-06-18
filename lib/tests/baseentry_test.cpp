@@ -16,18 +16,18 @@ public:
                   uint16_t owner_id,
                   const std::string& group,
                   uint16_t group_id) :
-        BaseEntry(file, permissions, owner, owner_id, group, group_id) {}
+        BaseEntry("nowhere", file, permissions, owner, owner_id, group, group_id) {}
 
     TestBaseEntry(InputBuffer& buffer, const std::vector<std::string>& owners, const std::vector<std::string>& groups) :
         BaseEntry(buffer, owners, groups) {}
 
-    void compressEntry(const boost::filesystem::path& root, ContentWriteBackend& backend) override {}
-    void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend) override {}
+    void compressEntry(ContentWriteBackend& backend) override {}
+    void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont) override {}
     void updateEntry(const BaseEntry* old_entry,
                      const boost::filesystem::path& old_root,
                      const boost::filesystem::path& dest_root,
                      ContentReadBackend& backend,
-                     bool checkExisting) override {}
+                     bool cont) override {}
 
     std::string listEntry(size_t user_width, size_t size_width, std::tm* t) const override { return ""; }
 };

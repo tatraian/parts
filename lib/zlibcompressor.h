@@ -6,11 +6,11 @@
 namespace parts
 {
 
-class ZlibCompressor : public Compressor
+class ZLibCompressor : public Compressor
 {
 public:
-    ZlibCompressor() = default;
-    ~ZlibCompressor() override = default;
+    ZLibCompressor() = default;
+    ~ZLibCompressor() override = default;
 
     virtual size_t compressFile(const boost::filesystem::path& path, ContentWriteBackend& backend) override;
 

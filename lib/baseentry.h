@@ -10,25 +10,19 @@
 
 #include <boost/filesystem/path.hpp>
 
+#include <sys/stat.h>
+
 namespace parts
 {
 
 class BaseEntry
 {
 public:
-    BaseEntry(const boost::filesystem::path& file,
-              uint16_t permissions,
-              const std::string& owner,
-              uint16_t owner_id,
-              const std::string& group,
-              uint16_t group_id) :
-        m_file(file),
-        m_permissions(permissions),
-        m_owner(owner),
-        m_ownerId(owner_id),
-        m_group(group),
-        m_groupId(group_id)
-    {}
+    BaseEntry(const boost::filesystem::path& root,
+              const boost::filesystem::path& file,
+              std::vector<std::string>& owners,
+              std::vector<std::string>& groups,
+              bool save_owner);
 
     BaseEntry(InputBuffer& buffer,
               const std::vector<std::string>& owners,
@@ -38,16 +32,15 @@ public:
 
     virtual void append(std::vector<uint8_t>& buffer) const;
 
-    virtual void compressEntry(const boost::filesystem::path& root, ContentWriteBackend& backend) = 0;
+    virtual void compressEntry(ContentWriteBackend& backend) = 0;
 
-    virtual void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend) = 0;
+    virtual void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont) = 0;
 
-    /** checkExisting can be used to continue a previous extract, e.g. check if the target already exists */
     virtual void updateEntry(const BaseEntry* old_entry,
                              const boost::filesystem::path& old_root,
                              const boost::filesystem::path& dest_root,
                              ContentReadBackend& backend,
-                             bool checkExisting) = 0;
+                             bool cont) = 0;
 
     virtual std::string listEntry(size_t user_width, size_t size_width, std::tm* t) const = 0;
 
@@ -75,11 +68,36 @@ public:
     virtual std::string toString() const;
 
 protected:
+    // Constructor for unit tests only
+    BaseEntry(const boost::filesystem::path& root,
+              const boost::filesystem::path& file,
+              uint16_t permissions,
+              const std::string& owner,
+              uint16_t owner_id,
+              const std::string& group,
+              uint16_t group_id) :
+        m_root(root),
+        m_file(file),
+        m_permissions(permissions),
+        m_owner(owner),
+        m_ownerId(owner_id),
+        m_group(group),
+        m_groupId(group_id)
+    {}
+
     void setMetadata(const boost::filesystem::path& dest_root);
 
     std::string permissionsToString() const;
 
+    uint16_t getOwnerId(const struct stat* file_stat, std::vector<std::string>& owners, bool save);
+    uint16_t getGroupId(const struct stat* file_stat, std::vector<std::string>& groups, bool save);
+    uint16_t getPermissions(const struct stat* file_stat);
+
+    uint16_t findOrInsert(const std::string& name, std::vector<std::string>& table);
+
 protected:
+    boost::filesystem::path m_root;
+
     boost::filesystem::path m_file;
     uint16_t m_permissions;
     std::string m_owner;

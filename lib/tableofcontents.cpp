@@ -9,11 +9,6 @@
 
 #include <boost/filesystem.hpp>
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <pwd.h>
-#include <grp.h>
-
 #include <chrono>
 
 using namespace parts;
@@ -30,12 +25,6 @@ TableOfContents::TableOfContents(const boost::filesystem::path& source, const Pa
     LOG_TRACE("Source: {}", source.string());
     m_owners.push_back(DEFAULT_OWNER);
     m_groups.push_back(DEFAULT_GROUP);
-
-    if (source.string().empty())
-    {
-        LOG_INFO ("Empty source directory provided, skip scanning directory.");
-        return;
-    }
 
     if (!boost::filesystem::exists(source))
         throw PartsException("Source doesn't exist: " + source.string());
@@ -59,7 +48,7 @@ TableOfContents::TableOfContents(const boost::filesystem::path& source, const Pa
 }
 
 //==========================================================================================================================================
-TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, size_t decompressed_toc_size, const PartsCompressionParameters& parameters) :
+TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, const PartsCompressionParameters& parameters) :
     m_parameters(parameters),
     m_maxSize(0),
     m_maxOwnerWidth(0)
@@ -69,7 +58,7 @@ TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, s
 
     LOG_DEBUG("Decompressing TOC");
     auto decompressor = DecompressorFactory::createDecompressor(m_parameters.m_tocCompression);
-    InputBuffer uncompressed_toc = decompressor->extractBuffer(compressed_toc, decompressed_toc_size);
+    InputBuffer uncompressed_toc = decompressor->extractBuffer(compressed_toc);
 
     unpackNames(uncompressed_toc, m_owners);
     unpackNames(uncompressed_toc, m_groups);
@@ -82,7 +71,7 @@ TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, s
         std::shared_ptr<BaseEntry> entry;
         switch (type) {
         case EntryTypes::RegularFile:
-            entry.reset(new RegularFileEntry(uncompressed_toc, m_owners, m_groups, m_parameters));
+            entry.reset(new RegularFileEntry(uncompressed_toc, m_owners, m_groups, m_parameters.m_hashType));
             m_maxSize = std::max(m_maxSize, std::dynamic_pointer_cast<RegularFileEntry>(entry)->uncompressedSize());
             break;
         case EntryTypes::Directory:
@@ -98,7 +87,7 @@ TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, s
         m_maxOwnerWidth = std::max(m_maxOwnerWidth, entry->owner().size() + entry->group().size() + 1);
 
         LOG_DEBUG("TOC entry: {}", entry->toString());
-        m_files.push_back(std::make_pair(entry->file(), entry));
+        m_files[entry->file()] = entry;
     }
 }
 
@@ -131,9 +120,7 @@ void TableOfContents::shiftOffsets(uint64_t& data_start)
 //==========================================================================================================================================
 std::shared_ptr<BaseEntry> TableOfContents::find(const boost::filesystem::path& file)
 {
-    auto it = std::find_if( m_files.begin(), m_files.end(),
-        [&file](const std::pair<boost::filesystem::path, std::shared_ptr<parts::BaseEntry> >& element) { return element.first == file;} );
-
+    auto it = m_files.find(file);
     if (it == m_files.end())
         return std::shared_ptr<BaseEntry>();
 
@@ -145,107 +132,21 @@ void TableOfContents::add(const boost::filesystem::path& root, const boost::file
 {
     boost::filesystem::path filename = file.lexically_relative(root);
 
-    // getting stat
-    struct stat file_stat;
-    lstat(file.c_str(), &file_stat);
-
-    uint16_t permissions = getPermissions(&file_stat);
-    uint16_t owner_id    = getOwnerId(&file_stat);
-    uint16_t group_id    = getGroupId(&file_stat);
-
     std::shared_ptr<BaseEntry> entry;
     // must check this first, because depending of the target of the link is_regular_file and is_directory are also true...
     if (boost::filesystem::is_symlink(file)) {
-        boost::filesystem::path target = boost::filesystem::read_symlink(file);
-
-        entry.reset(new LinkEntry(filename,
-                                  permissions,
-                                  m_owners[owner_id],
-                                  owner_id,
-                                  m_groups[group_id],
-                                  group_id,
-                                  // order is important otherwise fileInsideRoot will die with relative paths
-                                  target.is_absolute() && fileInsideRoot(root, target) ? target.lexically_relative(root) : target,
-                                  target.is_absolute()));
+        entry.reset(new LinkEntry(root, filename, m_owners, m_groups, m_parameters.m_saveOwners));
     } else if (boost::filesystem::is_directory(file)) {
-        entry.reset(new DirectoryEntry(filename,
-                                       permissions,
-                                       m_owners[owner_id],
-                                       owner_id,
-                                       m_groups[group_id],
-                                       group_id));
+        entry.reset(new DirectoryEntry(root, filename, m_owners, m_groups, m_parameters.m_saveOwners));
     } else if (boost::filesystem::is_regular_file(file)) {
-        entry.reset(new RegularFileEntry(filename,
-                                         file,
-                                         permissions,
-                                         m_owners[owner_id],
-                                         owner_id,
-                                         m_groups[group_id],
-                                         group_id,
-                                         m_parameters.m_fileCompression,
-                                         m_parameters,
-                                         0,
-                                         boost::filesystem::file_size(file),
-                                         0));
+        entry.reset(new RegularFileEntry(root, filename, m_owners, m_groups, m_parameters.m_saveOwners, m_parameters));
     } else {
-        // TODO log here!
+        LOG_WARNING("Unknown file type: {}", file.string());
         return;
     }
     LOG_DEBUG("Adding TOC entry: {}", entry->toString());
 
-    m_files.push_back(std::make_pair(entry->file(), entry));
-}
-
-//==========================================================================================================================================
-uint16_t TableOfContents::getOwnerId(const struct stat *file_stat)
-{
-    // if owner is not saved, we return with the default user
-    if (!m_parameters.m_saveOwners)
-        return 0;
-
-    struct passwd* pw = getpwuid(file_stat->st_uid);
-    std::string owner(pw->pw_name);
-    return findOrInsert(owner, m_owners);
-}
-
-//==========================================================================================================================================
-uint16_t TableOfContents::getGroupId(const struct stat *file_stat)
-{
-    // if owner is not saved, we return with the default user
-    if (!m_parameters.m_saveOwners)
-        return 0;
-
-    struct group*  gr = getgrgid(file_stat->st_gid);
-    std::string group(gr->gr_name);
-    return findOrInsert(group, m_groups);
-}
-
-//==========================================================================================================================================
-uint16_t TableOfContents::getPermissions(const struct stat *file_stat)
-{
-    return static_cast<uint16_t>(file_stat->st_mode & (S_IRWXU|S_IRWXO|S_IRWXG|S_ISUID|S_ISGID));
-}
-
-//==========================================================================================================================================
-uint16_t TableOfContents::findOrInsert(const std::string& name, std::vector<std::string>& table)
-{
-    auto it = std::find(table.begin(), table.end(), name);
-    if (it == table.end())
-    {
-        table.push_back(name);
-        return table.size() - 1;
-    }
-
-    return it - table.begin();
-}
-
-//==========================================================================================================================================
-bool TableOfContents::fileInsideRoot(const boost::filesystem::path& root, const boost::filesystem::path& file)
-{
-    auto real_root = boost::filesystem::canonical(root);
-    auto real_file = boost::filesystem::canonical(file);
-
-    return real_file.string().find(real_root.string()) == 0;
+    m_files[entry->file()] = entry;
 }
 
 //==========================================================================================================================================

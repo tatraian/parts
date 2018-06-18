@@ -12,11 +12,11 @@ class PartsUpdateJob : public PartsJobInterface
 {
 public:
     PartsUpdateJob(HashType hash_type,
-                   CompressionType compression_type,
                    TableOfContents& new_toc,
                    const boost::filesystem::path& orig_source,
                    const boost::filesystem::path& dest,
-                   ContentReadBackend& content_reader);
+                   ContentReadBackend& content_reader,
+                   bool cont);
 
     ~PartsUpdateJob() = default;
 
@@ -26,11 +26,9 @@ public:
     const BaseEntry* nextEntry() const override
     { return m_actualElement->second.get(); }
 
-    std::string doNext(bool checkExisting) override;
+    void doNext() override;
 
 protected:
-    CompressionType m_compressionType;
-
     std::string m_oldRootName;
     std::string m_rootname;
 
@@ -41,6 +39,7 @@ protected:
     boost::filesystem::path m_oldRootDir;
     boost::filesystem::path m_dest;
     ContentReadBackend& m_contentReader;
+    bool m_continue;
 };
 
 }

@@ -3,12 +3,18 @@
 #include <fstream>
 
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/hex.hpp>
 
 #include <digestpp/algorithm/md5.hpp>
 #include <digestpp/algorithm/sha2.hpp>
 #include <digestpp/hasher.hpp>
 
 using namespace parts;
+
+//==========================================================================================================================================
+Hash::Hash() :
+    m_type(HashType::MD5)
+{}
 
 //==========================================================================================================================================
 Hash::Hash(HashType type, const boost::filesystem::path& path) :

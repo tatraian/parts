@@ -9,7 +9,7 @@
 using namespace parts;
 
 //==========================================================================================================================================
-InputBuffer PlainDecompressor::extractBuffer(const std::vector<uint8_t>& buffer, size_t decompressed_size)
+InputBuffer PlainDecompressor::extractBuffer(const std::vector<uint8_t>& buffer)
 {
     InputBuffer result;
     result.insert(result.begin(), buffer.begin(), buffer.end());
@@ -20,8 +20,7 @@ InputBuffer PlainDecompressor::extractBuffer(const std::vector<uint8_t>& buffer,
 void PlainDecompressor::extractFile(const boost::filesystem::path& file,
                                     ContentReadBackend& backend,
                                     size_t position,
-                                    size_t compressed_size,
-                                    size_t decompressed_size)
+                                    size_t compressed_size)
 {
     std::ofstream output(file.string(), std::ios::binary | std::ios::ate);
     if (!output) {

@@ -19,6 +19,17 @@ enum class HashType {
     SHA256 = 1,
 };
 
+inline constexpr const char* to_string(CompressionType type) {
+    switch (type) {
+    case CompressionType::None:
+        return "Plain";
+    case CompressionType::LZMA:
+        return "LZMA";
+    case CompressionType::ZLIB:
+        return "ZLIB";
+    }
+}
+
 class PartsException : public std::runtime_error {
 public:
     PartsException(const std::string& msg) : std::runtime_error(msg) {}
@@ -47,29 +58,22 @@ struct LzmaCompressorParameters
     //uint32_t m_threads;
 };
 
-
 struct PartsCompressionParameters
 {
     PartsCompressionParameters(HashType hash_type = HashType::SHA256,
                                CompressionType toc_compression = CompressionType::LZMA,
                                CompressionType file_compression = CompressionType::LZMA,
-                               bool save_owners = false,
-                               bool compare_hash = false) :
+                               bool save_owners = false) :
         m_hashType(hash_type),
         m_tocCompression(toc_compression),
         m_fileCompression(file_compression),
-        m_saveOwners(save_owners),
-        m_compareHash(compare_hash)
+        m_saveOwners(save_owners)
     {}
 
     HashType m_hashType;
     CompressionType m_tocCompression;
     CompressionType m_fileCompression;
     bool m_saveOwners;
-    /**
-     * In case set to true, after file extraction the generated hash is checked against the stored one
-     */
-    bool m_compareHash;
 
     LzmaCompressorParameters m_lzmaParameters;
 };

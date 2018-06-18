@@ -32,8 +32,6 @@ void extractInternal(z_stream& context,
         throw PartsException("Zlib decompression setup error");
     }
 
-    SimpleGuard< std::function<void()> > guard([&](){inflateEnd(&context);});
-
     int action = Z_NO_FLUSH;
 
     for(;;){
@@ -70,15 +68,10 @@ void extractInternal(z_stream& context,
 }
 
 //==========================================================================================================================================
-parts::InputBuffer ZlibDecompressor::extractBuffer(const std::vector<uint8_t>& buffer, size_t decompressed_size)
+parts::InputBuffer ZLibDecompressor::extractBuffer(const std::vector<uint8_t>& buffer)
 {
     z_stream context;
-
-    if (buffer.empty() || decompressed_size == 0)
-    {
-        InputBuffer result;
-        return result;
-    }
+    SimpleGuard< std::function<void()> > guard([&](){inflateEnd(&context);});
 
     size_t start = 0;
     auto reader = [&](uint8_t* dest, size_t size) {
@@ -98,21 +91,16 @@ parts::InputBuffer ZlibDecompressor::extractBuffer(const std::vector<uint8_t>& b
 }
 
 //==========================================================================================================================================
-void ZlibDecompressor::extractFile(const boost::filesystem::path& file,
+void ZLibDecompressor::extractFile(const boost::filesystem::path& file,
                                    parts::ContentReadBackend& backend,
                                    size_t position,
-                                   size_t compressed_size,
-                                   size_t decompressed_size)
+                                   size_t compressed_size)
 {
     z_stream context;
+    SimpleGuard< std::function<void()> > guard([&](){inflateEnd(&context);});
 
     LOG_DEBUG("Seeking position: {}", position);
     backend.seek(position);
-
-    if (compressed_size == 0 || decompressed_size == 0)
-    {
-        return;
-    }
 
     size_t read_bytes = 0;
     auto reader = [&](uint8_t* dest, size_t size) {
@@ -123,10 +111,6 @@ void ZlibDecompressor::extractFile(const boost::filesystem::path& file,
     };
 
     std::ofstream output(file.string(), std::ios::binary | std::ios::ate);
-    if (!output) {
-        throw PartsException ("Cannot create file "+file.string());
-    }
-
     auto writer = [&](uint8_t* src, size_t size) {
         output.write(reinterpret_cast<char*>(src), size);
     };

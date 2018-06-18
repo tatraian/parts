@@ -6,6 +6,8 @@
 #include <iostream>
 #include <lzma.h>
 
+#include <boost/filesystem.hpp>
+
 using namespace parts;
 
 //==========================================================================================================================================
@@ -50,7 +52,7 @@ struct LzmaLevelReader
 
 //==========================================================================================================================================
 int main(int argc, char** argv) {
-    ConsoleLogger logger(LOG_LEVELS::TRACE);
+    ConsoleLogger logger(LOG_LEVELS::INFO);
     set_logger(&logger);
 
     args::ArgumentParser parser("This program compresses a directory or a file into '.parts' format.");
@@ -59,17 +61,27 @@ int main(int argc, char** argv) {
     args::Flag lzma_extrem(parser, "lzma_extrem", "Extrem flag of LZMA compression", {"lzma_extrem"});
     args::Flag lzma_machine_code(parser, "lzma_machine_code", "Switch on LZMA machine code optimization (for X86)", {"lzma_machine_code"});
     args::ValueFlag<int, LzmaLevelReader> lzma_level(parser, "lzma_level", "Set lzma compression level (1-9)", {"lzma_level"}, 6);
+    args::Flag use_zlib(parser, "zlib", "use zlib with highest compression ratio", {"zlib"});
     args::Positional<std::string> archive_name(parser, "archive_name", "The name of the archive", args::Options::Required);
     args::Positional<std::string> compress_dir(parser, "compress_dir", "The file/dir to be compressed", args::Options::Required);
 
     try
     {
         parser.ParseCLI(argc, argv);
-        std::string compress_entry = cut_slash(compress_dir.Get());
+        boost::filesystem::path compress_path(cut_slash(compress_dir.Get()));
+        if (compress_path.is_relative()) {
+            compress_path = boost::filesystem::system_complete(compress_path);
+        }
 
         parts::PartsCompressionParameters parameters;
-        parameters.m_fileCompression = CompressionType::LZMA;
-        parameters.m_tocCompression = CompressionType::LZMA;
+        if (use_zlib) {
+            parameters.m_fileCompression = CompressionType::ZLIB;
+            parameters.m_tocCompression  = CompressionType::ZLIB;
+        } else {
+            parameters.m_fileCompression = CompressionType::LZMA;
+            parameters.m_tocCompression = CompressionType::LZMA;
+        }
+
         parameters.m_hashType = hash_type.Get();
 
         parameters.m_lzmaParameters.m_compressionLevel = lzma_level.Get();
@@ -82,7 +94,7 @@ int main(int argc, char** argv) {
         if (archive_filename.size() <= 6 /* .parts */ || archive_filename.substr(archive_filename.size() - 6) != ".parts")
             archive_filename += ".parts";
 
-        parts::PartsArchive archive(compress_entry, parameters);
+        parts::PartsArchive archive(compress_path, parameters);
 
         archive.createArchive(archive_filename);
 

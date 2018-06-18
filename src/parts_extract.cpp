@@ -37,8 +37,9 @@ int main(int argc, char** argv)
     args::ValueFlag<std::string> mc_extract_file(parser, "extract_file", "file to be extracted", {"mc_file"});
     args::ValueFlag<std::string> mc_extract_dest_file(parser, "extract_dest_file", "temp file to extract", {"mc_dest_file"});
     args::Flag list_only(parser, "list_only", "Only list archive", {'l', "list_only"});
-    args::Flag check_existing(parser, "check_existing", "Check existing files during update", {'c', "check_existing"});
-    args::Flag compare_hash(parser, "compare_hash", "Check hash after file extract", {"compare_hash"});
+    args::Flag continue_(parser, "continue", "Continue an already started extraction. The content in the destination will be checked and "
+                                             " if a file's hash differs from the archive version, then it will be reextracted",
+                         {'c', "continue"});
 
     try
     {
@@ -58,13 +59,11 @@ int main(int argc, char** argv)
 
         boost::filesystem::path old_dir;
         if (updated_from)
-             old_dir= cut_slash(cut_slash(updated_from.Get()));
+             old_dir= boost::filesystem::system_complete(cut_slash(cut_slash(updated_from.Get())));
 
-        boost::filesystem::path dest_dir = cut_slash(dest_root_dir.Get());
+        boost::filesystem::path dest_dir = boost::filesystem::system_complete(cut_slash(dest_root_dir.Get()));
 
-        PartsCompressionParameters parameters;
-        parameters.m_compareHash = compare_hash;
-        PartsArchive archive(std::move(input_stream), parameters);
+        PartsArchive archive(std::move(input_stream));
 
         if ((mc_extract_file && !mc_extract_dest_file) ||
             (!mc_extract_file && mc_extract_dest_file)){
@@ -82,9 +81,9 @@ int main(int argc, char** argv)
             // to avoid writing summary line
             return 0;
         } else if (!updated_from) {
-            archive.extractArchive(dest_dir);
+            archive.extractArchive(dest_dir, continue_);
         } else {
-            archive.updateArchive(old_dir,dest_dir,check_existing);
+            archive.updateArchive(old_dir,dest_dir, continue_);
         }
 
         LOG_INFO("Requests: {}, Data received {} Kb", archive.sentRequests(), archive.readBytes() / 1024.);

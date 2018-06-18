@@ -25,24 +25,19 @@ public:
      * @brief PartsArchive constructor for extracting archive
      * @param backend Backend should now the destination
      */
-    PartsArchive(std::unique_ptr<ContentReadBackend>&& backend, const PartsCompressionParameters& parameters);
+    PartsArchive(std::unique_ptr<ContentReadBackend>&& backend);
 
     const TableOfContents& toc() const
     { return m_toc; }
-
-    /** Don't set it to const, the whole idea is to be able to set it from the outside world */
-    PartsCompressionParameters & compressionParameters()
-    { return m_compressionParameters; }
 
     void listArchive(std::ostream& output) const;
 
     void createArchive(const boost::filesystem::path& archive);
 
-    void extractArchive(const boost::filesystem::path& dest);
-    /** checkExisting is to continue an aborted/failed update */
+    void extractArchive(const boost::filesystem::path& dest, bool cont);
     void updateArchive(const boost::filesystem::path& original_source,
                        const boost::filesystem::path& dest,
-                       bool checkExisting = false);
+                       bool cont);
 
     // Job API!
     // Take care auto job = updateJob(...);
@@ -50,7 +45,8 @@ public:
     //     job->doNext()
     // without '*' you check the unique_ptr...
     std::unique_ptr<PartsJobInterface> updateJob(const boost::filesystem::path& original_source,
-                                                 const boost::filesystem::path& dest);
+                                                 const boost::filesystem::path& dest,
+                                                 bool cont);
 
     uint64_t readBytes() const
     { if (m_contentReader) return m_contentReader->readBytes(); else return 0; }
@@ -58,11 +54,6 @@ public:
     { if (m_contentReader) return m_contentReader->sentRequests(); else return 0; }
 
     bool extractToMc(const boost::filesystem::path& file_path, const boost::filesystem::path& dest_file);
-
-    std::string source() const
-    { if (m_contentReader) return m_contentReader->source(); else return ""; }
-
-    void disableCaching() { if (m_contentReader) m_contentReader->disableCaching(); }
 
 protected:
     // destination for write mode

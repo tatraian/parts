@@ -43,8 +43,8 @@ BOOST_AUTO_TEST_CASE(can_decompress_zlib_buffer_smaller_than_mb) {
 
     std::vector<uint8_t> input = {1,2,3,4,5,6,7,8,9,0};
 
-    ZlibDecompressor decomp;
-    InputBuffer result = decomp.extractBuffer(create_data(input), input.size());
+    ZLibDecompressor decomp;
+    InputBuffer result = decomp.extractBuffer(create_data(input));
     BOOST_CHECK_EQUAL_COLLECTIONS(input.begin(), input.end(), result.begin(), result.end());
 }
 
@@ -56,8 +56,8 @@ BOOST_AUTO_TEST_CASE(can_decompress_zlib_buffer_greater_than_mb) {
         input[tmp] = tmp;
     }
 
-    ZlibDecompressor decomp;
-    InputBuffer result = decomp.extractBuffer(create_data(input), input.size());
+    ZLibDecompressor decomp;
+    InputBuffer result = decomp.extractBuffer(create_data(input));
     BOOST_CHECK_EQUAL_COLLECTIONS(input.begin(), input.end(), result.begin(), result.end());
 }
 

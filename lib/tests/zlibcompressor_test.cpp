@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(zlib_can_compress_buffer) {
     for(size_t tmp = 0; tmp != MB; ++tmp)
         input.push_back(tmp);
 
-    ZlibCompressor compressor;
+    ZLibCompressor compressor;
     std::vector<uint8_t> compressed;
     compressor.compressBuffer(input, compressed);
     check_data(input, compressed);
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(zlib_can_compress_file) {
     Mock<ContentWriteBackend> mock;
     When(OverloadedMethod(mock, append, void(const std::vector<uint8_t>&))).AlwaysDo([&](const std::vector<uint8_t>& a){compressed = a;});
 
-    ZlibCompressor compressor;
+    ZLibCompressor compressor;
 
     compressor.compressFile(path, mock.get());
 

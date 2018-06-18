@@ -1,7 +1,6 @@
 #include "consolelogger.h"
 
 #include <iostream>
-#include <fmt/format.h>
 
 using namespace parts;
 

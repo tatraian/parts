@@ -7,9 +7,29 @@
 using namespace parts;
 using namespace fakeit;
 
+namespace {
+class TestDirectoryEntry : public DirectoryEntry {
+public:
+    TestDirectoryEntry(const boost::filesystem::path& file,
+                       uint16_t permissions,
+                       const std::string& owner,
+                       uint16_t owner_id,
+                       const std::string& group,
+                       uint16_t group_id) : DirectoryEntry(boost::filesystem::path("nowhere"),
+                                                           file,
+                                                           permissions,
+                                                           owner,
+                                                           owner_id,
+                                                           group,
+                                                           group_id)
+    {
+    }
+};
+}
+
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_pack_directory_data) {
-    DirectoryEntry entry("file1", 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1);
+    TestDirectoryEntry entry("file1", 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1);
 
     std::vector<uint8_t> result(100);
     result.clear();
@@ -39,9 +59,8 @@ BOOST_AUTO_TEST_CASE(can_pack_directory_data) {
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(directory_compress_doesn_t_modify_the_output) {
     Mock<ContentWriteBackend> writer_mock;
-
     // Since mock are not initialized a calling of its function will produce error
-    DirectoryEntry entry("file1", 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1);
+    TestDirectoryEntry entry("file1", 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1);
 
-    entry.compressEntry(boost::filesystem::path("nowhere"), writer_mock.get());
+    entry.compressEntry(writer_mock.get());
 }

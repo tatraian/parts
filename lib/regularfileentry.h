@@ -3,6 +3,8 @@
 
 #include "baseentry.h"
 #include "hash.h"
+#include "parts_definitions.h"
+#include "compressor.h"
 
 namespace parts
 {
@@ -10,59 +12,31 @@ namespace parts
 class RegularFileEntry : public BaseEntry
 {
 public:
-    /** 
-     * We store root-relative filenames (relfile), however for the hash generation to work
-     * we need a kind of absolute path (file)
-     */
-    RegularFileEntry(const boost::filesystem::path& relfile,
+    RegularFileEntry(const boost::filesystem::path& root,
                      const boost::filesystem::path& file,
-                     uint16_t permissions,
-                     const std::string& owner,
-                     uint16_t owner_id,
-                     const std::string& group,
-                     uint16_t group_id,
-                     CompressionType compression_hint,
-                     const PartsCompressionParameters & compression_parameters,
-                     uint64_t compressed_size,
-                     uint64_t uncompressed_size,
-                     uint64_t offset);
-
-    /** 
-     * This variant is required so that we can setup the hash from outside 
-     * E.g. we have a NOT Parts archive, from which we read hash from
-     **/
-    RegularFileEntry(const boost::filesystem::path& relfile,
-                     const boost::filesystem::path& file,
-                     uint16_t permissions,
-                     const std::string& owner,
-                     uint16_t owner_id,
-                     const std::string& group,
-                     uint16_t group_id,
-                     const Hash & uncompressed_hash,
-                     CompressionType compression_hint,
-                     const PartsCompressionParameters & compression_parameters,
-                     uint64_t compressed_size,
-                     uint64_t uncompressed_size,
-                     uint64_t offset);
+                     std::vector<std::string>& owners,
+                     std::vector<std::string>& groups,
+                     bool save_owner,
+                     PartsCompressionParameters compression_parameters);
 
     RegularFileEntry(InputBuffer& buffer,
                      const std::vector<std::string>& owners,
                      const std::vector<std::string>& groups,
-                     const PartsCompressionParameters & compression_parameters);
+                     HashType hash_type);
 
     ~RegularFileEntry() override = default;
 
     void append(std::vector<uint8_t>& buffer) const override;
 
-    void compressEntry(const boost::filesystem::path& root, ContentWriteBackend& backend) override;
+    void compressEntry(ContentWriteBackend& backend) override;
 
-    void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend) override;
+    void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont) override;
 
     void updateEntry(const BaseEntry* old_entry,
                      const boost::filesystem::path& old_root,
                      const boost::filesystem::path& dest_root,
                      ContentReadBackend& backend,
-                     bool checkExisting) override;
+                     bool cont) override;
 
     std::string listEntry(size_t user_width, size_t size_width, std::tm* t) const override;
 
@@ -76,13 +50,6 @@ public:
     const uint64_t& uncompressedSize() const
     { return m_uncompressedSize; }
 
-    /**
-     * This is purely for background compatibility, in case it turns out that
-     * the given file was stored as not compressed (.VER)
-     */
-    CompressionType compressionHint() const
-    { return m_compressionHint; }
-
     const uint64_t& compressedSize() const
     { return m_compressedSize; }
 
@@ -92,15 +59,47 @@ public:
     void shiftOffset(uint64_t& shift)
     { m_offset += shift; }
 
+    /**
+     * @brief compressionType gets back the compression type. Before compressing only the hint is send back. In case of small files this can
+     * be changed to plain.
+     */
+    CompressionType compressionType() const
+    { return m_compressionType; }
+
+protected:
+    // help fake unit test
+    RegularFileEntry(const boost::filesystem::path& root,
+                     const boost::filesystem::path& file,
+                     uint16_t permissions,
+                     const std::string& owner,
+                     uint16_t owner_id,
+                     const std::string& group,
+                     uint16_t group_id,
+                     PartsCompressionParameters compression_parameters) :
+        BaseEntry(root, file, permissions, owner, owner_id, group, group_id),
+        m_compressionType(compression_parameters.m_fileCompression),
+        m_uncompressedSize(0),
+        m_compressedSize(0),
+        m_offset(0),
+        m_compressionParameters(compression_parameters)
+    {}
+
+    virtual std::unique_ptr<Compressor> createCompressor();
+
+    bool checkHashMatch(const boost::filesystem::path& path);
+
+    bool checkExisting(const boost::filesystem::path& dest_root);
 
 
 protected:
+    CompressionType m_compressionType;
     Hash m_uncompressedHash;
     uint64_t m_uncompressedSize;
-    CompressionType m_compressionHint;
-    PartsCompressionParameters m_compressionParameters;
     uint64_t m_compressedSize;
     uint64_t m_offset;
+
+    // In case of compression
+    PartsCompressionParameters m_compressionParameters;
 };
 
 }

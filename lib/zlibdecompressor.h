@@ -6,19 +6,18 @@
 namespace parts
 {
 
-class ZlibDecompressor : public Decompressor
+class ZLibDecompressor : public Decompressor
 {
 public:
-    ZlibDecompressor() = default;
-    ~ZlibDecompressor() override = default;
+    ZLibDecompressor() = default;
+    ~ZLibDecompressor() override = default;
 
-    parts::InputBuffer extractBuffer(const std::vector<uint8_t>& buffer, size_t decompressed_size) override;
+    parts::InputBuffer extractBuffer(const std::vector<uint8_t>& buffer) override;
 
     void extractFile(const boost::filesystem::path& file,
                      parts::ContentReadBackend& backend,
                      size_t position,
-                     size_t compressed_size,
-                     size_t decompressed_size) override;
+                     size_t compressed_size) override;
 };
 
 }

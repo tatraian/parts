@@ -12,13 +12,12 @@
 using namespace parts;
 
 //==========================================================================================================================================
-DirectoryEntry::DirectoryEntry(const boost::filesystem::path& file,
-                               uint16_t permissions,
-                               const std::string& owner,
-                               uint16_t owner_id,
-                               const std::string& group,
-                               uint16_t group_id) :
-    BaseEntry(file, permissions, owner, owner_id, group, group_id)
+DirectoryEntry::DirectoryEntry(const boost::filesystem::path& root,
+                               const boost::filesystem::path& file,
+                               std::vector<std::string>& owners,
+                               std::vector<std::string>& groups,
+                               bool save_owner) :
+    BaseEntry(root, file, owners, groups, save_owner)
 {
 }
 
@@ -39,16 +38,21 @@ void DirectoryEntry::append(std::vector<uint8_t>& buffer) const
 }
 
 //==========================================================================================================================================
-void DirectoryEntry::compressEntry(const boost::filesystem::path& root, ContentWriteBackend& backend)
+void DirectoryEntry::compressEntry(ContentWriteBackend& backend)
 {
     // Do nothing
     LOG_TRACE("Compressing dir:  {}", m_file.string());
 }
 
 //==========================================================================================================================================
-void DirectoryEntry::extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend)
+void DirectoryEntry::extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont)
 {
     LOG_TRACE("Create dir:   {}", m_file.string());
+    if (cont && boost::filesystem::is_directory(dest_root / m_file)) {
+        setMetadata(dest_root);
+        return;
+    }
+
     // Do not decompression, but creates the directory with the correct rights
     boost::system::error_code ec;
     boost::filesystem::create_directories(dest_root / m_file, ec);
@@ -65,16 +69,9 @@ void DirectoryEntry::updateEntry(const BaseEntry* old_entry,
                                  const boost::filesystem::path& old_root,
                                  const boost::filesystem::path& dest_root,
                                  ContentReadBackend& backend,
-                                 bool checkExisting)
+                                 bool cont)
 {
-    if (checkExisting && boost::filesystem::exists( dest_root / m_file )) {
-        LOG_TRACE("Directory already exists, don't create:    {}", (dest_root / m_file).string());
-        setMetadata(dest_root);
-        return;
-    }
-
-    // Do the same as in case of extract, (that is good if the old entry is file or link too)
-    extractEntry(dest_root, backend);
+    extractEntry(dest_root, backend, cont);
 }
 
 //==========================================================================================================================================
