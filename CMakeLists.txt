@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.3)
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_POSITION_INDEPENDENT_CODE YES)
 
 include("cmake/HunterGate.cmake")
 
 HunterGate(
-    URL "https://github.com/ruslo/hunter/archive/v0.19.108.tar.gz"
-    SHA1 "56cf9f1d52296373dbcc0d0c9c2b5526a0815019"
+    URL "https://github.com/ruslo/hunter/archive/v0.22.16.tar.gz"
+    SHA1 "84153076a3cebf4869c904fa5c93ea309386b583"
 )
 
 option(BUILD_TESTS "Build tests too" ON)

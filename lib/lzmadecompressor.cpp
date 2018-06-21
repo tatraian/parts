@@ -32,19 +32,19 @@ void extractInternal(lzma_stream& lzma_context,
                      std::function<size_t (uint8_t*, size_t)> read,
                      std::function<void (uint8_t*, size_t)> write)
 {
-    uint8_t ibuf[MB];
-    uint8_t obuf[MB];
+    auto ibuf = std::make_unique<uint8_t[]>(MB);
+    auto obuf = std::make_unique<uint8_t[]>(MB);
 
     lzma_context.next_in = nullptr;
     lzma_context.avail_in = 0;
-    lzma_context.next_out = obuf;
+    lzma_context.next_out = obuf.get();
     lzma_context.avail_out = MB;
     lzma_action action = LZMA_RUN;
 
     for(;;){
         if (lzma_context.avail_in == 0) {
-            size_t read_bytes = read(ibuf, MB);
-            lzma_context.next_in = ibuf;
+            size_t read_bytes = read(ibuf.get(), MB);
+            lzma_context.next_in = ibuf.get();
             lzma_context.avail_in = read_bytes;
 
             if (read_bytes != MB) {
@@ -57,8 +57,8 @@ void extractInternal(lzma_stream& lzma_context,
         if (lzma_context.avail_out == 0 || result == LZMA_STREAM_END) {
             size_t bytes_to_write = MB - lzma_context.avail_out;
 
-            write(obuf, bytes_to_write);
-            lzma_context.next_out = obuf;
+            write(obuf.get(), bytes_to_write);
+            lzma_context.next_out = obuf.get();
             lzma_context.avail_out = 1024*1024;
             if (result == LZMA_STREAM_END)
                 break;

@@ -17,15 +17,15 @@ void extractInternal(z_stream& context,
                      std::function<size_t (uint8_t*, size_t)> read,
                      std::function<void (uint8_t*, size_t)> write)
 {
-    uint8_t ibuf[MB];
-    uint8_t obuf[MB];
+    auto ibuf = std::make_unique<uint8_t[]>(MB);
+    auto obuf = std::make_unique<uint8_t[]>(MB);
 
     context.zalloc = Z_NULL;
     context.zfree = Z_NULL;
     context.opaque = Z_NULL;
     context.next_in = nullptr;
     context.avail_in = 0;
-    context.next_out = obuf;
+    context.next_out = obuf.get();
     context.avail_out = MB;
 
     if (inflateInit(&context)) {
@@ -36,8 +36,8 @@ void extractInternal(z_stream& context,
 
     for(;;){
         if (context.avail_in == 0) {
-            size_t read_bytes = read(ibuf, MB);
-            context.next_in = ibuf;
+            size_t read_bytes = read(ibuf.get(), MB);
+            context.next_in = ibuf.get();
             context.avail_in = read_bytes;
 
             if (read_bytes != MB) {
@@ -49,9 +49,8 @@ void extractInternal(z_stream& context,
 
         if (context.avail_out == 0 || result == Z_STREAM_END) {
             size_t bytes_to_write = MB - context.avail_out;
-
-            write(obuf, bytes_to_write);
-            context.next_out = obuf;
+            write(obuf.get(), bytes_to_write);
+            context.next_out = obuf.get();
             context.avail_out = 1024*1024;
             if (result == Z_STREAM_END)
                 break;
