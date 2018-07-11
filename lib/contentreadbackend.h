@@ -38,6 +38,14 @@ public:
     uint64_t sentRequests() const
     { return m_sentRequests; }
 
+    /**
+     * For backends capable of caching we need
+     * to have some sort of control over caching 
+     * itself, e.g. normally we don't cache files
+     * only header + TOC
+     */
+    virtual void controlCaching(bool enable) {}
+
 protected:
     uint64_t m_readBytes;
     uint64_t m_sentRequests;
