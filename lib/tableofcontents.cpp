@@ -124,7 +124,7 @@ void TableOfContents::shiftOffsets(uint64_t& data_start)
 }
 
 //==========================================================================================================================================
-std::shared_ptr<BaseEntry> TableOfContents::find(const boost::filesystem::path& file)
+std::shared_ptr<BaseEntry> TableOfContents::find(const boost::filesystem::path& file) const
 {
     auto it = m_files.find(file);
     if (it == m_files.end())

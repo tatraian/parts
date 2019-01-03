@@ -21,6 +21,13 @@ public:
     typedef std::map<boost::filesystem::path, std::shared_ptr<BaseEntry>>::iterator iterator;
     typedef std::map<boost::filesystem::path, std::shared_ptr<BaseEntry>>::const_iterator const_iterator;
 
+    /** 
+     * The only reasons for these default variants is to support 3rd party TOC handling, so that
+     * 3rd party implementations can directly inherit from this
+     */
+    TableOfContents() = default;
+    virtual ~TableOfContents() = default;
+
     TableOfContents(const boost::filesystem::path& source, const PartsCompressionParameters& parameters);
     TableOfContents(ContentReadBackend& backend, size_t toc_size, const PartsCompressionParameters& parameters);
 
@@ -41,7 +48,7 @@ public:
     size_t size() const
     { return m_files.size(); }
 
-    std::shared_ptr<BaseEntry> find(const boost::filesystem::path& file);
+    std::shared_ptr<BaseEntry> find(const boost::filesystem::path& file) const;
 
     uint64_t maxSize() const
     { return m_maxSize; }
@@ -54,7 +61,7 @@ public:
 
 
 protected:
-    void add(const boost::filesystem::path& root, const boost::filesystem::path& file);
+    virtual void add(const boost::filesystem::path& root, const boost::filesystem::path& file);
 
     void packNames(std::vector<uint8_t>& buffer, const std::vector<std::string>& names) const;
     void unpackNames(InputBuffer& buffer, std::vector<std::string>& names);
