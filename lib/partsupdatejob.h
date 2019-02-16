@@ -28,6 +28,8 @@ public:
 
     void doNext() override;
 
+    void skip() override;
+
 protected:
     std::string m_oldRootName;
     std::string m_rootname;

@@ -47,3 +47,14 @@ void PartsUpdateJob::doNext()
                                          m_continue);
     ++m_actualElement;
 }
+
+//==========================================================================================================================================
+void PartsUpdateJob::skip()
+{
+    if (m_actualElement == m_toc.end())
+    {
+        throw PartsException ("Job error, already finished.");
+    }
+
+    ++m_actualElement;
+}
