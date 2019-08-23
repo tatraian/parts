@@ -1,6 +1,6 @@
 #include "contentreadbackend.h"
 
 //==========================================================================================================================================
-parts::ContentReadBackend::~ContentReadBackend()
+parts::ContentReadBackend::~ContentReadBackend() noexcept
 {
 }
