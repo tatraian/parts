@@ -2,6 +2,7 @@
 
 #include "packager.h"
 
+#include "logger_internal.h"
 using namespace parts;
 
 namespace {
@@ -9,7 +10,8 @@ char magic[] = {'p','a','r','t','s','!'};
 }
 
 //==========================================================================================================================================
-Header::Header(const PartsCompressionParameters& parameters) :
+Header::Header(const PartsCompressionParameters& parameters) noexcept:
+    m_valid(true),
     m_magic(magic),
     m_version(2),
     m_tocCompressionType(parameters.m_tocCompression),
@@ -20,7 +22,8 @@ Header::Header(const PartsCompressionParameters& parameters) :
 }
 
 //==========================================================================================================================================
-Header::Header(ContentReadBackend& reader)
+Header::Header(ContentReadBackend& reader) noexcept :
+    m_valid(false)
 {
     InputBuffer buffer;
     reader.read(buffer, 16);
@@ -28,29 +31,41 @@ Header::Header(ContentReadBackend& reader)
     std::vector<uint8_t> read_magic(6,0);
     Packager::pop_front(buffer, read_magic);
     for(size_t tmp = 0; tmp != 6; ++tmp)
-        if (magic[tmp] != read_magic[tmp])
-            throw PartsException("Not parts archive: " + reader.source());
+        if (magic[tmp] != read_magic[tmp]) {
+            LOG_ERROR("Not parts archive: {}", reader.source());
+            m_valid = false;
+        }
 
     m_magic = magic;
     Packager::pop_front(buffer, m_version);
-    if (m_version == 1)
-        throw PartsException("Unhandled version: " + std::to_string(m_version));
+    if (m_version == 1) {
+        LOG_ERROR("Unhandled version: {}", m_version);
+        return;
+    }
 
-    if (m_version != 2)
-        throw PartsException("Unknown archive version: " + std::to_string(m_version));
+    if (m_version != 2) {
+        LOG_ERROR("Unknown archive version: {}", m_version);
+        return;
+    }
 
-    uint8_t tmp;
-    Packager::pop_front(buffer, tmp);
-    m_tocCompressionType = static_cast<CompressionType>(tmp);
+    try {
+        uint8_t tmp;
+        Packager::pop_front(buffer, tmp);
+        m_tocCompressionType = static_cast<CompressionType>(tmp);
 
-    Packager::pop_front(buffer, tmp);
-    m_hashType = static_cast<HashType>(tmp);
+        Packager::pop_front(buffer, tmp);
+        m_hashType = static_cast<HashType>(tmp);
 
-    Packager::pop_front(buffer, m_dummy[0]);
-    Packager::pop_front(buffer, m_dummy[1]);
-    Packager::pop_front(buffer, m_dummy[2]);
+        Packager::pop_front(buffer, m_dummy[0]);
+        Packager::pop_front(buffer, m_dummy[1]);
+        Packager::pop_front(buffer, m_dummy[2]);
 
-    Packager::pop_front(buffer, m_tocSize);
+        Packager::pop_front(buffer, m_tocSize);
+    } catch (const std::exception&) {
+        LOG_ERROR("There is no enough data for reading header!");
+        return;
+    }
+    m_valid = true;
 }
 
 //==========================================================================================================================================

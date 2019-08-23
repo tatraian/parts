@@ -12,8 +12,14 @@ namespace parts {
 class Header
 {
 public:
-    Header(const PartsCompressionParameters& parameters);
-    Header(ContentReadBackend& reader);
+    Header(const PartsCompressionParameters& parameters) noexcept;
+    Header(ContentReadBackend& reader) noexcept;
+
+    Header(const Header&) = default;
+    Header& operator=(const Header&) = default;
+
+    Header(Header&&) = default;
+    Header& operator=(Header&&) = default;
 
     std::vector<uint8_t> getRaw() const;
 
@@ -27,7 +33,11 @@ public:
     HashType getHashType() const
     { return m_hashType; }
 
+    operator bool() const
+    { return m_valid; }
+
 protected:
+    bool m_valid;
     char* m_magic; // "parts!" - 6 bytes
     uint8_t m_version;
     CompressionType m_tocCompressionType;
