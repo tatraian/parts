@@ -34,6 +34,9 @@ LinkEntry::LinkEntry(const boost::filesystem::path& root,
 LinkEntry::LinkEntry(InputBuffer& buffer, const std::vector<std::string>& owners, const std::vector<std::string>& groups) noexcept:
     BaseEntry(buffer, owners, groups)
 {
+    if (!m_valid)
+        return;
+
     try {
         Packager::pop_front(buffer, m_destination);
     } catch(const std::exception& e) {
