@@ -91,10 +91,11 @@ HttpReaderBackend::HttpReaderBackend(const string& file_url) :m_fileUrl(file_url
     m_curlHandle = curl_easy_init();
     curl_easy_setopt(m_curlHandle, CURLOPT_URL, file_url.c_str());
     curl_easy_setopt(m_curlHandle, CURLOPT_HTTPHEADER, NULL);
+    m_valid = true;
 }
 
 //==========================================================================================================================================
-HttpReaderBackend::~HttpReaderBackend()
+HttpReaderBackend::~HttpReaderBackend() noexcept
 {
     curl_easy_cleanup(m_curlHandle);
 }

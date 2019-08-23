@@ -1,5 +1,6 @@
 #include "filereadbackend.h"
 #include "parts_definitions.h"
+#include "logger_internal.h"
 
 #include <boost/endian/conversion.hpp>
 #include <boost/filesystem.hpp>
@@ -11,11 +12,14 @@ FileReadBackend::FileReadBackend(const boost::filesystem::path& filename) :
     m_path(filename),
     m_file(filename.string(), std::ios::binary)
 {
-    if (!m_file)
-        throw PartsException("Cannot open file for reading: " + filename.string());
+    if (!m_file) {
+        LOG_ERROR("Cannot open file for reading: {}", filename.string());
+        return;
+    }
 
     // This is removed from initializer list to avoid boost exception in case of non existing files.
     m_filesize = boost::filesystem::file_size(m_path);
+    m_valid = true;
 }
 
 //==========================================================================================================================================

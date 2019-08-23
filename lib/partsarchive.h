@@ -55,9 +55,6 @@ public:
 
     bool extractToMc(const boost::filesystem::path& file_path, const boost::filesystem::path& dest_file);
 
-    void controlCaching(bool enable)
-    { if (m_contentReader) m_contentReader->controlCaching(enable); }
-
 protected:
     // destination for write mode
     boost::filesystem::path m_root;

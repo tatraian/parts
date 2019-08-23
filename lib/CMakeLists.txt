@@ -31,6 +31,7 @@ set(parts_SRCS
 
     # reader backends
     contentreadbackend.h
+    contentreadbackend.cpp
     filereadbackend.h
     filereadbackend.cpp
     ${HTTP_SOURCES}

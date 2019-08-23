@@ -10,8 +10,8 @@ namespace parts {
 
 class ContentReadBackend {
 public:
-    ContentReadBackend() : m_readBytes(0), m_sentRequests(0) {}
-    virtual ~ContentReadBackend() = default;
+    ContentReadBackend() noexcept: m_valid(false), m_readBytes(0), m_sentRequests(0) {}
+    virtual ~ContentReadBackend() noexcept;
 
     ContentReadBackend(const ContentReadBackend&) = delete;
     ContentReadBackend& operator=(const ContentReadBackend&) = delete;
@@ -38,15 +38,13 @@ public:
     uint64_t sentRequests() const
     { return m_sentRequests; }
 
-    /**
-     * For backends capable of caching we need
-     * to have some sort of control over caching 
-     * itself, e.g. normally we don't cache files
-     * only header + TOC
-     */
-    virtual void controlCaching(bool enable) {}
+    operator bool() const {
+        return m_valid;
+    }
 
 protected:
+    bool     m_valid;
+
     uint64_t m_readBytes;
     uint64_t m_sentRequests;
 };

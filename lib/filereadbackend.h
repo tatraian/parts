@@ -13,7 +13,7 @@ class FileReadBackend : public ContentReadBackend
 {
 public:
     FileReadBackend(const boost::filesystem::path& filename);
-    ~FileReadBackend() override = default;
+    ~FileReadBackend() noexcept override = default;
 
      std::string source() const override
      { return m_path.string(); }

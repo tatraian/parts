@@ -10,7 +10,7 @@ class HttpReaderBackend : public ContentReadBackend
 {
 public:
     HttpReaderBackend(const std::string& file_url);
-    ~HttpReaderBackend();
+    ~HttpReaderBackend() noexcept;
 
     std::string source() const override { return m_fileUrl; }
     void read(std::vector<uint8_t> &data) override;

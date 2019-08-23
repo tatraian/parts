@@ -24,16 +24,19 @@ BOOST_AUTO_TEST_CASE(can_open_file) {
     test_file.close();
 
     std::unique_ptr<FileReadBackend> backend;
-    BOOST_REQUIRE_NO_THROW(backend.reset(new FileReadBackend (boost::filesystem::path("/tmp/opentest"))));
+    backend.reset(new FileReadBackend (boost::filesystem::path("/tmp/opentest")));
 
+    BOOST_CHECK(*backend);
     BOOST_CHECK_EQUAL(backend->source(), "/tmp/opentest");
 }
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(throws_if_file_not_exist) {
-    boost::filesystem::remove("/tmp/opentest");
+    boost::system::error_code err;
+    boost::filesystem::remove("/tmp/opentest", err);
 
-    BOOST_REQUIRE_THROW(FileReadBackend backend("/tmp/opentest"), PartsException);
+    FileReadBackend backend("/tmp/opentest");
+    BOOST_CHECK(!backend);
 }
 
 //==========================================================================================================================================
