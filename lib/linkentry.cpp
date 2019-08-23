@@ -17,19 +17,29 @@ LinkEntry::LinkEntry(const boost::filesystem::path& root,
                      const boost::filesystem::path& file,
                      std::vector<std::string>& owners,
                      std::vector<std::string>& groups,
-                     bool save_owner) :
+                     bool save_owner) noexcept:
     BaseEntry(root, file, owners, groups, save_owner)
 {
-    boost::filesystem::path target = boost::filesystem::read_symlink(root/file);
+    try {
+        boost::filesystem::path target = boost::filesystem::read_symlink(root/file);
 
-    m_destination =target;
+        m_destination =target;
+    } catch (const std::exception& e) {
+        LOG_ERROR("Cannot read symbolic link target: {}", (root/file).string());
+        m_valid = false;
+    }
 }
 
 //==========================================================================================================================================
-LinkEntry::LinkEntry(InputBuffer& buffer, const std::vector<std::string>& owners, const std::vector<std::string>& groups) :
+LinkEntry::LinkEntry(InputBuffer& buffer, const std::vector<std::string>& owners, const std::vector<std::string>& groups) noexcept:
     BaseEntry(buffer, owners, groups)
 {
-    Packager::pop_front(buffer, m_destination);
+    try {
+        Packager::pop_front(buffer, m_destination);
+    } catch(const std::exception& e) {
+        LOG_ERROR("Cannot read data from stream");
+        m_valid = false;
+    }
 }
 
 //==========================================================================================================================================

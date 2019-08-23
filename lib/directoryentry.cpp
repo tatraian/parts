@@ -16,7 +16,7 @@ DirectoryEntry::DirectoryEntry(const boost::filesystem::path& root,
                                const boost::filesystem::path& file,
                                std::vector<std::string>& owners,
                                std::vector<std::string>& groups,
-                               bool save_owner) :
+                               bool save_owner) noexcept :
     BaseEntry(root, file, owners, groups, save_owner)
 {
 }
@@ -24,7 +24,7 @@ DirectoryEntry::DirectoryEntry(const boost::filesystem::path& root,
 //==========================================================================================================================================
 DirectoryEntry::DirectoryEntry(InputBuffer& buffer,
                                const std::vector<std::string>& owners,
-                               const std::vector<std::string>& groups) :
+                               const std::vector<std::string>& groups) noexcept:
     BaseEntry(buffer, owners, groups)
 {
 }

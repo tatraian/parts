@@ -154,6 +154,47 @@ BOOST_AUTO_TEST_CASE(regular_file_entry_can_be_created_from_input_stream) {
 
 
 //==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(regular_file_entry_don_t_throw_if_there_is_no_enough_data_at_hash) {
+    InputBuffer input = {0, 5, 'f', 'i', 'l', 'e', '1', 1, 0244, 0, 0, 0, 0,
+                                 // hash
+                                 0x88, 0xd4, 0x26, 0x6f, 0xd4, 0xe6, 0x33, 0x8d,
+                                 0x13, 0xb8, 0x45, 0xfc, 0xf2, 0x89, 0x57, 0x9d,
+                                 0x20, 0x9c, 0x89, 0x78, 0x23, 0xb9, 0x21, 0x7d,
+                                 };
+
+    std::vector<std::string> owners = {"DEFAULT_OWNER"};
+    std::vector<std::string> groups = {"DEFAULT_GROUP"};
+
+    RegularFileEntry entry(input, owners, groups, HashType::SHA256);
+    BOOST_CHECK(!entry);
+}
+
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(regular_file_entry_don_t_throw_if_there_is_no_enough_ragular_file_specific_data) {
+    InputBuffer input = {0, 5, 'f', 'i', 'l', 'e', '1', 1, 0244, 0, 0, 0, 0,
+                                 // hash
+                                 0x88, 0xd4, 0x26, 0x6f, 0xd4, 0xe6, 0x33, 0x8d,
+                                 0x13, 0xb8, 0x45, 0xfc, 0xf2, 0x89, 0x57, 0x9d,
+                                 0x20, 0x9c, 0x89, 0x78, 0x23, 0xb9, 0x21, 0x7d,
+                                 0xa3, 0xe1, 0x61, 0x93, 0x6f, 0x03, 0x15, 0x89,
+                                 // compression type
+                                 0x01, // LZMA
+                                 // uncompressed size
+                                 0, 0, 0, 0, 0, 0, 0, 100,
+                                 // compressed size
+                                 0, 0, 0, 0, 0, 0, 0, 42,
+                                 // offset
+                                 0, 0, 0, 0, 0, 0
+                                 };
+
+    std::vector<std::string> owners = {"DEFAULT_OWNER"};
+    std::vector<std::string> groups = {"DEFAULT_GROUP"};
+
+    RegularFileEntry entry(input, owners, groups, HashType::SHA256);
+    BOOST_CHECK(!entry);
+}
+
+//==========================================================================================================================================
 BOOST_FIXTURE_TEST_CASE(names_in_tables_are_find_correctly, TestRegularFileEntry) {
     std::vector<std::string> owners;
 

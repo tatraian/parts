@@ -97,3 +97,15 @@ BOOST_AUTO_TEST_CASE(can_unpack_link_data) {
     BOOST_CHECK_EQUAL(entry.groupId(), 0);
     BOOST_CHECK_EQUAL(entry.destination(), "../file2");
 }
+
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(don_t_throw_exception_in_case_of_read_error) {
+    InputBuffer input = {0, 5, 'f', 'i', 'l', 'e', '1', 1, 0244, 0, 0, 0, 0, 0, 8, '.', '.', '/', 'f', 'i', 'l', 'e'};
+
+    std::vector<std::string> owners = {"DEFAULT_OWNER"};
+    std::vector<std::string> groups = {"DEFAULT_GROUP"};
+
+    LinkEntry entry(input, owners, groups);
+    BOOST_CHECK(!entry);
+
+}

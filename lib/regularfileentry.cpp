@@ -22,7 +22,7 @@ RegularFileEntry::RegularFileEntry(const boost::filesystem::path& root,
                                    std::vector<std::string>& owners,
                                    std::vector<std::string>& groups,
                                    bool save_owner,
-                                   PartsCompressionParameters compression_parameters) :
+                                   PartsCompressionParameters compression_parameters) noexcept :
     BaseEntry(root, file, owners, groups, save_owner),
     m_compressionType(compression_parameters.m_fileCompression),
     m_uncompressedSize(0),
@@ -30,24 +30,40 @@ RegularFileEntry::RegularFileEntry(const boost::filesystem::path& root,
     m_offset(0),
     m_compressionParameters(compression_parameters)
 {
-    m_uncompressedHash = Hash(m_compressionParameters.m_hashType, root/file);
-    m_uncompressedSize = boost::filesystem::file_size(root/file);
+    if (!m_valid)
+        return;
+
+    try {
+        m_uncompressedHash = Hash(m_compressionParameters.m_hashType, root/file);
+        m_uncompressedSize = boost::filesystem::file_size(root/file);
+    } catch(const std::exception&) {
+        LOG_ERROR("Cannot get file size: {}", (root/file).string());
+        m_valid = false;
+    }
 }
 
 //==========================================================================================================================================
 RegularFileEntry::RegularFileEntry(InputBuffer& buffer,
                                    const std::vector<std::string>& owners,
                                    const std::vector<std::string>& groups,
-                                   HashType hash_type) :
+                                   HashType hash_type) noexcept :
     BaseEntry(buffer, owners, groups),
     m_uncompressedHash(hash_type, buffer)
 {
-    uint8_t tmp;
-    Packager::pop_front(buffer, tmp);
-    m_compressionType = static_cast<CompressionType>(tmp);
-    Packager::pop_front(buffer, m_uncompressedSize);
-    Packager::pop_front(buffer, m_compressedSize);
-    Packager::pop_front(buffer, m_offset);
+    if (!m_valid && !m_uncompressedHash.isValid())
+        return;
+
+    try {
+        uint8_t tmp;
+        Packager::pop_front(buffer, tmp);
+        m_compressionType = static_cast<CompressionType>(tmp);
+        Packager::pop_front(buffer, m_uncompressedSize);
+        Packager::pop_front(buffer, m_compressedSize);
+        Packager::pop_front(buffer, m_offset);
+    } catch(const std::exception&) {
+        LOG_ERROR("Cannot get read regular file stream");
+        m_valid = false;
+    }
 }
 
 //==========================================================================================================================================

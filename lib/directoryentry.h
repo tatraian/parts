@@ -13,13 +13,19 @@ public:
                    const boost::filesystem::path& file,
                    std::vector<std::string>& owners,
                    std::vector<std::string>& groups,
-                   bool save_owner);
+                   bool save_owner) noexcept;
 
     DirectoryEntry(InputBuffer& buffer,
                    const std::vector<std::string>& owners,
-                   const std::vector<std::string>& groups);
+                   const std::vector<std::string>& groups) noexcept;
 
-    ~DirectoryEntry() override = default;
+    ~DirectoryEntry() noexcept override = default;
+
+    DirectoryEntry(const DirectoryEntry&) = default;
+    DirectoryEntry& operator=(const DirectoryEntry&) = default;
+
+    DirectoryEntry(DirectoryEntry&&) = default;
+    DirectoryEntry& operator=(DirectoryEntry&&) = default;
 
     void append(std::vector<uint8_t>& buffer) const override;
 

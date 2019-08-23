@@ -17,14 +17,20 @@ public:
                      std::vector<std::string>& owners,
                      std::vector<std::string>& groups,
                      bool save_owner,
-                     PartsCompressionParameters compression_parameters);
+                     PartsCompressionParameters compression_parameters) noexcept;
 
     RegularFileEntry(InputBuffer& buffer,
                      const std::vector<std::string>& owners,
                      const std::vector<std::string>& groups,
-                     HashType hash_type);
+                     HashType hash_type) noexcept;
 
-    ~RegularFileEntry() override = default;
+    ~RegularFileEntry() noexcept override = default;
+
+    RegularFileEntry(const RegularFileEntry&) = default;
+    RegularFileEntry& operator=(const RegularFileEntry&) = default;
+
+    RegularFileEntry(RegularFileEntry&&) = default;
+    RegularFileEntry& operator=(RegularFileEntry&&) = default;
 
     void append(std::vector<uint8_t>& buffer) const override;
 
