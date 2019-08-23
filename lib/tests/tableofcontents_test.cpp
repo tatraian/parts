@@ -35,6 +35,7 @@ BOOST_AUTO_TEST_CASE(TableOfContents_can_parse_only_one_file) {
 
     TableOfContents toc(filename, params);
 
+    BOOST_CHECK(toc);
     BOOST_REQUIRE_EQUAL(toc.size(), 1);
     BOOST_REQUIRE_EQUAL(toc.begin()->first, boost::filesystem::path(filename).filename());
     std::shared_ptr<BaseEntry> entry = toc.begin()->second;
@@ -80,6 +81,7 @@ BOOST_FIXTURE_TEST_CASE(detects_files_correctly, FakeTableOfContents) {
     PartsCompressionParameters params;
     TableOfContents toc(test_path, params);
 
+    BOOST_CHECK(toc);
     std::shared_ptr<BaseEntry> entry = toc.find(test_dir.lexically_relative(test_root));
     BOOST_REQUIRE(entry);
     std::shared_ptr<DirectoryEntry> dir = std::dynamic_pointer_cast<DirectoryEntry>(entry);

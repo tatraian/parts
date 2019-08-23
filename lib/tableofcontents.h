@@ -21,15 +21,21 @@ public:
     typedef std::map<boost::filesystem::path, std::shared_ptr<BaseEntry>>::iterator iterator;
     typedef std::map<boost::filesystem::path, std::shared_ptr<BaseEntry>>::const_iterator const_iterator;
 
-    /** 
+    /**
      * The only reasons for these default variants is to support 3rd party TOC handling, so that
      * 3rd party implementations can directly inherit from this
      */
     TableOfContents() = default;
     virtual ~TableOfContents() = default;
 
-    TableOfContents(const boost::filesystem::path& source, const PartsCompressionParameters& parameters);
-    TableOfContents(ContentReadBackend& backend, size_t toc_size, const PartsCompressionParameters& parameters);
+    TableOfContents(const TableOfContents&) = default;
+    TableOfContents& operator=(const TableOfContents&) = default;
+
+    TableOfContents(TableOfContents&&) = default;
+    TableOfContents& operator=(TableOfContents&&) = default;
+
+    TableOfContents(const boost::filesystem::path& source, const PartsCompressionParameters& parameters) noexcept;
+    TableOfContents(ContentReadBackend& backend, size_t toc_size, const PartsCompressionParameters& parameters) noexcept;
 
     std::vector<uint8_t> getRaw() const;
 
@@ -56,6 +62,9 @@ public:
     size_t maxOwnerGroupWidth() const
     { return m_maxOwnerWidth; }
 
+    operator bool() const
+    { return !m_files.empty(); }
+
     static const std::string DEFAULT_OWNER;
     static const std::string DEFAULT_GROUP;
 
@@ -67,7 +76,7 @@ protected:
     void unpackNames(InputBuffer& buffer, std::vector<std::string>& names);
 
     // This constructor is just for unit testing...
-    TableOfContents(const PartsCompressionParameters& params);
+    TableOfContents(const PartsCompressionParameters& params) noexcept;
 
 protected:
     std::map<boost::filesystem::path, std::shared_ptr<BaseEntry> > m_files;

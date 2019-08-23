@@ -17,7 +17,7 @@ const std::string TableOfContents::DEFAULT_OWNER = "__PARTS_DEFAULT_OWNER__";
 const std::string TableOfContents::DEFAULT_GROUP = "__PARTS_DEFAULT_GROUP__";
 
 //==========================================================================================================================================
-TableOfContents::TableOfContents(const boost::filesystem::path& source, const PartsCompressionParameters& parameters) :
+TableOfContents::TableOfContents(const boost::filesystem::path& source, const PartsCompressionParameters& parameters) noexcept:
     m_parameters(parameters),
     m_maxSize(0),
     m_maxOwnerWidth(0)
@@ -32,68 +32,82 @@ TableOfContents::TableOfContents(const boost::filesystem::path& source, const Pa
         return;
     }
 
-    if (!boost::filesystem::exists(source))
-        throw PartsException("Source doesn't exist: " + source.string());
-
-    add(source.parent_path(), source);
-    if (boost::filesystem::is_regular_file(source) || boost::filesystem::is_symlink(source))
+    if (!boost::filesystem::exists(source)) {
+        LOG_ERROR("Source doesn't exist: {}", source.string());
         return;
-
-    auto start_time = std::chrono::system_clock::now();
-    LOG_TRACE("Creating TOC");
-    boost::filesystem::recursive_directory_iterator dir(source), end;
-    for (;dir != end;++dir)
-    {
-        add(source.parent_path(), dir->path());
-        if (boost::filesystem::is_symlink(dir->path()))
-            dir.no_push();
     }
-    auto end_time = std::chrono::system_clock::now();
-    std::chrono::duration<double> diff = end_time-start_time;
-    LOG_DEBUG("TOC creation time: {} s", diff.count());
+
+    try {
+        add(source.parent_path(), source);
+        if (boost::filesystem::is_regular_file(source) || boost::filesystem::is_symlink(source))
+            return;
+
+        auto start_time = std::chrono::system_clock::now();
+        LOG_TRACE("Creating TOC");
+        boost::filesystem::recursive_directory_iterator dir(source), end;
+        for (;dir != end;++dir)
+        {
+            add(source.parent_path(), dir->path());
+            if (boost::filesystem::is_symlink(dir->path()))
+                dir.no_push();
+        }
+        auto end_time = std::chrono::system_clock::now();
+        std::chrono::duration<double> diff = end_time-start_time;
+        LOG_DEBUG("TOC creation time: {} s", diff.count());
+    } catch(const std::exception& e) {
+        LOG_ERROR("Error during creating TOC for file: {}, reason: {}", source.string(), e.what());
+        // signs that TOC is invalid
+        m_files.clear();
+    }
 }
 
 //==========================================================================================================================================
-TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, const PartsCompressionParameters& parameters) :
+TableOfContents::TableOfContents(ContentReadBackend& backend, size_t toc_size, const PartsCompressionParameters& parameters) noexcept:
     m_parameters(parameters),
     m_maxSize(0),
     m_maxOwnerWidth(0)
 {
-    std::vector<uint8_t> compressed_toc(toc_size, 0);
-    backend.read(compressed_toc);
+    try {
+        std::vector<uint8_t> compressed_toc(toc_size, 0);
+        backend.read(compressed_toc);
 
-    LOG_DEBUG("Decompressing TOC");
-    auto decompressor = DecompressorFactory::createDecompressor(m_parameters.m_tocCompression);
-    InputBuffer uncompressed_toc = decompressor->extractBuffer(compressed_toc);
+        LOG_DEBUG("Decompressing TOC");
+        auto decompressor = DecompressorFactory::createDecompressor(m_parameters.m_tocCompression);
+        InputBuffer uncompressed_toc = decompressor->extractBuffer(compressed_toc);
 
-    unpackNames(uncompressed_toc, m_owners);
-    unpackNames(uncompressed_toc, m_groups);
+        unpackNames(uncompressed_toc, m_owners);
+        unpackNames(uncompressed_toc, m_groups);
 
-    while (!uncompressed_toc.empty())
-    {
-        uint8_t tmp = 0;
-        Packager::pop_front(uncompressed_toc, tmp);
-        EntryTypes type = static_cast<EntryTypes>(tmp);
-        std::shared_ptr<BaseEntry> entry;
-        switch (type) {
-        case EntryTypes::RegularFile:
-            entry.reset(new RegularFileEntry(uncompressed_toc, m_owners, m_groups, m_parameters.m_hashType));
-            m_maxSize = std::max(m_maxSize, std::dynamic_pointer_cast<RegularFileEntry>(entry)->uncompressedSize());
-            break;
-        case EntryTypes::Directory:
-            entry.reset(new DirectoryEntry(uncompressed_toc, m_owners, m_groups));
-            break;
-        case EntryTypes::Link:
-            entry.reset(new LinkEntry(uncompressed_toc, m_owners, m_groups));
-            break;
-        default:
-            throw PartsException("Unknown node type: " + std::to_string(tmp));
+        while (!uncompressed_toc.empty())
+        {
+            uint8_t tmp = 0;
+            Packager::pop_front(uncompressed_toc, tmp);
+            EntryTypes type = static_cast<EntryTypes>(tmp);
+            std::shared_ptr<BaseEntry> entry;
+            switch (type) {
+            case EntryTypes::RegularFile:
+                entry.reset(new RegularFileEntry(uncompressed_toc, m_owners, m_groups, m_parameters.m_hashType));
+                m_maxSize = std::max(m_maxSize, std::dynamic_pointer_cast<RegularFileEntry>(entry)->uncompressedSize());
+                break;
+            case EntryTypes::Directory:
+                entry.reset(new DirectoryEntry(uncompressed_toc, m_owners, m_groups));
+                break;
+            case EntryTypes::Link:
+                entry.reset(new LinkEntry(uncompressed_toc, m_owners, m_groups));
+                break;
+            default:
+                throw PartsException("Unknown node type: " + std::to_string(tmp));
+            }
+
+            m_maxOwnerWidth = std::max(m_maxOwnerWidth, entry->owner().size() + entry->group().size() + 1);
+
+            LOG_DEBUG("TOC entry: {}", entry->toString());
+            m_files[entry->file()] = entry;
         }
-
-        m_maxOwnerWidth = std::max(m_maxOwnerWidth, entry->owner().size() + entry->group().size() + 1);
-
-        LOG_DEBUG("TOC entry: {}", entry->toString());
-        m_files[entry->file()] = entry;
+    } catch(const std::exception& e) {
+        LOG_ERROR("Cannot create toc from backend: {}, reason: {}", backend.source(), e.what());
+        // sign that TOC is invalid
+        m_files.clear();
     }
 }
 
@@ -176,7 +190,7 @@ void TableOfContents::unpackNames(InputBuffer& buffer, std::vector<std::string>&
 }
 
 //==========================================================================================================================================
-TableOfContents::TableOfContents(const PartsCompressionParameters& params) : m_parameters(params)
+TableOfContents::TableOfContents(const PartsCompressionParameters& params) noexcept : m_parameters(params)
 {
     // Unit test only constructor, It does nothing
 }
