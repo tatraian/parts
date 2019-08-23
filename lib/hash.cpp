@@ -1,5 +1,7 @@
 #include "hash.h"
 
+#include "logger_internal.h"
+
 #include <fstream>
 
 #include <boost/filesystem.hpp>
@@ -22,19 +24,29 @@ Hash::Hash(HashType type, const boost::filesystem::path& path) :
     m_hash(hash_size(m_type), 0)
 {
     if (!boost::filesystem::exists(path))
-        throw PartsException("File doesn't exist: " + path.string());
+    {
+        LOG_ERROR("File doesn't exist: {}", path.string());
+        m_hash.clear();
+    }
 
-    if (!boost::filesystem::is_regular_file(path))
-        throw PartsException("File is not regular file: " + path.string());
+    if (!boost::filesystem::is_regular_file(path)) {
+        LOG_ERROR("File is not regular file: {}", path.string());
+        m_hash.clear();
+    }
 
     std::ifstream file(path.string(), std::ios::binary);
-    switch (type) {
+    try {
+        switch (type) {
         case HashType::MD5:
             digestpp::md5().absorb(file).digest(&m_hash[0], m_hash.size());
             break;
         case HashType::SHA256:
             digestpp::sha256().absorb(file).digest(&m_hash[0], m_hash.size());
             break;
+        }
+    } catch(const std::exception& e) {
+        LOG_ERROR("Cannot calculate file's hash: {}", path.string());
+        m_hash.clear();
     }
 }
 
@@ -43,14 +55,21 @@ Hash::Hash(HashType type, const std::vector<uint8_t>& data) :
     m_type(type),
     m_hash(hash_size(m_type), 0)
 {
-    switch (type) {
+    try {
+
+        switch (type) {
         case HashType::MD5:
             digestpp::md5().absorb(data.begin(), data.end()).digest(&m_hash[0], m_hash.size());
             break;
         case HashType::SHA256:
             digestpp::sha256().absorb(data.begin(), data.end()).digest(&m_hash[0], m_hash.size());
             break;
+        }
+    } catch(const std::exception& e) {
+        LOG_ERROR("Cannot calculate buffer's hash!");
+        m_hash.clear();
     }
+
 }
 
 //==========================================================================================================================================
@@ -58,11 +77,14 @@ Hash::Hash(HashType type, InputBuffer& data) :
     m_type(type),
     m_hash(hash_size(m_type), 0)
 {
+    if (data.size() < m_hash.size()) {
+        LOG_ERROR("No enough data to read hash");
+        m_hash.clear();
+        return;
+    }
 
     m_hash.clear();
 
-    if (data.size() < m_hash.size())
-        throw PartsException("No enough data to read hash");
     m_hash.insert(m_hash.end(), data.begin(), data.begin() + hash_size(type));
     data.erase(data.begin(), data.begin() + hash_size(type));
 }
