@@ -22,13 +22,19 @@ public:
               const boost::filesystem::path& file,
               std::vector<std::string>& owners,
               std::vector<std::string>& groups,
-              bool save_owner);
+              bool save_owner) noexcept;
 
     BaseEntry(InputBuffer& buffer,
               const std::vector<std::string>& owners,
-              const std::vector<std::string>& groups);
+              const std::vector<std::string>& groups) noexcept;
 
-    virtual ~BaseEntry() {}
+    virtual ~BaseEntry() noexcept;
+
+    BaseEntry(const BaseEntry&) = default;
+    BaseEntry& operator=(const BaseEntry&) = default;
+
+    BaseEntry(BaseEntry&&) = default;
+    BaseEntry& operator=(BaseEntry&&) = default;
 
     virtual void append(std::vector<uint8_t>& buffer) const;
 
@@ -67,6 +73,9 @@ public:
 
     virtual std::string toString() const;
 
+    operator bool() const
+    { return m_valid; }
+
 protected:
     // Constructor for unit tests only
     BaseEntry(const boost::filesystem::path& root,
@@ -75,7 +84,8 @@ protected:
               const std::string& owner,
               uint16_t owner_id,
               const std::string& group,
-              uint16_t group_id) :
+              uint16_t group_id) noexcept:
+        m_valid(true),
         m_root(root),
         m_file(file),
         m_permissions(permissions),
@@ -96,6 +106,7 @@ protected:
     uint16_t findOrInsert(const std::string& name, std::vector<std::string>& table);
 
 protected:
+    bool m_valid;
     boost::filesystem::path m_root;
 
     boost::filesystem::path m_file;

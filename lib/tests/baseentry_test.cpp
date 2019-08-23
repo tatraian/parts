@@ -37,6 +37,7 @@ public:
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_pack_base_data) {
     TestBaseEntry entry("file1", 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1);
+    BOOST_REQUIRE(entry);
 
     std::vector<uint8_t> result(100);
     result.clear();
@@ -67,6 +68,7 @@ BOOST_AUTO_TEST_CASE(can_unpack_base_data) {
 
     TestBaseEntry entry(input, names, names);
 
+    BOOST_REQUIRE(entry);
     BOOST_REQUIRE_EQUAL(input.size(), 0);
     BOOST_CHECK_EQUAL(entry.file(), "file1");
     BOOST_CHECK_EQUAL(entry.permissions(), 0644);
@@ -82,7 +84,8 @@ BOOST_AUTO_TEST_CASE(throws_if_there_is_no_entry_for_owner) {
 
     std::vector<std::string> names = {"DEFAULT_OWNER", "DEFAULT_GROUP"};
 
-    BOOST_REQUIRE_THROW(TestBaseEntry entry(input, names, names), PartsException);
+    TestBaseEntry entry(input, names, names);
+    BOOST_CHECK(!entry);
 }
 
 //==========================================================================================================================================
@@ -91,6 +94,7 @@ BOOST_AUTO_TEST_CASE(throws_if_there_is_no_entry_for_group) {
 
     std::vector<std::string> names = {"DEFAULT_OWNER", "DEFAULT_GROUP"};
 
-    BOOST_REQUIRE_THROW(TestBaseEntry entry(input, names, names), PartsException);
+    TestBaseEntry entry(input, names, names);
+    BOOST_CHECK(!entry);
 }
 

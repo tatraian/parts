@@ -4,6 +4,7 @@
 
 #include <sstream>
 
+#include <boost/filesystem.hpp>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <pwd.h>
@@ -18,10 +19,16 @@ BaseEntry::BaseEntry(const boost::filesystem::path& root,
                      const boost::filesystem::path& file,
                      std::vector<std::string>& owners,
                      std::vector<std::string>& groups,
-                     bool save_owner) :
+                     bool save_owner) noexcept :
+    m_valid(false),
     m_root(root),
     m_file(file)
 {
+    if (!boost::filesystem::exists(root/file)) {
+        LOG_ERROR("Path does not exists: {}", (root/file).string());
+        return;
+    }
+
     // getting stat
     struct stat file_stat;
     lstat((root / file).string().c_str(), &file_stat);
@@ -31,23 +38,35 @@ BaseEntry::BaseEntry(const boost::filesystem::path& root,
     m_owner = owners[m_ownerId];
     m_groupId = getGroupId(&file_stat, groups, save_owner);
     m_group = groups[m_groupId];
+    m_valid = true;
 }
 
 
 //==========================================================================================================================================
-BaseEntry::BaseEntry(InputBuffer& buffer, const std::vector<std::string>& owners, const std::vector<std::string>& groups)
+BaseEntry::BaseEntry(InputBuffer& buffer, const std::vector<std::string>& owners, const std::vector<std::string>& groups) noexcept :
+    m_valid(false)
 {
     Packager::pop_front(buffer, m_file);
     Packager::pop_front(buffer, m_permissions);
     Packager::pop_front(buffer, m_ownerId);
     Packager::pop_front(buffer, m_groupId);
 
-    if (owners.size() <= m_ownerId)
-        throw PartsException("Unknown owner id, during processing file: " + m_file.string());
+    if (owners.size() <= m_ownerId) {
+        LOG_ERROR("Unknown owner id, during processing file: {}" ,m_file.string());
+        return;
+    }
     m_owner = owners[m_ownerId];
-    if (groups.size() <= m_groupId)
-        throw PartsException("Unknown group id, during processing file: " + m_file.string());
+    if (groups.size() <= m_groupId) {
+        LOG_ERROR("Unknown group id, during processing file: {}",m_file.string());
+        return;
+    }
     m_group = groups[m_groupId];
+    m_valid = true;
+}
+
+//==========================================================================================================================================
+BaseEntry::~BaseEntry() noexcept
+{
 }
 
 //==========================================================================================================================================
