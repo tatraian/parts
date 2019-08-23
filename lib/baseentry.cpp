@@ -46,11 +46,15 @@ BaseEntry::BaseEntry(const boost::filesystem::path& root,
 BaseEntry::BaseEntry(InputBuffer& buffer, const std::vector<std::string>& owners, const std::vector<std::string>& groups) noexcept :
     m_valid(false)
 {
-    Packager::pop_front(buffer, m_file);
-    Packager::pop_front(buffer, m_permissions);
-    Packager::pop_front(buffer, m_ownerId);
-    Packager::pop_front(buffer, m_groupId);
-
+    try {
+        Packager::pop_front(buffer, m_file);
+        Packager::pop_front(buffer, m_permissions);
+        Packager::pop_front(buffer, m_ownerId);
+        Packager::pop_front(buffer, m_groupId);
+    } catch (const std::exception& e) {
+       LOG_ERROR("Invalid binary data during parsing entry");
+       return;
+    }
     if (owners.size() <= m_ownerId) {
         LOG_ERROR("Unknown owner id, during processing file: {}" ,m_file.string());
         return;

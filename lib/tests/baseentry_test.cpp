@@ -98,3 +98,14 @@ BOOST_AUTO_TEST_CASE(throws_if_there_is_no_entry_for_group) {
     BOOST_CHECK(!entry);
 }
 
+//==========================================================================================================================================
+BOOST_AUTO_TEST_CASE(will_be_invalid_in_case_of_read_error) {
+    InputBuffer input = {0, 5, 'f', 'i', 'l', 'e', '1', 1, 0244, 0, 3};
+
+    std::vector<std::string> names = {"DEFAULT_OWNER", "DEFAULT_GROUP"};
+
+    TestBaseEntry entry(input, names, names);
+    BOOST_CHECK(!entry);
+
+}
+
