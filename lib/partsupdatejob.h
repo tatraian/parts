@@ -16,9 +16,9 @@ public:
                    const boost::filesystem::path& orig_source,
                    const boost::filesystem::path& dest,
                    ContentReadBackend& content_reader,
-                   bool cont);
+                   bool cont) noexcept;
 
-    ~PartsUpdateJob() = default;
+    ~PartsUpdateJob() noexcept override = default;
 
     operator bool() const override
     { return m_actualElement != m_toc.end(); }

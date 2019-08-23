@@ -19,16 +19,22 @@ public:
      * @param target The source of compression
      * @param parameters The compression parameters
      */
-    PartsArchive(const boost::filesystem::path& source, const PartsCompressionParameters& parameters);
+    PartsArchive(const boost::filesystem::path& source, const PartsCompressionParameters& parameters) noexcept;
 
     /**
      * @brief PartsArchive constructor for extracting archive
      * @param backend Backend should now the destination
      */
-    PartsArchive(std::unique_ptr<ContentReadBackend>&& backend);
+    PartsArchive(std::unique_ptr<ContentReadBackend>&& backend) noexcept;
+
+    PartsArchive(const PartsArchive&) = delete;
+    PartsArchive& operator=(const PartsArchive&) = delete;
+
+    PartsArchive(PartsArchive&&) = default;
+    PartsArchive& operator=(PartsArchive&&) = default;
 
     const TableOfContents& toc() const
-    { return m_toc; }
+    { return *m_toc; }
 
     void listArchive(std::ostream& output) const;
 
@@ -55,18 +61,21 @@ public:
 
     bool extractToMc(const boost::filesystem::path& file_path, const boost::filesystem::path& dest_file);
 
+    operator bool() const
+    { return *m_toc; }
+
 protected:
     // destination for write mode
     boost::filesystem::path m_root;
     // reader interface for extract/update mode
     std::unique_ptr<ContentReadBackend> m_contentReader;
 
-    Header m_header;
+    std::unique_ptr<Header> m_header;
 
     // Compression parameters (in case of compression)
     PartsCompressionParameters m_compressionParameters;
 
-    TableOfContents m_toc;
+    std::unique_ptr<TableOfContents> m_toc;
 };
 
 }

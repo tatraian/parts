@@ -6,8 +6,8 @@ namespace parts {
 
 class PartsJobInterface {
 public:
-    PartsJobInterface() = default;
-    virtual ~PartsJobInterface() = default;
+    PartsJobInterface() noexcept = default;
+    virtual ~PartsJobInterface() noexcept = default;
 
     PartsJobInterface(const PartsJobInterface&) = delete;
     PartsJobInterface& operator=(const PartsJobInterface&) = delete;

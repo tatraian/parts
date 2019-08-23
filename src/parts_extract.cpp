@@ -65,6 +65,9 @@ int main(int argc, char** argv)
 
         PartsArchive archive(std::move(input_stream));
 
+        if (!archive)
+            throw std::runtime_error("Cannot open archive");
+
         if ((mc_extract_file && !mc_extract_dest_file) ||
             (!mc_extract_file && mc_extract_dest_file)){
             throw args::ParseError("'mc_file' and 'mc_dest_file' parameters must be used together");

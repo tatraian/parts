@@ -95,6 +95,8 @@ int main(int argc, char** argv) {
             archive_filename += ".parts";
 
         parts::PartsArchive archive(compress_path, parameters);
+        if (!archive)
+            throw std::runtime_error("Cannot parse source!");
 
         archive.createArchive(archive_filename);
 

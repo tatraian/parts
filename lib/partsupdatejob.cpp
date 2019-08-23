@@ -8,7 +8,7 @@ PartsUpdateJob::PartsUpdateJob(HashType hash_type,
                                const boost::filesystem::path& orig_source,
                                const boost::filesystem::path& dest,
                                ContentReadBackend& content_reader,
-                               bool cont) :
+                               bool cont) noexcept :
     m_oldToc(orig_source, PartsCompressionParameters(hash_type)),
     m_toc(new_toc),
     m_actualElement(m_toc.begin()),
