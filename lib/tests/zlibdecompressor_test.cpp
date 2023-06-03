@@ -23,6 +23,10 @@ std::vector<uint8_t> create_data(const std::vector<uint8_t>& input)
     context.opaque = Z_NULL;
 
     int result = deflateInit(&context, Z_BEST_COMPRESSION);
+    if (result != 0)
+    {
+        throw std::runtime_error("Cannot create zlib context");
+    }
 
     std::vector<uint8_t> compressed(MB, 0);
     context.next_in = const_cast<uint8_t *>(&input[0]);
@@ -31,6 +35,11 @@ std::vector<uint8_t> create_data(const std::vector<uint8_t>& input)
     context.avail_out = compressed.size();
 
     result = deflate(&context, Z_FINISH);
+    if (result != 0)
+    {
+        throw std::runtime_error("Cannot zlib compress");
+    }
+
     compressed.resize(compressed.size() - context.avail_out);
     deflateEnd(&context);
 

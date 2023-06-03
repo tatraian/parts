@@ -4,6 +4,8 @@
 #include "parts_definitions.h"
 
 #include <string>
+#include <limits>
+
 #include "inputbuffer.h"
 
 #include <boost/filesystem/path.hpp>

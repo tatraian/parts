@@ -19,6 +19,10 @@ std::vector<uint8_t> create_data(const std::vector<uint8_t>& input)
 {
     lzma_stream lzma_context = LZMA_STREAM_INIT;
     lzma_ret result = lzma_easy_encoder(&lzma_context, 9, LZMA_CHECK_CRC64);
+    if (result != LZMA_OK)
+    {
+        throw std::runtime_error("Cannot create lzma_context");
+    }
 
     std::vector<uint8_t> compressed(MB, 0);
     lzma_context.next_in = &input[0];
@@ -27,6 +31,10 @@ std::vector<uint8_t> create_data(const std::vector<uint8_t>& input)
     lzma_context.avail_out = compressed.size();
 
     result = lzma_code(&lzma_context, LZMA_FINISH);
+    if (result != LZMA_STREAM_END)
+    {
+        throw std::runtime_error("Cannot compress test data");
+    }
 
     compressed.resize(compressed.size() - lzma_context.avail_out);
     lzma_end(&lzma_context);

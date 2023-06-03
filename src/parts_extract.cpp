@@ -33,7 +33,7 @@ int main(int argc, char** argv)
     args::ValueFlag<std::string> updated_from(parser,
                                               "updated_from",
                                               "The 'old' version, that will be used to update",
-                                              {'u', "--updated_from"});
+                                              {'u', "updated_from"});
     args::ValueFlag<std::string> mc_extract_file(parser, "extract_file", "file to be extracted", {"mc_file"});
     args::ValueFlag<std::string> mc_extract_dest_file(parser, "extract_dest_file", "temp file to extract", {"mc_dest_file"});
     args::Flag list_only(parser, "list_only", "Only list archive", {'l', "list_only"});

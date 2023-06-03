@@ -19,6 +19,10 @@ enum class HashType {
     SHA256 = 1,
 };
 
+#if __GNUG__
+#pragma GCC diagnostic ignored "-Wreturn-type"
+#endif
+
 inline constexpr const char* to_string(CompressionType type) {
     switch (type) {
     case CompressionType::None:
@@ -43,6 +47,10 @@ inline constexpr size_t hash_size(HashType type) {
         return 32;
     }
 }
+
+#if __GNUG__
+#pragma GCC diagnostic error "-Wreturn-type"
+#endif
 
 struct LzmaCompressorParameters
 {

@@ -39,7 +39,7 @@ endif()
 
 add_definitions(-Wall -Werror=switch-enum)
 
-include_directories(thirdparty)
+include_directories(SYSTEM thirdparty)
 add_subdirectory(lib)
 include_directories(lib)
 add_subdirectory(src)

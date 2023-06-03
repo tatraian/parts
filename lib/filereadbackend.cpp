@@ -40,7 +40,7 @@ void FileReadBackend::read(InputBuffer& data, size_t size)
 void FileReadBackend::read(uint8_t* data, size_t size)
 {
     m_file.read(reinterpret_cast<char*>(data), size);
-    if (m_file.gcount() != size)
+    if (static_cast<size_t>(m_file.gcount()) != size)
         throw PartsException("Not enough data to read in file: " + m_path.string());
     m_readBytes += size;
 }
