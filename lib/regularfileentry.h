@@ -12,8 +12,8 @@ namespace parts
 class RegularFileEntry : public BaseEntry
 {
 public:
-    RegularFileEntry(const boost::filesystem::path& root,
-                     const boost::filesystem::path& file,
+    RegularFileEntry(const std::filesystem::path& root,
+                     const std::filesystem::path& file,
                      std::vector<std::string>& owners,
                      std::vector<std::string>& groups,
                      bool save_owner,
@@ -36,17 +36,17 @@ public:
 
     void compressEntry(ContentWriteBackend& backend) override;
 
-    void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont) override;
+    void extractEntry(const std::filesystem::path& dest_root, ContentReadBackend& backend, bool cont) override;
 
     void updateEntry(const BaseEntry* old_entry,
-                     const boost::filesystem::path& old_root,
-                     const boost::filesystem::path& dest_root,
+                     const std::filesystem::path& old_root,
+                     const std::filesystem::path& dest_root,
                      ContentReadBackend& backend,
                      bool cont) override;
 
     std::string listEntry(size_t user_width, size_t size_width, std::tm* t) const override;
 
-    bool extractToMc(const boost::filesystem::path& dest_file, ContentReadBackend& backend) override;
+    bool extractToMc(const std::filesystem::path& dest_file, ContentReadBackend& backend) override;
 
     std::string toString() const override;
 
@@ -74,8 +74,8 @@ public:
 
 protected:
     // help fake unit test
-    RegularFileEntry(const boost::filesystem::path& root,
-                     const boost::filesystem::path& file,
+    RegularFileEntry(const std::filesystem::path& root,
+                     const std::filesystem::path& file,
                      uint16_t permissions,
                      const std::string& owner,
                      uint16_t owner_id,
@@ -92,9 +92,9 @@ protected:
 
     virtual std::unique_ptr<Compressor> createCompressor();
 
-    bool checkHashMatch(const boost::filesystem::path& path);
+    bool checkHashMatch(const std::filesystem::path& path);
 
-    bool checkExisting(const boost::filesystem::path& dest_root);
+    bool checkExisting(const std::filesystem::path& dest_root);
 
 
 protected:

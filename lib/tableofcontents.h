@@ -10,7 +10,7 @@
 #include <vector>
 #include <string>
 
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 
 namespace parts
 {
@@ -18,8 +18,8 @@ namespace parts
 class TableOfContents
 {
 public:
-    typedef std::map<boost::filesystem::path, std::shared_ptr<BaseEntry>>::iterator iterator;
-    typedef std::map<boost::filesystem::path, std::shared_ptr<BaseEntry>>::const_iterator const_iterator;
+    typedef std::map<std::filesystem::path, std::shared_ptr<BaseEntry>>::iterator iterator;
+    typedef std::map<std::filesystem::path, std::shared_ptr<BaseEntry>>::const_iterator const_iterator;
 
     /**
      * The only reasons for these default variants is to support 3rd party TOC handling, so that
@@ -34,7 +34,7 @@ public:
     TableOfContents(TableOfContents&&) = default;
     TableOfContents& operator=(TableOfContents&&) = default;
 
-    TableOfContents(const boost::filesystem::path& source, const PartsCompressionParameters& parameters) noexcept;
+    TableOfContents(const std::filesystem::path& source, const PartsCompressionParameters& parameters) noexcept;
     TableOfContents(ContentReadBackend& backend, size_t toc_size, const PartsCompressionParameters& parameters) noexcept;
 
     std::vector<uint8_t> getRaw() const;
@@ -54,7 +54,7 @@ public:
     size_t size() const
     { return m_files.size(); }
 
-    std::shared_ptr<BaseEntry> find(const boost::filesystem::path& file) const;
+    std::shared_ptr<BaseEntry> find(const std::filesystem::path& file) const;
 
     uint64_t maxSize() const
     { return m_maxSize; }
@@ -70,7 +70,7 @@ public:
 
 
 protected:
-    virtual void add(const boost::filesystem::path& root, const boost::filesystem::path& file);
+    virtual void add(const std::filesystem::path& root, const std::filesystem::path& file);
 
     void packNames(std::vector<uint8_t>& buffer, const std::vector<std::string>& names) const;
     void unpackNames(InputBuffer& buffer, std::vector<std::string>& names);
@@ -79,7 +79,7 @@ protected:
     TableOfContents(const PartsCompressionParameters& params) noexcept;
 
 protected:
-    std::map<boost::filesystem::path, std::shared_ptr<BaseEntry> > m_files;
+    std::map<std::filesystem::path, std::shared_ptr<BaseEntry> > m_files;
     std::vector<std::string> m_owners;
     std::vector<std::string> m_groups;
 

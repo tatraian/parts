@@ -1,4 +1,3 @@
-#include <boost/lexical_cast.hpp>
 #include "compressorfactory.h"
 
 #include "plaincompressor.h"
@@ -18,6 +17,6 @@ std::unique_ptr<Compressor> CompressorFactory::createCompressor(CompressionType 
     case CompressionType::ZLIB:
         return std::unique_ptr<Compressor>(new ZLibCompressor());
     default:
-      throw PartsException("Invalid compressor :"+boost::lexical_cast<std::string>((uint32_t)type));
+      throw PartsException("Invalid compressor : " + std::to_string(static_cast<uint8_t>(type)));
     }
 }

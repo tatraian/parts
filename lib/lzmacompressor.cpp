@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <lzma.h>
+#include <functional>
 
 #include "parts_definitions.h"
 #include "internal_definitions.h"
@@ -65,7 +66,7 @@ LzmaCompressor::~LzmaCompressor()
 }
 
 //==========================================================================================================================================
-size_t LzmaCompressor::compressFile(const boost::filesystem::path& path, ContentWriteBackend& backend)
+size_t LzmaCompressor::compressFile(const std::filesystem::path& path, ContentWriteBackend& backend)
 {
     lzma_stream context;
     setupXZLib(context, m_parameters);

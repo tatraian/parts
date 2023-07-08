@@ -1,5 +1,5 @@
 #include <boost/test/auto_unit_test.hpp>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 #include "../parts_definitions.h"
 
@@ -13,17 +13,17 @@ struct FileWriteBackendFixture : FileWriteBackend {
     {}
 
     ~FileWriteBackendFixture() {
-        //boost::filesystem::remove("/tmp/try");
+        //std::filesystem::remove("/tmp/try");
     }
 };
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(we_can_open_files) {
-    if (boost::filesystem::exists("/tmp/try1"))
-        boost::filesystem::remove("/tmp/try1");
+    if (std::filesystem::exists("/tmp/try1"))
+        std::filesystem::remove("/tmp/try1");
     FileWriteBackend backend("/tmp/try1");
 
-    BOOST_REQUIRE(boost::filesystem::exists("/tmp/try1"));
+    BOOST_REQUIRE(std::filesystem::exists("/tmp/try1"));
 }
 
 //==========================================================================================================================================

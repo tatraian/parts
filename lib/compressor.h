@@ -4,7 +4,7 @@
 #include "contentwritebackend.h"
 
 #include "inputbuffer.h"
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 
 
 namespace parts
@@ -20,7 +20,7 @@ public:
      * @param backend The writer backend into which the compressed data will be written.
      * @return the compressed content size
      */
-    virtual size_t compressFile(const boost::filesystem::path& path,
+    virtual size_t compressFile(const std::filesystem::path& path,
                                 ContentWriteBackend& backend) = 0;
 
     virtual size_t compressBuffer(const std::vector<uint8_t>& buffer,

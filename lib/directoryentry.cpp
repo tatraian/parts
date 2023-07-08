@@ -4,7 +4,7 @@
 #include "internal_definitions.h"
 #include "logger_internal.h"
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 #include <fmt/format.h>
 #include <fmt/time.h>
@@ -12,8 +12,8 @@
 using namespace parts;
 
 //==========================================================================================================================================
-DirectoryEntry::DirectoryEntry(const boost::filesystem::path& root,
-                               const boost::filesystem::path& file,
+DirectoryEntry::DirectoryEntry(const std::filesystem::path& root,
+                               const std::filesystem::path& file,
                                std::vector<std::string>& owners,
                                std::vector<std::string>& groups,
                                bool save_owner) noexcept :
@@ -45,17 +45,17 @@ void DirectoryEntry::compressEntry(ContentWriteBackend& backend)
 }
 
 //==========================================================================================================================================
-void DirectoryEntry::extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont)
+void DirectoryEntry::extractEntry(const std::filesystem::path& dest_root, ContentReadBackend& backend, bool cont)
 {
     LOG_TRACE("Create dir:   {}", m_file.string());
-    if (cont && boost::filesystem::is_directory(dest_root / m_file)) {
+    if (cont && std::filesystem::is_directory(dest_root / m_file)) {
         setMetadata(dest_root);
         return;
     }
 
     // Do not decompression, but creates the directory with the correct rights
-    boost::system::error_code ec;
-    boost::filesystem::create_directories(dest_root / m_file, ec);
+    std::error_code ec;
+    std::filesystem::create_directories(dest_root / m_file, ec);
     if (ec)
     {
         throw PartsException("Cannot create directory: " + (dest_root / m_file).string());
@@ -66,8 +66,8 @@ void DirectoryEntry::extractEntry(const boost::filesystem::path& dest_root, Cont
 
 //==========================================================================================================================================
 void DirectoryEntry::updateEntry(const BaseEntry* old_entry,
-                                 const boost::filesystem::path& old_root,
-                                 const boost::filesystem::path& dest_root,
+                                 const std::filesystem::path& old_root,
+                                 const std::filesystem::path& dest_root,
                                  ContentReadBackend& backend,
                                  bool cont)
 {

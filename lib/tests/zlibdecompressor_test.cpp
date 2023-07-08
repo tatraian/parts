@@ -35,7 +35,7 @@ std::vector<uint8_t> create_data(const std::vector<uint8_t>& input)
     context.avail_out = compressed.size();
 
     result = deflate(&context, Z_FINISH);
-    if (result != 0)
+    if (result != Z_STREAM_END)
     {
         throw std::runtime_error("Cannot zlib compress");
     }

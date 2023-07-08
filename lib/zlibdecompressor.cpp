@@ -1,4 +1,5 @@
 #include <fstream>
+#include <functional>
 #include <zlib.h>
 
 #include "simpleguard.h"
@@ -90,7 +91,7 @@ parts::InputBuffer ZLibDecompressor::extractBuffer(const std::vector<uint8_t>& b
 }
 
 //==========================================================================================================================================
-void ZLibDecompressor::extractFile(const boost::filesystem::path& file,
+void ZLibDecompressor::extractFile(const std::filesystem::path& file,
                                    parts::ContentReadBackend& backend,
                                    size_t position,
                                    size_t compressed_size)

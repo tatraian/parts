@@ -13,8 +13,8 @@ class PartsUpdateJob : public PartsJobInterface
 public:
     PartsUpdateJob(HashType hash_type,
                    TableOfContents& new_toc,
-                   const boost::filesystem::path& orig_source,
-                   const boost::filesystem::path& dest,
+                   const std::filesystem::path& orig_source,
+                   const std::filesystem::path& dest,
                    ContentReadBackend& content_reader,
                    bool cont) noexcept;
 
@@ -38,8 +38,8 @@ protected:
     TableOfContents& m_toc;
 
     TableOfContents::iterator m_actualElement;
-    boost::filesystem::path m_oldRootDir;
-    boost::filesystem::path m_dest;
+    std::filesystem::path m_oldRootDir;
+    std::filesystem::path m_dest;
     ContentReadBackend& m_contentReader;
     bool m_continue;
 };

@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE(can_unpack_string_length_4) {
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_unpack_path_with_two_length_names) {
     InputBuffer input = {0, 14, '/', 'u', 's', 'r', '/', 's', 'h', 'a', 'r', 'e', '/', 'l', 'i', 'b'};
-    boost::filesystem::path path;
+    std::filesystem::path path;
 
     Packager::pop_front(input, path);
 
@@ -281,7 +281,7 @@ BOOST_AUTO_TEST_CASE(string_pack_throw_exception_if_length_is_too_short) {
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(can_pack_path_with_two_length_names) {
     std::vector<uint8_t> result;
-    boost::filesystem::path path("/usr/share/lib");
+    std::filesystem::path path("/usr/share/lib");
 
     Packager::append(result, path);
 

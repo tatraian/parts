@@ -4,7 +4,7 @@
 #include "../parts_definitions.h"
 
 #include <fstream>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 
 using namespace parts;
@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(can_open_file) {
     test_file.close();
 
     std::unique_ptr<FileReadBackend> backend;
-    backend.reset(new FileReadBackend (boost::filesystem::path("/tmp/opentest")));
+    backend.reset(new FileReadBackend (std::filesystem::path("/tmp/opentest")));
 
     BOOST_CHECK(*backend);
     BOOST_CHECK_EQUAL(backend->source(), "/tmp/opentest");
@@ -32,8 +32,8 @@ BOOST_AUTO_TEST_CASE(can_open_file) {
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(throws_if_file_not_exist) {
-    boost::system::error_code err;
-    boost::filesystem::remove("/tmp/opentest", err);
+    std::error_code err;
+    std::filesystem::remove("/tmp/opentest", err);
 
     FileReadBackend backend("/tmp/opentest");
     BOOST_CHECK(!backend);

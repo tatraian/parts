@@ -8,7 +8,7 @@
 using namespace parts;
 
 //==========================================================================================================================================
-size_t PlainCompressor::compressFile(const boost::filesystem::path& path, ContentWriteBackend& backend)
+size_t PlainCompressor::compressFile(const std::filesystem::path& path, ContentWriteBackend& backend)
 {
     std::ifstream input_file(path.string(), std::ios::binary | std::ios::in);
     if (!input_file)

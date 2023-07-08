@@ -12,7 +12,7 @@ class FakeCompressor : public Compressor {
 public:
     FakeCompressor() : Compressor() {}
 
-    size_t compressFile(const boost::filesystem::path& path,
+    size_t compressFile(const std::filesystem::path& path,
                         ContentWriteBackend& backend) override {
         return 2;
     }

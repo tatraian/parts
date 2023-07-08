@@ -2,7 +2,7 @@
 #define FILEREADBACKEND_H
 
 #include "contentreadbackend.h"
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 
 #include <fstream>
 
@@ -12,7 +12,7 @@ namespace parts
 class FileReadBackend : public ContentReadBackend
 {
 public:
-    FileReadBackend(const boost::filesystem::path& filename);
+    FileReadBackend(const std::filesystem::path& filename);
     ~FileReadBackend() noexcept override = default;
 
      std::string source() const override
@@ -29,7 +29,7 @@ public:
      uint64_t position() override;
 
 protected:
-     boost::filesystem::path m_path;
+     std::filesystem::path m_path;
      std::ifstream m_file;
      uint64_t m_filesize;
 };

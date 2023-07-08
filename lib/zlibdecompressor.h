@@ -14,7 +14,7 @@ public:
 
     parts::InputBuffer extractBuffer(const std::vector<uint8_t>& buffer) override;
 
-    void extractFile(const boost::filesystem::path& file,
+    void extractFile(const std::filesystem::path& file,
                      parts::ContentReadBackend& backend,
                      size_t position,
                      size_t compressed_size) override;

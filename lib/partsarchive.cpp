@@ -7,13 +7,13 @@
 #include <chrono>
 #include <ctime>
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 using namespace parts;
 
 
 //==========================================================================================================================================
-PartsArchive::PartsArchive(const boost::filesystem::path& source, const PartsCompressionParameters& parameters) noexcept :
+PartsArchive::PartsArchive(const std::filesystem::path& source, const PartsCompressionParameters& parameters) noexcept :
     m_root(source.parent_path()),
     m_header(new Header(parameters)),
     m_compressionParameters(parameters),
@@ -48,13 +48,13 @@ void PartsArchive::listArchive(std::ostream& output) const
 }
 
 //==========================================================================================================================================
-void PartsArchive::createArchive(const boost::filesystem::path& archive)
+void PartsArchive::createArchive(const std::filesystem::path& archive)
 {
-    auto p = boost::filesystem::unique_path();
-    p = "/tmp" / p;
+    auto unique_temp_file_name = archive;
+    unique_temp_file_name.replace_extension(archive.extension().string() + "_tmp");
+    LOG_DEBUG("Unique temprary file: {}", unique_temp_file_name.string());
 
-    LOG_DEBUG("Uniq temprary file: {}", p.string());
-    FileWriteBackend temp(p);
+    FileWriteBackend temp(unique_temp_file_name);
 
     for(auto& entry : *m_toc) {
         entry.second->compressEntry(temp);
@@ -78,7 +78,7 @@ void PartsArchive::createArchive(const boost::filesystem::path& archive)
 }
 
 //==========================================================================================================================================
-void PartsArchive::extractArchive(const boost::filesystem::path& dest, bool cont)
+void PartsArchive::extractArchive(const std::filesystem::path& dest, bool cont)
 {
     for (auto& entry : *m_toc) {
         entry.second->extractEntry(dest, *m_contentReader.get(), cont);
@@ -86,8 +86,8 @@ void PartsArchive::extractArchive(const boost::filesystem::path& dest, bool cont
 }
 
 //==========================================================================================================================================
-void PartsArchive::updateArchive(const boost::filesystem::path& original_source,
-                                 const boost::filesystem::path& dest,
+void PartsArchive::updateArchive(const std::filesystem::path& original_source,
+                                 const std::filesystem::path& dest,
                                  bool cont)
 {
     PartsUpdateJob job(m_header->getHashType(),
@@ -103,8 +103,8 @@ void PartsArchive::updateArchive(const boost::filesystem::path& original_source,
 }
 
 //==========================================================================================================================================
-std::unique_ptr<PartsJobInterface> PartsArchive::updateJob(const boost::filesystem::path& original_source,
-                                                           const boost::filesystem::path& dest,
+std::unique_ptr<PartsJobInterface> PartsArchive::updateJob(const std::filesystem::path& original_source,
+                                                           const std::filesystem::path& dest,
                                                            bool cont)
 {
     return std::make_unique<PartsUpdateJob>(m_header->getHashType(),
@@ -117,7 +117,7 @@ std::unique_ptr<PartsJobInterface> PartsArchive::updateJob(const boost::filesyst
 }
 
 //==========================================================================================================================================
-bool PartsArchive::extractToMc(const boost::filesystem::path& file_path, const boost::filesystem::path& dest_file)
+bool PartsArchive::extractToMc(const std::filesystem::path& file_path, const std::filesystem::path& dest_file)
 {
     auto entry = m_toc->find(file_path);
     if (!entry) {

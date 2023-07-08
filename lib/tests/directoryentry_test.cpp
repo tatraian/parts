@@ -10,12 +10,12 @@ using namespace fakeit;
 namespace {
 class TestDirectoryEntry : public DirectoryEntry {
 public:
-    TestDirectoryEntry(const boost::filesystem::path& file,
+    TestDirectoryEntry(const std::filesystem::path& file,
                        uint16_t permissions,
                        const std::string& owner,
                        uint16_t owner_id,
                        const std::string& group,
-                       uint16_t group_id) : DirectoryEntry(boost::filesystem::path("nowhere"),
+                       uint16_t group_id) : DirectoryEntry(std::filesystem::path("nowhere"),
                                                            file,
                                                            permissions,
                                                            owner,

@@ -6,7 +6,7 @@
 #include <iostream>
 
 #include <boost/endian/conversion.hpp>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 using namespace parts;
 
@@ -28,7 +28,7 @@ void append(File& file, Value value) {
 }
 
 //==========================================================================================================================================
-FileWriteBackend::FileWriteBackend(const boost::filesystem::path& file) :
+FileWriteBackend::FileWriteBackend(const std::filesystem::path& file) :
     m_filename(file)
 {
     m_file.open(file.string(),std::ios::out | std::ios::ate | std::ios::binary);
@@ -104,7 +104,7 @@ void FileWriteBackend::concatenate(ContentWriteBackend&& tail)
 
     // This will drop this object in invalid state
     file_tail.m_file.close();
-    boost::filesystem::remove(file_tail.m_filename);
+    std::filesystem::remove(file_tail.m_filename);
 }
 
 //==========================================================================================================================================

@@ -7,7 +7,7 @@
 #include "internal_definitions.h"
 #include "logger_internal.h"
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 #include <chrono>
 
@@ -17,7 +17,7 @@ const std::string TableOfContents::DEFAULT_OWNER = "__PARTS_DEFAULT_OWNER__";
 const std::string TableOfContents::DEFAULT_GROUP = "__PARTS_DEFAULT_GROUP__";
 
 //==========================================================================================================================================
-TableOfContents::TableOfContents(const boost::filesystem::path& source, const PartsCompressionParameters& parameters) noexcept:
+TableOfContents::TableOfContents(const std::filesystem::path& source, const PartsCompressionParameters& parameters) noexcept:
     m_parameters(parameters),
     m_maxSize(0),
     m_maxOwnerWidth(0)
@@ -32,24 +32,24 @@ TableOfContents::TableOfContents(const boost::filesystem::path& source, const Pa
         return;
     }
 
-    if (!boost::filesystem::exists(source)) {
+    if (!std::filesystem::exists(source)) {
         LOG_ERROR("Source doesn't exist: {}", source.string());
         return;
     }
 
     try {
         add(source.parent_path(), source);
-        if (boost::filesystem::is_regular_file(source) || boost::filesystem::is_symlink(source))
+        if (std::filesystem::is_regular_file(source) || std::filesystem::is_symlink(source))
             return;
 
         auto start_time = std::chrono::system_clock::now();
         LOG_TRACE("Creating TOC");
-        boost::filesystem::recursive_directory_iterator dir(source), end;
+        std::filesystem::recursive_directory_iterator dir(source), end;
         for (;dir != end;++dir)
         {
             add(source.parent_path(), dir->path());
-            if (boost::filesystem::is_symlink(dir->path()))
-                dir.no_push();
+            if (std::filesystem::is_symlink(dir->path()))
+                dir.disable_recursion_pending();
         }
         auto end_time = std::chrono::system_clock::now();
         std::chrono::duration<double> diff = end_time-start_time;
@@ -138,7 +138,7 @@ void TableOfContents::shiftOffsets(uint64_t& data_start)
 }
 
 //==========================================================================================================================================
-std::shared_ptr<BaseEntry> TableOfContents::find(const boost::filesystem::path& file) const
+std::shared_ptr<BaseEntry> TableOfContents::find(const std::filesystem::path& file) const
 {
     auto it = m_files.find(file);
     if (it == m_files.end())
@@ -148,17 +148,17 @@ std::shared_ptr<BaseEntry> TableOfContents::find(const boost::filesystem::path& 
 }
 
 //==========================================================================================================================================
-void TableOfContents::add(const boost::filesystem::path& root, const boost::filesystem::path& file)
+void TableOfContents::add(const std::filesystem::path& root, const std::filesystem::path& file)
 {
-    boost::filesystem::path filename = file.lexically_relative(root);
+    std::filesystem::path filename = file.lexically_relative(root);
 
     std::shared_ptr<BaseEntry> entry;
     // must check this first, because depending of the target of the link is_regular_file and is_directory are also true...
-    if (boost::filesystem::is_symlink(file)) {
+    if (std::filesystem::is_symlink(file)) {
         entry.reset(new LinkEntry(root, filename, m_owners, m_groups, m_parameters.m_saveOwners));
-    } else if (boost::filesystem::is_directory(file)) {
+    } else if (std::filesystem::is_directory(file)) {
         entry.reset(new DirectoryEntry(root, filename, m_owners, m_groups, m_parameters.m_saveOwners));
-    } else if (boost::filesystem::is_regular_file(file)) {
+    } else if (std::filesystem::is_regular_file(file)) {
         entry.reset(new RegularFileEntry(root, filename, m_owners, m_groups, m_parameters.m_saveOwners, m_parameters));
     } else {
         LOG_WARNING("Unknown file type: {}", file.string());

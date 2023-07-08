@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(can_compress_buffer) {
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(throws_if_file_not_exists) {
     PlainCompressor compressor;
-    boost::filesystem::path path ("not_existing/file");
+    std::filesystem::path path ("not_existing/file");
 
     Mock<ContentWriteBackend> mock;
 

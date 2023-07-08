@@ -7,9 +7,10 @@
 #include "../linkentry.h"
 #include "../directoryentry.h"
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 #include <iostream>
+#include <fstream>
 
 using namespace parts;
 
@@ -28,20 +29,20 @@ BOOST_AUTO_TEST_CASE(TableOfContents_can_parse_only_one_file) {
     const char* filename = "/tmp/one_file";
     PartsCompressionParameters params;
 
-    boost::filesystem::remove(filename);
+    std::filesystem::remove(filename);
     std::ofstream file(filename, std::ios::ate);
 
-    BOOST_REQUIRE(boost::filesystem::is_regular_file(filename));
+    BOOST_REQUIRE(std::filesystem::is_regular_file(filename));
 
     TableOfContents toc(filename, params);
 
     BOOST_CHECK(toc);
     BOOST_REQUIRE_EQUAL(toc.size(), 1);
-    BOOST_REQUIRE_EQUAL(toc.begin()->first, boost::filesystem::path(filename).filename());
+    BOOST_REQUIRE_EQUAL(toc.begin()->first, std::filesystem::path(filename).filename());
     std::shared_ptr<BaseEntry> entry = toc.begin()->second;
     std::shared_ptr<RegularFileEntry> file_entry = std::dynamic_pointer_cast<RegularFileEntry>(entry);
     BOOST_REQUIRE(file_entry);
-    BOOST_REQUIRE_EQUAL(file_entry->file(), boost::filesystem::path(filename).filename());
+    BOOST_REQUIRE_EQUAL(file_entry->file(), std::filesystem::path(filename).filename());
 
     BOOST_REQUIRE_EQUAL(file_entry->ownerId(), 0);
     BOOST_REQUIRE_EQUAL(file_entry->owner(), TableOfContents::DEFAULT_OWNER);
@@ -51,20 +52,20 @@ BOOST_AUTO_TEST_CASE(TableOfContents_can_parse_only_one_file) {
 
 //==========================================================================================================================================
 BOOST_FIXTURE_TEST_CASE(detects_files_correctly, FakeTableOfContents) {
-    boost::filesystem::path test_root("/tmp");
-    boost::filesystem::path test_path("/tmp/test_path");
-    boost::filesystem::path test_dir("/tmp/test_path/test_dir");
-    boost::filesystem::path test_file("/tmp/test_path/test_file");
-    boost::filesystem::path test_dir_file("/tmp/test_path/test_dir/test_file");
-    boost::filesystem::path test_absolute_link("/tmp/test_path/test_absolute_link");
-    boost::filesystem::path test_relative_link("/tmp/test_path/test_dir/test_relative_link");
-    boost::filesystem::path test_absolute_dir_link("/tmp/test_path/test_absolute_dir_link");
-    boost::filesystem::path test_relative_dir_link("/tmp/test_path/test_relative_dir_link");
-    boost::filesystem::path test_absolute_link_to_out("/tmp/test_path/test_absolute_out_link");
-    boost::filesystem::remove_all(test_path);
+    std::filesystem::path test_root("/tmp");
+    std::filesystem::path test_path("/tmp/test_path");
+    std::filesystem::path test_dir("/tmp/test_path/test_dir");
+    std::filesystem::path test_file("/tmp/test_path/test_file");
+    std::filesystem::path test_dir_file("/tmp/test_path/test_dir/test_file");
+    std::filesystem::path test_absolute_link("/tmp/test_path/test_absolute_link");
+    std::filesystem::path test_relative_link("/tmp/test_path/test_dir/test_relative_link");
+    std::filesystem::path test_absolute_dir_link("/tmp/test_path/test_absolute_dir_link");
+    std::filesystem::path test_relative_dir_link("/tmp/test_path/test_relative_dir_link");
+    std::filesystem::path test_absolute_link_to_out("/tmp/test_path/test_absolute_out_link");
+    std::filesystem::remove_all(test_path);
 
-    boost::filesystem::create_directory(test_path);
-    boost::filesystem::create_directory(test_dir);
+    std::filesystem::create_directory(test_path);
+    std::filesystem::create_directory(test_dir);
     std::ofstream f(test_file.c_str(), std::ios::ate);
     f << "aaa";
     f.close();
@@ -72,11 +73,11 @@ BOOST_FIXTURE_TEST_CASE(detects_files_correctly, FakeTableOfContents) {
     f << "bbb";
     f.close();
 
-    boost::filesystem::create_symlink(test_dir_file, test_absolute_link);
-    boost::filesystem::create_symlink(boost::filesystem::relative(test_file, test_relative_link.parent_path()), test_relative_link);
-    boost::filesystem::create_symlink(test_dir, test_absolute_dir_link);
-    boost::filesystem::create_symlink(boost::filesystem::relative(test_dir, test_relative_dir_link.parent_path()), test_relative_dir_link);
-    boost::filesystem::create_symlink( "/bin/bash", test_absolute_link_to_out);
+    std::filesystem::create_symlink(test_dir_file, test_absolute_link);
+    std::filesystem::create_symlink(std::filesystem::relative(test_file, test_relative_link.parent_path()), test_relative_link);
+    std::filesystem::create_symlink(test_dir, test_absolute_dir_link);
+    std::filesystem::create_symlink(std::filesystem::relative(test_dir, test_relative_dir_link.parent_path()), test_relative_dir_link);
+    std::filesystem::create_symlink( "/bin/bash", test_absolute_link_to_out);
 
     PartsCompressionParameters params;
     TableOfContents toc(test_path, params);
@@ -114,7 +115,7 @@ BOOST_FIXTURE_TEST_CASE(detects_files_correctly, FakeTableOfContents) {
     link = std::dynamic_pointer_cast<LinkEntry>(entry);
     BOOST_REQUIRE(link);
 
-    BOOST_CHECK_EQUAL(link->destination(), test_dir.leaf());
+    BOOST_CHECK_EQUAL(link->destination(), test_dir.filename());
 
     entry = toc.find(test_absolute_link_to_out.lexically_relative(test_root));
     BOOST_REQUIRE(entry);

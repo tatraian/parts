@@ -10,14 +10,14 @@ using namespace fakeit;
 namespace {
 class TestLinkEntry : public LinkEntry {
 public:
-    TestLinkEntry(const boost::filesystem::path& file,
+    TestLinkEntry(const std::filesystem::path& file,
                   uint16_t permissions,
                   const std::string& owner,
                   uint16_t owner_id,
                   const std::string& group,
                   uint16_t group_id,
-                  const boost::filesystem::path& destination,
-                  bool absolute) : LinkEntry(boost::filesystem::path("nowhere"),
+                  const std::filesystem::path& destination,
+                  bool absolute) : LinkEntry(std::filesystem::path("nowhere"),
                                              file,
                                              permissions,
                                              owner,

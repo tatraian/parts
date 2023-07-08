@@ -6,7 +6,7 @@
 #include <iostream>
 #include <lzma.h>
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 using namespace parts;
 
@@ -68,9 +68,9 @@ int main(int argc, char** argv) {
     try
     {
         parser.ParseCLI(argc, argv);
-        boost::filesystem::path compress_path(cut_slash(compress_dir.Get()));
+        std::filesystem::path compress_path(cut_slash(compress_dir.Get()));
         if (compress_path.is_relative()) {
-            compress_path = boost::filesystem::system_complete(compress_path);
+            compress_path = std::filesystem::canonical(compress_path);
         }
 
         parts::PartsCompressionParameters parameters;

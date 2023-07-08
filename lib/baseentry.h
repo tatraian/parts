@@ -8,7 +8,7 @@
 #include <vector>
 #include "inputbuffer.h"
 
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 
 #include <sys/stat.h>
 
@@ -18,8 +18,8 @@ namespace parts
 class BaseEntry
 {
 public:
-    BaseEntry(const boost::filesystem::path& root,
-              const boost::filesystem::path& file,
+    BaseEntry(const std::filesystem::path& root,
+              const std ::filesystem::path& file,
               std::vector<std::string>& owners,
               std::vector<std::string>& groups,
               bool save_owner) noexcept;
@@ -40,20 +40,20 @@ public:
 
     virtual void compressEntry(ContentWriteBackend& backend) = 0;
 
-    virtual void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont) = 0;
+    virtual void extractEntry(const std::filesystem::path& dest_root, ContentReadBackend& backend, bool cont) = 0;
 
     virtual void updateEntry(const BaseEntry* old_entry,
-                             const boost::filesystem::path& old_root,
-                             const boost::filesystem::path& dest_root,
+                             const std::filesystem::path& old_root,
+                             const std::filesystem::path& dest_root,
                              ContentReadBackend& backend,
                              bool cont) = 0;
 
     virtual std::string listEntry(size_t user_width, size_t size_width, std::tm* t) const = 0;
 
-    virtual bool extractToMc(const boost::filesystem::path& dest_file, ContentReadBackend& backend)
+    virtual bool extractToMc(const std::filesystem::path& dest_file, ContentReadBackend& backend)
     { return false; }
 
-    const boost::filesystem::path& file() const
+    const std::filesystem::path& file() const
     { return m_file; }
 
     uint16_t permissions() const
@@ -78,8 +78,8 @@ public:
 
 protected:
     // Constructor for unit tests only
-    BaseEntry(const boost::filesystem::path& root,
-              const boost::filesystem::path& file,
+    BaseEntry(const std::filesystem::path& root,
+              const std::filesystem::path& file,
               uint16_t permissions,
               const std::string& owner,
               uint16_t owner_id,
@@ -95,7 +95,7 @@ protected:
         m_groupId(group_id)
     {}
 
-    void setMetadata(const boost::filesystem::path& dest_root);
+    void setMetadata(const std::filesystem::path& dest_root);
 
     std::string permissionsToString() const;
 
@@ -107,9 +107,9 @@ protected:
 
 protected:
     bool m_valid;
-    boost::filesystem::path m_root;
+    std::filesystem::path m_root;
 
-    boost::filesystem::path m_file;
+    std::filesystem::path m_file;
     uint16_t m_permissions;
     std::string m_owner;
     uint16_t m_ownerId;

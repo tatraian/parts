@@ -1,6 +1,6 @@
 #include <boost/test/auto_unit_test.hpp>
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 #include "../hash.h"
 
@@ -8,7 +8,7 @@ using namespace parts;
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(hash_do_not_throw_exception_in_case_of_not_existing_files) {
-    boost::filesystem::path not_exist("/not/existing/file/with/long/name");
+    std::filesystem::path not_exist("/not/existing/file/with/long/name");
 
     Hash h(HashType::SHA256, not_exist);
     BOOST_REQUIRE(!h.isValid());

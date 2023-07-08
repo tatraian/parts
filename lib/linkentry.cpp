@@ -4,7 +4,7 @@
 #include "internal_definitions.h"
 #include "logger_internal.h"
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 #include <fmt/format.h>
 #include <fmt/time.h>
@@ -13,15 +13,15 @@ using namespace parts;
 
 
 //==========================================================================================================================================
-LinkEntry::LinkEntry(const boost::filesystem::path& root,
-                     const boost::filesystem::path& file,
+LinkEntry::LinkEntry(const std::filesystem::path& root,
+                     const std::filesystem::path& file,
                      std::vector<std::string>& owners,
                      std::vector<std::string>& groups,
                      bool save_owner) noexcept:
     BaseEntry(root, file, owners, groups, save_owner)
 {
     try {
-        boost::filesystem::path target = boost::filesystem::read_symlink(root/file);
+        std::filesystem::path target = std::filesystem::read_symlink(root/file);
 
         m_destination =target;
     } catch (const std::exception& e) {
@@ -61,24 +61,24 @@ void LinkEntry::compressEntry(ContentWriteBackend& backend)
 }
 
 //==========================================================================================================================================
-void LinkEntry::extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont)
+void LinkEntry::extractEntry(const std::filesystem::path& dest_root, ContentReadBackend& backend, bool cont)
 {
     LOG_TRACE("Create link:  {}", m_file.string());
 
     // Symlink already created, since we continues the update this won't cause problem.
-    if (cont && boost::filesystem::is_symlink(dest_root / m_file) && boost::filesystem::read_symlink(dest_root / m_file) == m_destination)
+    if (cont && std::filesystem::is_symlink(dest_root / m_file) && std::filesystem::read_symlink(dest_root / m_file) == m_destination)
         return;
 
-    boost::system::error_code ec;
-    boost::filesystem::create_symlink(m_destination, dest_root / m_file, ec);
+    std::error_code ec;
+    std::filesystem::create_symlink(m_destination, dest_root / m_file, ec);
     if (ec)
         throw PartsException("Cannot create symbolic link: '" + (dest_root / m_file).string() + "' to '" + m_destination.string() +"'");
 }
 
 //==========================================================================================================================================
 void LinkEntry::updateEntry(const BaseEntry* old_entry,
-                            const boost::filesystem::path& old_root,
-                            const boost::filesystem::path& dest_root,
+                            const std::filesystem::path& old_root,
+                            const std::filesystem::path& dest_root,
                             ContentReadBackend& backend,
                             bool cont)
 {
@@ -108,10 +108,10 @@ std::string LinkEntry::toString() const
 }
 
 //==========================================================================================================================================
-bool LinkEntry::fileInsideRoot(const boost::filesystem::path& root, const boost::filesystem::path& file)
+bool LinkEntry::fileInsideRoot(const std::filesystem::path& root, const std::filesystem::path& file)
 {
-    auto real_root = boost::filesystem::canonical(root);
-    auto real_file = boost::filesystem::canonical(file);
+    auto real_root = std::filesystem::canonical(root);
+    auto real_file = std::filesystem::canonical(file);
 
     return real_file.string().find(real_root.string()) == 0;
 }

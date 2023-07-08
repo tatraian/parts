@@ -8,7 +8,7 @@
 namespace parts
 {
 
-enum class CompressionType {
+enum class CompressionType : uint8_t {
     None = 0,
     LZMA = 1,
     ZLIB = 2,

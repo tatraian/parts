@@ -1,5 +1,6 @@
 #include <zlib.h>
 #include <fstream>
+#include <functional>
 
 #include "simpleguard.h"
 #include "parts_definitions.h"
@@ -10,7 +11,7 @@
 using namespace parts;
 
 //==========================================================================================================================================
-size_t ZLibCompressor::compressFile(const boost::filesystem::path& path, ContentWriteBackend& backend)
+size_t ZLibCompressor::compressFile(const std::filesystem::path& path, ContentWriteBackend& backend)
 {
     z_stream context;
     auto guard = SimpleGuard<std::function<void()>>([&](){deflateEnd(&context); });

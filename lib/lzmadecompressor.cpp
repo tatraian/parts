@@ -6,6 +6,7 @@
 #include "logger_internal.h"
 
 #include <fstream>
+#include <functional>
 #include <lzma.h>
 
 using namespace parts;
@@ -99,7 +100,7 @@ InputBuffer LzmaDecompressor::extractBuffer(const std::vector<uint8_t>& buffer)
 }
 
 //==========================================================================================================================================
-void LzmaDecompressor::extractFile(const boost::filesystem::path& file,
+void LzmaDecompressor::extractFile(const std::filesystem::path& file,
                                    ContentReadBackend& backend,
                                    size_t position,
                                    size_t compressed_size)

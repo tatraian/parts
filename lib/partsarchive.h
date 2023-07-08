@@ -1,7 +1,7 @@
 #ifndef PARTSARCHIVE_H
 #define PARTSARCHIVE_H
 
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 #include "parts_definitions.h"
 #include "header.h"
 #include "tableofcontents.h"
@@ -19,7 +19,7 @@ public:
      * @param target The source of compression
      * @param parameters The compression parameters
      */
-    PartsArchive(const boost::filesystem::path& source, const PartsCompressionParameters& parameters) noexcept;
+    PartsArchive(const std::filesystem::path& source, const PartsCompressionParameters& parameters) noexcept;
 
     /**
      * @brief PartsArchive constructor for extracting archive
@@ -38,11 +38,11 @@ public:
 
     void listArchive(std::ostream& output) const;
 
-    void createArchive(const boost::filesystem::path& archive);
+    void createArchive(const std::filesystem::path& archive);
 
-    void extractArchive(const boost::filesystem::path& dest, bool cont);
-    void updateArchive(const boost::filesystem::path& original_source,
-                       const boost::filesystem::path& dest,
+    void extractArchive(const std::filesystem::path& dest, bool cont);
+    void updateArchive(const std::filesystem::path& original_source,
+                       const std::filesystem::path& dest,
                        bool cont);
 
     // Job API!
@@ -50,8 +50,8 @@ public:
     // while(*job)
     //     job->doNext()
     // without '*' you check the unique_ptr...
-    std::unique_ptr<PartsJobInterface> updateJob(const boost::filesystem::path& original_source,
-                                                 const boost::filesystem::path& dest,
+    std::unique_ptr<PartsJobInterface> updateJob(const std::filesystem::path& original_source,
+                                                 const std::filesystem::path& dest,
                                                  bool cont);
 
     uint64_t readBytes() const
@@ -59,14 +59,14 @@ public:
     uint64_t sentRequests() const
     { if (m_contentReader) return m_contentReader->sentRequests(); else return 0; }
 
-    bool extractToMc(const boost::filesystem::path& file_path, const boost::filesystem::path& dest_file);
+    bool extractToMc(const std::filesystem::path& file_path, const std::filesystem::path& dest_file);
 
     operator bool() const
     { return *m_toc; }
 
 protected:
     // destination for write mode
-    boost::filesystem::path m_root;
+    std::filesystem::path m_root;
     // reader interface for extract/update mode
     std::unique_ptr<ContentReadBackend> m_contentReader;
 

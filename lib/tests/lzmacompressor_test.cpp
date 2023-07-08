@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(lzma_can_compress_buffer) {
 
 //==========================================================================================================================================
 BOOST_AUTO_TEST_CASE(lzma_can_compress_file) {
-    boost::filesystem::path path("/tmp/parts_unit_test_never_write_file");
+    std::filesystem::path path("/tmp/parts_unit_test_never_write_file");
 
     std::vector<uint8_t> input(MB, 0);
     for(size_t tmp = 0; tmp != input.size(); ++tmp)

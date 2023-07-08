@@ -9,8 +9,8 @@ namespace parts
 class DirectoryEntry : public BaseEntry
 {
 public:
-    DirectoryEntry(const boost::filesystem::path& root,
-                   const boost::filesystem::path& file,
+    DirectoryEntry(const std::filesystem::path& root,
+                   const std::filesystem::path& file,
                    std::vector<std::string>& owners,
                    std::vector<std::string>& groups,
                    bool save_owner) noexcept;
@@ -31,11 +31,11 @@ public:
 
     void compressEntry(ContentWriteBackend& backend) override;
 
-    void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont) override;
+    void extractEntry(const std::filesystem::path& dest_root, ContentReadBackend& backend, bool cont) override;
 
     void updateEntry(const BaseEntry* old_entry,
-                     const boost::filesystem::path& old_root,
-                     const boost::filesystem::path& dest_root,
+                     const std::filesystem::path& old_root,
+                     const std::filesystem::path& dest_root,
                      ContentReadBackend& backend,
                      bool cont) override;
 
@@ -45,8 +45,8 @@ public:
 
 protected:
     // Constructor for unit tests:
-    DirectoryEntry(const boost::filesystem::path& root,
-                   const boost::filesystem::path& file,
+    DirectoryEntry(const std::filesystem::path& root,
+                   const std::filesystem::path& file,
                    uint16_t permissions,
                    const std::string& owner,
                    uint16_t owner_id,

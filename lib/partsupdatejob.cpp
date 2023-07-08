@@ -5,8 +5,8 @@ using namespace parts;
 //==========================================================================================================================================
 PartsUpdateJob::PartsUpdateJob(HashType hash_type,
                                TableOfContents& new_toc,
-                               const boost::filesystem::path& orig_source,
-                               const boost::filesystem::path& dest,
+                               const std::filesystem::path& orig_source,
+                               const std::filesystem::path& dest,
                                ContentReadBackend& content_reader,
                                bool cont) noexcept :
     m_oldToc(orig_source, PartsCompressionParameters(hash_type)),
@@ -34,7 +34,7 @@ void PartsUpdateJob::doNext()
         throw PartsException ("Job error, already finished.");
     }
 
-    boost::filesystem::path p;
+    std::filesystem::path p;
     std::string path_string = m_actualElement->first.string();
     p = path_string.replace(path_string.find(m_rootname), m_rootname.size(), m_oldRootName);
 

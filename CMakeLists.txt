@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.3)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE YES)
 
 include("cmake/HunterGate.cmake")
@@ -17,8 +17,6 @@ project(Parts VERSION 1.0.0)
 
 set(targets_export_name "${PROJECT_NAME}Targets")
 
-hunter_add_package(Boost COMPONENTS system filesystem)
-find_package(Boost CONFIG REQUIRED system filesystem)
 hunter_add_package(lzma)
 find_package(lzma)
 hunter_add_package(ZLIB)

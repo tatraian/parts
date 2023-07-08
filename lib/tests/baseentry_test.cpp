@@ -10,7 +10,7 @@ namespace
 // Just to creation
 class TestBaseEntry : public BaseEntry {
 public:
-    TestBaseEntry(const boost::filesystem::path& file,
+    TestBaseEntry(const std::filesystem::path& file,
                   uint16_t permissions,
                   const std::string& owner,
                   uint16_t owner_id,
@@ -22,10 +22,10 @@ public:
         BaseEntry(buffer, owners, groups) {}
 
     void compressEntry(ContentWriteBackend& backend) override {}
-    void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont) override {}
+    void extractEntry(const std::filesystem::path& dest_root, ContentReadBackend& backend, bool cont) override {}
     void updateEntry(const BaseEntry* old_entry,
-                     const boost::filesystem::path& old_root,
-                     const boost::filesystem::path& dest_root,
+                     const std::filesystem::path& old_root,
+                     const std::filesystem::path& dest_root,
                      ContentReadBackend& backend,
                      bool cont) override {}
 

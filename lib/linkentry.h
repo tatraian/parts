@@ -9,8 +9,8 @@ namespace parts
 class LinkEntry : public BaseEntry
 {
 public:
-    LinkEntry(const boost::filesystem::path& root,
-              const boost::filesystem::path& file,
+    LinkEntry(const std::filesystem::path& root,
+              const std::filesystem::path& file,
               std::vector<std::string>& owners,
               std::vector<std::string>& groups,
               bool save_owner) noexcept;
@@ -31,11 +31,11 @@ public:
 
     void compressEntry(ContentWriteBackend& backend) override;
 
-    void extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont) override;
+    void extractEntry(const std::filesystem::path& dest_root, ContentReadBackend& backend, bool cont) override;
 
     void updateEntry(const BaseEntry* old_entry,
-                     const boost::filesystem::path& old_root,
-                     const boost::filesystem::path& dest_root,
+                     const std::filesystem::path& old_root,
+                     const std::filesystem::path& dest_root,
                      ContentReadBackend& backend,
                      bool cont) override;
 
@@ -43,28 +43,28 @@ public:
 
     std::string toString() const override;
 
-    const boost::filesystem::path& destination() const
+    const std::filesystem::path& destination() const
     { return m_destination; }
 
 protected:
     // Constructor for only unit tests
-    LinkEntry(const boost::filesystem::path& root,
-              const boost::filesystem::path& file,
+    LinkEntry(const std::filesystem::path& root,
+              const std::filesystem::path& file,
               uint16_t permissions,
               const std::string& owner,
               uint16_t owner_id,
               const std::string& group,
               uint16_t group_id,
-              const boost::filesystem::path& destination,
+              const std::filesystem::path& destination,
               bool absolute) :
         BaseEntry(root, file, permissions, owner, owner_id, group, group_id),
         m_destination(destination)
     {}
 
-    static bool fileInsideRoot(const boost::filesystem::path& root, const boost::filesystem::path& file);
+    static bool fileInsideRoot(const std::filesystem::path& root, const std::filesystem::path& file);
 
 protected:
-    boost::filesystem::path m_destination;
+    std::filesystem::path m_destination;
 };
 
 }

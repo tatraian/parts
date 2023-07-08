@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "contentreadbackend.h"
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 
 
 namespace parts
@@ -24,7 +24,7 @@ public:
 
     virtual InputBuffer extractBuffer(const std::vector<uint8_t>& buffer) = 0;
 
-    virtual void extractFile(const boost::filesystem::path& file,
+    virtual void extractFile(const std::filesystem::path& file,
                              ContentReadBackend& backend,
                              size_t position,
                              size_t compressed_size) = 0;

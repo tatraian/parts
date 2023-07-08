@@ -3,12 +3,12 @@
 #include "logger_internal.h"
 
 #include <boost/endian/conversion.hpp>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 using namespace parts;
 
 //==========================================================================================================================================
-FileReadBackend::FileReadBackend(const boost::filesystem::path& filename) :
+FileReadBackend::FileReadBackend(const std::filesystem::path& filename) :
     m_path(filename),
     m_file(filename.string(), std::ios::binary)
 {
@@ -18,7 +18,7 @@ FileReadBackend::FileReadBackend(const boost::filesystem::path& filename) :
     }
 
     // This is removed from initializer list to avoid boost exception in case of non existing files.
-    m_filesize = boost::filesystem::file_size(m_path);
+    m_filesize = std::filesystem::file_size(m_path);
     m_valid = true;
 }
 

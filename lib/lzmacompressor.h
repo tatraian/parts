@@ -13,7 +13,7 @@ public:
     LzmaCompressor(const LzmaCompressorParameters& parameters);
     ~LzmaCompressor() override;
 
-    size_t compressFile(const boost::filesystem::path& path, ContentWriteBackend& backend) override;
+    size_t compressFile(const std::filesystem::path& path, ContentWriteBackend& backend) override;
 
     size_t compressBuffer(const std::vector<uint8_t>& buffer, std::vector<uint8_t>& backend) override;
 

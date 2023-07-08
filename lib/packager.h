@@ -8,7 +8,7 @@
 
 #include "inputbuffer.h"
 
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 
 namespace parts
 {
@@ -21,7 +21,7 @@ public:
     static void pop_front(InputBuffer& input, uint32_t& value);
     static void pop_front(InputBuffer& input, uint64_t& value);
     static void pop_front(InputBuffer& input, std::vector<uint8_t>& value);
-    static void pop_front(InputBuffer& input, boost::filesystem::path& value);
+    static void pop_front(InputBuffer& input, std::filesystem::path& value);
     template<class SizeType>
     static void pop_front(InputBuffer& input, std::string& value){
         SizeType size;
@@ -38,7 +38,7 @@ public:
     static void append(std::vector<uint8_t>& output, uint32_t value);
     static void append(std::vector<uint8_t>& output, uint64_t value);
     static void append(std::vector<uint8_t>& output, const std::vector<uint8_t>& value);
-    static void append(std::vector<uint8_t>& output, const boost::filesystem::path& value);
+    static void append(std::vector<uint8_t>& output, const std::filesystem::path& value);
     template<class SizeType>
     static void append(std::vector<uint8_t>& output, const std::string& value){
         SizeType size = static_cast<SizeType>(value.size());

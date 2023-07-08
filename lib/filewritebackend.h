@@ -5,7 +5,7 @@
 
 #include <fstream>
 
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 
 namespace parts
 {
@@ -13,7 +13,7 @@ namespace parts
 class FileWriteBackend : public ContentWriteBackend
 {
 public:
-    FileWriteBackend(const boost::filesystem::path& file);
+    FileWriteBackend(const std::filesystem::path& file);
     ~FileWriteBackend() override;
 
     void append(uint8_t value) override;
@@ -32,7 +32,7 @@ protected:
     void checkFile() const;
 
 protected:
-    boost::filesystem::path m_filename;
+    std::filesystem::path m_filename;
     std::fstream m_file;
 };
 

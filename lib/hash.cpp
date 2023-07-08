@@ -4,7 +4,7 @@
 
 #include <fstream>
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <boost/algorithm/hex.hpp>
 
 #include <digestpp/algorithm/md5.hpp>
@@ -19,17 +19,17 @@ Hash::Hash() :
 {}
 
 //==========================================================================================================================================
-Hash::Hash(HashType type, const boost::filesystem::path& path) :
+Hash::Hash(HashType type, const std::filesystem::path& path) :
     m_type(type),
     m_hash(hash_size(m_type), 0)
 {
-    if (!boost::filesystem::exists(path))
+    if (!std::filesystem::exists(path))
     {
         LOG_ERROR("File doesn't exist: {}", path.string());
         m_hash.clear();
     }
 
-    if (!boost::filesystem::is_regular_file(path)) {
+    if (!std::filesystem::is_regular_file(path)) {
         LOG_ERROR("File is not regular file: {}", path.string());
         m_hash.clear();
     }

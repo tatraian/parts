@@ -1,5 +1,5 @@
 #include <iostream>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <partsarchive.h>
 #ifdef BUILD_HTTP_FEATURES
 #include <httpreaderbackend.h>
@@ -57,11 +57,11 @@ int main(int argc, char** argv)
             input_stream.reset(new FileReadBackend(cut_slash(archive_param.Get())));
         }
 
-        boost::filesystem::path old_dir;
+        std::filesystem::path old_dir;
         if (updated_from)
-             old_dir= boost::filesystem::system_complete(cut_slash(cut_slash(updated_from.Get())));
+             old_dir= std::filesystem::canonical(cut_slash(cut_slash(updated_from.Get())));
 
-        boost::filesystem::path dest_dir = boost::filesystem::system_complete(cut_slash(dest_root_dir.Get()));
+        std::filesystem::path dest_dir = std::filesystem::canonical(cut_slash(dest_root_dir.Get()));
 
         PartsArchive archive(std::move(input_stream));
 

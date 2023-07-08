@@ -66,7 +66,7 @@ void Packager::pop_front(InputBuffer& input, std::vector<uint8_t>& value)
 }
 
 //==========================================================================================================================================
-void Packager::pop_front(InputBuffer& input, boost::filesystem::path& value)
+void Packager::pop_front(InputBuffer& input, std::filesystem::path& value)
 {
     std::string tmp;
     pop_front<uint16_t>(input, tmp);
@@ -104,7 +104,7 @@ void Packager::append(std::vector<uint8_t>& output, const std::vector<uint8_t>& 
 }
 
 //==========================================================================================================================================
-void Packager::append(std::vector<uint8_t> &output, const boost::filesystem::path& value)
+void Packager::append(std::vector<uint8_t> &output, const std::filesystem::path& value)
 {
     append<uint16_t>(output, value.string());
 }

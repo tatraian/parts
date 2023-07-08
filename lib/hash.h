@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 #include <boost/algorithm/hex.hpp>
 
 namespace parts
@@ -18,7 +18,7 @@ class Hash
 {
 public:
     Hash();
-    Hash(HashType type, const boost::filesystem::path& path);
+    Hash(HashType type, const std::filesystem::path& path);
     Hash(HashType type, const std::vector<uint8_t>& data);
     Hash(HashType type, InputBuffer& data);
     template<class It>

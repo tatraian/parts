@@ -9,7 +9,7 @@
 
 #include "plaincompressor.h"
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <fmt/format.h>
 #include <fmt/time.h>
 
@@ -17,8 +17,8 @@ using namespace parts;
 
 
 //==========================================================================================================================================
-RegularFileEntry::RegularFileEntry(const boost::filesystem::path& root,
-                                   const boost::filesystem::path& file,
+RegularFileEntry::RegularFileEntry(const std::filesystem::path& root,
+                                   const std::filesystem::path& file,
                                    std::vector<std::string>& owners,
                                    std::vector<std::string>& groups,
                                    bool save_owner,
@@ -35,7 +35,7 @@ RegularFileEntry::RegularFileEntry(const boost::filesystem::path& root,
 
     try {
         m_uncompressedHash = Hash(m_compressionParameters.m_hashType, root/file);
-        m_uncompressedSize = boost::filesystem::file_size(root/file);
+        m_uncompressedSize = std::filesystem::file_size(root/file);
     } catch(const std::exception&) {
         LOG_ERROR("Cannot get file size: {}", (root/file).string());
         m_valid = false;
@@ -91,7 +91,7 @@ void RegularFileEntry::compressEntry(ContentWriteBackend& backend)
 }
 
 //==========================================================================================================================================
-void RegularFileEntry::extractEntry(const boost::filesystem::path& dest_root, ContentReadBackend& backend, bool cont)
+void RegularFileEntry::extractEntry(const std::filesystem::path& dest_root, ContentReadBackend& backend, bool cont)
 {
     LOG_TRACE("Extract file: {}", m_file.string());
     if (cont && checkExisting(dest_root)) {
@@ -107,8 +107,8 @@ void RegularFileEntry::extractEntry(const boost::filesystem::path& dest_root, Co
 
 //==========================================================================================================================================
 void RegularFileEntry::updateEntry(const BaseEntry* old_entry,
-                                   const boost::filesystem::path& old_root,
-                                   const boost::filesystem::path& dest_root,
+                                   const std::filesystem::path& old_root,
+                                   const std::filesystem::path& dest_root,
                                    ContentReadBackend& backend,
                                    bool cont)
 {
@@ -125,7 +125,7 @@ void RegularFileEntry::updateEntry(const BaseEntry* old_entry,
         return;
     }
 
-    boost::filesystem::copy_file(old_root / old_entry->file(), dest_root / m_file);
+    std::filesystem::copy_file(old_root / old_entry->file(), dest_root / m_file);
     setMetadata(dest_root);
 
 }
@@ -165,7 +165,7 @@ std::unique_ptr<Compressor> RegularFileEntry::createCompressor()
 }
 
 //==========================================================================================================================================
-bool RegularFileEntry::checkHashMatch(const boost::filesystem::path& path)
+bool RegularFileEntry::checkHashMatch(const std::filesystem::path& path)
 {
     Hash existing_hash(m_uncompressedHash.type(), path);
     LOG_DEBUG("Hashes: {}\n        {}", existing_hash.hashString(), m_uncompressedHash.hashString());
@@ -173,22 +173,22 @@ bool RegularFileEntry::checkHashMatch(const boost::filesystem::path& path)
 }
 
 //==========================================================================================================================================
-bool RegularFileEntry::checkExisting(const boost::filesystem::path& dest_root)
+bool RegularFileEntry::checkExisting(const std::filesystem::path& dest_root)
 {
-    if (boost::filesystem::is_regular_file(dest_root / m_file)) {
+    if (std::filesystem::is_regular_file(dest_root / m_file)) {
         if (checkHashMatch(dest_root / m_file)) {
             LOG_TRACE("File already exsists: {}", m_file.string());
             return true;
         }
         LOG_TRACE("Erasing half extracted entry: {}", m_file.string());
-        boost::filesystem::remove(dest_root / m_file);
+        std::filesystem::remove(dest_root / m_file);
     }
 
     return false;
 }
 
 //==========================================================================================================================================
-bool RegularFileEntry::extractToMc(const boost::filesystem::path& dest_file, ContentReadBackend& backend)
+bool RegularFileEntry::extractToMc(const std::filesystem::path& dest_file, ContentReadBackend& backend)
 {
     auto decompressor = DecompressorFactory::createDecompressor(m_compressionType);
     decompressor->extractFile(dest_file, backend, m_offset, m_compressedSize);

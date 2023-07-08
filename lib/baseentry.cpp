@@ -3,20 +3,22 @@
 #include "packager.h"
 
 #include <sstream>
+#include <algorithm>
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <pwd.h>
 #include <grp.h>
+#include <unistd.h>
 
 #include "logger_internal.h"
 
 using namespace parts;
 
 //==========================================================================================================================================
-BaseEntry::BaseEntry(const boost::filesystem::path& root,
-                     const boost::filesystem::path& file,
+BaseEntry::BaseEntry(const std::filesystem::path& root,
+                     const std::filesystem::path& file,
                      std::vector<std::string>& owners,
                      std::vector<std::string>& groups,
                      bool save_owner) noexcept :
@@ -24,7 +26,7 @@ BaseEntry::BaseEntry(const boost::filesystem::path& root,
     m_root(root),
     m_file(file)
 {
-    if (!boost::filesystem::exists(root/file)) {
+    if (!std::filesystem::exists(root/file)) {
         LOG_ERROR("Path does not exists: {}", (root/file).string());
         return;
     }
@@ -89,7 +91,7 @@ std::string BaseEntry::toString() const
 }
 
 //==========================================================================================================================================
-void BaseEntry::setMetadata(const boost::filesystem::path& dest_root)
+void BaseEntry::setMetadata(const std::filesystem::path& dest_root)
 {
     if (m_ownerId != 0) {
         struct passwd* pw = getpwnam(m_owner.c_str());
