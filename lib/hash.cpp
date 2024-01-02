@@ -5,7 +5,6 @@
 #include <fstream>
 
 #include <filesystem>
-#include <boost/algorithm/hex.hpp>
 
 #include <digestpp/algorithm/md5.hpp>
 #include <digestpp/algorithm/sha2.hpp>

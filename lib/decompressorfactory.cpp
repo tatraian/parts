@@ -1,4 +1,3 @@
-#include <boost/lexical_cast.hpp>
 #include "decompressorfactory.h"
 #include "lzmadecompressor.h"
 #include "plaindecompressor.h"
@@ -18,6 +17,6 @@ std::unique_ptr<Decompressor> DecompressorFactory::createDecompressor(Compressio
     case CompressionType::ZLIB:
         return std::unique_ptr<Decompressor>(new ZLibDecompressor());
     default:
-      throw PartsException("Invalid decompressor :"+boost::lexical_cast<std::string>((uint32_t)type));
+        throw PartsException(std::string("Invalid decompressor ") + to_string(type));
     }
 }

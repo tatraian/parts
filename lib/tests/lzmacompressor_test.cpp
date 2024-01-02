@@ -1,5 +1,5 @@
-#include <boost/test/auto_unit_test.hpp>
-#include <fakeit/boost/fakeit.hpp>
+#include <gmock/gmock.h>
+#include <fakeit.hpp>
 
 #include <fstream>
 #include <lzma.h>
@@ -30,8 +30,8 @@ void check_data(const std::vector<uint8_t>& input,
     result = lzma_code(&lzma_context, LZMA_FINISH);
 
 
-    BOOST_REQUIRE_EQUAL(result, LZMA_STREAM_END);
-    BOOST_REQUIRE_EQUAL_COLLECTIONS(input.begin(), input.end(), uncompressed.begin(), uncompressed.end());
+    ASSERT_EQ(result, LZMA_STREAM_END);
+    ASSERT_THAT(input, uncompressed);
 
     lzma_end(&lzma_context);
 }
@@ -39,7 +39,7 @@ void check_data(const std::vector<uint8_t>& input,
 }
 
 //==========================================================================================================================================
-BOOST_AUTO_TEST_CASE(lzma_can_compress_buffer) {
+TEST(lzma_compressor, lzma_can_compress_buffer) {
     std::vector<uint8_t> input;
     for(size_t tmp = 0; tmp != MB; ++tmp)
         input.push_back(tmp);
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(lzma_can_compress_buffer) {
 
 
 //==========================================================================================================================================
-BOOST_AUTO_TEST_CASE(lzma_can_compress_file) {
+TEST(lzma_compressor, lzma_can_compress_file) {
     std::filesystem::path path("/tmp/parts_unit_test_never_write_file");
 
     std::vector<uint8_t> input(MB, 0);

@@ -9,7 +9,6 @@
 #include <vector>
 
 #include <filesystem>
-#include <boost/algorithm/hex.hpp>
 
 namespace parts
 {
@@ -21,14 +20,6 @@ public:
     Hash(HashType type, const std::filesystem::path& path);
     Hash(HashType type, const std::vector<uint8_t>& data);
     Hash(HashType type, InputBuffer& data);
-    template<class It>
-    Hash(HashType type, It begin, It end)  : m_type(type) {
-        boost::algorithm::unhex(begin, end, std::back_inserter(m_hash));
-
-        if (m_hash.size() != hash_size(m_type))
-            throw PartsException("The given hash lenght is not correct! (wished: " + std::to_string(hash_size(m_type)) +
-                                 ", expected: " + std::to_string(m_hash.size()) + ")");
-    }
 
     HashType type() const
     { return m_type; }

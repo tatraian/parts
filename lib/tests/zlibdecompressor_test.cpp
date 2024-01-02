@@ -1,5 +1,6 @@
-#include <boost/test/auto_unit_test.hpp>
-#include <fakeit/boost/fakeit.hpp>
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+#include <fakeit.hpp>
 
 #include <fstream>
 #include <zlib.h>
@@ -9,6 +10,7 @@
 #include "../internal_definitions.h"
 
 using namespace parts;
+using namespace testing;
 using namespace fakeit;
 
 namespace
@@ -48,17 +50,17 @@ std::vector<uint8_t> create_data(const std::vector<uint8_t>& input)
 }
 
 //==========================================================================================================================================
-BOOST_AUTO_TEST_CASE(can_decompress_zlib_buffer_smaller_than_mb) {
+TEST(zlib_decompressor_tests, can_decompress_zlib_buffer_smaller_than_mb) {
 
     std::vector<uint8_t> input = {1,2,3,4,5,6,7,8,9,0};
 
     ZLibDecompressor decomp;
     InputBuffer result = decomp.extractBuffer(create_data(input));
-    BOOST_CHECK_EQUAL_COLLECTIONS(input.begin(), input.end(), result.begin(), result.end());
+    ASSERT_THAT(input, testing::ElementsAreArray(result.begin(), result.end()));
 }
 
 //==========================================================================================================================================
-BOOST_AUTO_TEST_CASE(can_decompress_zlib_buffer_greater_than_mb) {
+TEST(zlib_decompressor_tests, can_decompress_zlib_buffer_greater_than_mb) {
 
     std::vector<uint8_t> input(MB + 100);
     for (size_t tmp = 0; tmp != input.size(); ++tmp) {
@@ -67,7 +69,7 @@ BOOST_AUTO_TEST_CASE(can_decompress_zlib_buffer_greater_than_mb) {
 
     ZLibDecompressor decomp;
     InputBuffer result = decomp.extractBuffer(create_data(input));
-    BOOST_CHECK_EQUAL_COLLECTIONS(input.begin(), input.end(), result.begin(), result.end());
+    ASSERT_THAT(input, testing::ElementsAreArray(result.begin(), result.end()));
 }
 
 // TODO after filereadbackend implementation file extraction test here.

@@ -5,7 +5,7 @@
 #include <ios>
 #include <iostream>
 
-#include <boost/endian/conversion.hpp>
+#include "endian_conversions.h"
 #include <filesystem>
 
 using namespace parts;
@@ -21,7 +21,7 @@ void append(File& file, Value value) {
         throw PartsException("Internal Error: file has been closed!");
 
 
-    boost::endian::native_to_big_inplace(value);
+    native_to_big_inplace(value);
     file.write(reinterpret_cast<char*>(&value), sizeof(value));
 }
 

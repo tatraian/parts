@@ -1,6 +1,6 @@
 #include "packager.h"
 
-#include <boost/endian/conversion.hpp>
+#include "endian_conversions.h"
 
 using namespace parts;
 
@@ -11,7 +11,7 @@ namespace
 template<class Value>
 void append_internal(std::vector<uint8_t>& output, Value value)
 {
-    boost::endian::native_to_big_inplace(value);
+    native_to_big_inplace(value);
     output.insert(output.end(), reinterpret_cast<uint8_t*>(&value), reinterpret_cast<uint8_t*>(&value) + sizeof(value));
 }
 
@@ -22,7 +22,7 @@ void pop_front_internal(InputBuffer& input, Value& value)
     if (input.size() < sizeof(value))
         throw PartsException("No enough data to read value");
     value = reinterpret_cast<Value&>(input.front());
-    boost::endian::big_to_native_inplace(value);
+    big_to_native_inplace(value);
     input.erase(input.begin(), input.begin() + sizeof(Value));
 }
 

@@ -23,6 +23,7 @@ set(parts_SRCS
     packager.h
     packager.cpp
     simpleguard.h
+    endian_conversions.h
 
     # write backends
     contentwritebackend.h
@@ -84,7 +85,7 @@ set(parts_SRCS
 
 add_library(parts ${parts_SRCS})
 target_link_libraries(parts PUBLIC fmt::fmt)
-target_link_libraries(parts PRIVATE lzma::lzma ZLIB::zlib ${HTTP_LINK})
+target_link_libraries(parts PRIVATE LibLZMA::LibLZMA ZLIB::ZLIB ${HTTP_LINK})
 
 install(TARGETS parts
     EXPORT ${targets_export_name}
@@ -117,8 +118,7 @@ if(BUILD_TESTS)
         tests/regularfileentry_test.cpp
         tests/tableofcontents_test.cpp
         tests/zlibcompressor_test.cpp
-        tests/zlibcompressor_test.cpp
         tests/zlibdecompressor_test.cpp)
-    target_link_libraries(parts_lib_tests parts FakeIt::FakeIt Boost::test_exec_monitor c++)
+    target_link_libraries(parts_lib_tests parts fakeit::fakeit GTest::Main)
     add_test(parts_lib_tester parts_lib_tests)
 endif()

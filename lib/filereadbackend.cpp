@@ -2,7 +2,6 @@
 #include "parts_definitions.h"
 #include "logger_internal.h"
 
-#include <boost/endian/conversion.hpp>
 #include <filesystem>
 
 using namespace parts;

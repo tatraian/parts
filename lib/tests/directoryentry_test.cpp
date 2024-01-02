@@ -1,5 +1,5 @@
-#include <boost/test/auto_unit_test.hpp>
-#include <fakeit/boost/fakeit.hpp>
+#include <gmock/gmock.h>
+#include <fakeit.hpp>
 
 #include "../directoryentry.h"
 #include "../internal_definitions.h"
@@ -28,36 +28,36 @@ public:
 }
 
 //==========================================================================================================================================
-BOOST_AUTO_TEST_CASE(can_pack_directory_data) {
+TEST(directory_entry, can_pack_directory_data) {
     TestDirectoryEntry entry("file1", 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1);
 
     std::vector<uint8_t> result(100);
     result.clear();
     entry.append(result);
 
-    BOOST_CHECK_EQUAL(result.size(), 14u);
+    ASSERT_EQ(result.size(), 14u);
     // First the type id
-    BOOST_CHECK_EQUAL(result[0], static_cast<uint8_t>(EntryTypes::Directory));
+    ASSERT_EQ(result[0], static_cast<uint8_t>(EntryTypes::Directory));
     // base entry check
-    BOOST_REQUIRE_EQUAL(result[1], 0u);
-    BOOST_REQUIRE_EQUAL(result[2], 5u);
+    ASSERT_EQ(result[1], 0u);
+    ASSERT_EQ(result[2], 5u);
 
-    BOOST_REQUIRE_EQUAL(result[3], 'f');
-    BOOST_REQUIRE_EQUAL(result[7], '1');
+    ASSERT_EQ(result[3], 'f');
+    ASSERT_EQ(result[7], '1');
 
-    BOOST_REQUIRE_EQUAL(result[8], 1u);
-    BOOST_REQUIRE_EQUAL(result[9], 0244);
+    ASSERT_EQ(result[8], 1u);
+    ASSERT_EQ(result[9], 0244);
 
-    BOOST_REQUIRE_EQUAL(result[10], 0u);
-    BOOST_REQUIRE_EQUAL(result[11], 2u);
+    ASSERT_EQ(result[10], 0u);
+    ASSERT_EQ(result[11], 2u);
 
-    BOOST_REQUIRE_EQUAL(result[12], 0u);
-    BOOST_REQUIRE_EQUAL(result[13], 1u);
+    ASSERT_EQ(result[12], 0u);
+    ASSERT_EQ(result[13], 1u);
 }
 
 
 //==========================================================================================================================================
-BOOST_AUTO_TEST_CASE(directory_compress_doesn_t_modify_the_output) {
+TEST(directory_entry, directory_compress_doesn_t_modify_the_output) {
     Mock<ContentWriteBackend> writer_mock;
     // Since mock are not initialized a calling of its function will produce error
     TestDirectoryEntry entry("file1", 0644, "PARTS_DEFAULT", 2, "PARTS_DEFAULT", 1);
